@@ -1,0 +1,3934 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carrete — carruseles para Instagram</title>
+<meta name="theme-color" content="#0a0a0a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --line: #262626;
+    --line-2: #404040;
+    --txt: #f5f5f5;
+    --dim: #8a8a8a;
+    --dimmer: #5c5c5c;
+    --warn: #fbbf24;
+    --drop: #4ade80;
+    --sel: #6ea8fe;
+    --err: #f87171;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* Sin esto, un trazo de longitud cero (los tres puntos del menú, el punto del
+     triángulo de aviso) no dibuja nada. */
+  svg { stroke-linecap: round; stroke-linejoin: round; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--txt); }
+  body {
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding-bottom: 0;
+    overscroll-behavior-y: contain;
+  }
+  .mono { font-family: var(--mono); }
+
+  /* ---- cabecera ---- */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(10,10,10,.96); border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(8px);
+  }
+  .bar { display: flex; align-items: center; gap: 8px; padding: 11px 16px 8px; }
+  .projmeta {
+    margin: 9px 16px 0; font: 10px/1.4 var(--mono); color: var(--dimmer);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .home { background: none; border: 0; padding: 0; cursor: pointer; }
+  h1 {
+    font: 400 13px/1 var(--mono); letter-spacing: .22em;
+    text-transform: uppercase; margin: 0; color: var(--txt);
+  }
+  .grow { flex: 1; }
+  .segs { display: flex; border: 1px solid var(--line); }
+  .segs button {
+    background: none; border: 0; color: var(--dim);
+    font: 11px/1 var(--mono); padding: 6px 7px; cursor: pointer; white-space: nowrap;
+  }
+  .segs button.on { background: var(--txt); color: #111; }
+  .segs button.off { color: var(--dimmer); }
+  .segs button.ratio {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 7px 9px;
+  }
+  .segs button.ratio svg { display: block; }
+  .segs button.ratio span { font-size: 9.5px; letter-spacing: .02em; }
+  .toolrow { display: flex; align-items: center; gap: 6px; padding: 0 16px 10px; }
+  .primary {
+    flex: none; background: var(--txt); color: #111; border: 0;
+    font: 11px/1 var(--mono); padding: 8px 11px; cursor: pointer;
+  }
+  .primary:disabled { opacity: .4; }
+  .ver {
+    font: 8.5px/1 var(--mono); color: var(--dimmer); letter-spacing: .04em;
+    background: none; border: 1px solid var(--line); padding: 3px 5px; cursor: pointer;
+  }
+  .ver:hover { color: var(--dim); }
+  .ver.on { color: #111; background: var(--txt); border-color: var(--txt); }
+  .icobtn {
+    background: none; border: 1px solid var(--line); color: var(--dim);
+    padding: 6px 7px; cursor: pointer; display: grid; place-items: center;
+  }
+  .icobtn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .icobtn:disabled { opacity: .28; cursor: default; }
+  /* Usadas por la cabecera de la vista de Proyectos. */
+  .capbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .capbar .caption { margin: 0; }
+  .fill {
+    position: relative; background: none; border: 1px solid var(--line);
+    color: var(--dim); font: 10px/1 var(--mono); padding: 7px 9px; cursor: pointer;
+  }
+  .prow { padding: 12px 0; border-top: 1px solid var(--line); }
+  .prow:first-child { border-top: 0; }
+  .prow .top { display: flex; align-items: center; gap: 8px; }
+  .prow input.name {
+    flex: 1; min-width: 0; background: none; border: 0; color: var(--txt);
+    font: 400 13px/1.3 system-ui, sans-serif; padding: 2px 0; outline: none;
+    border-bottom: 1px solid transparent;
+  }
+  .prow input.name:focus { border-bottom-color: var(--line-2); }
+  .prow .sub { font: 10px/1.6 var(--mono); color: var(--dimmer); margin: 4px 0 0; }
+  .prow .acts { display: flex; gap: 6px; margin-top: 8px; }
+  .prow .acts button {
+    background: none; border: 1px solid var(--line); color: var(--dim);
+    font: 10px/1 var(--mono); padding: 6px 8px; cursor: pointer;
+  }
+  .prow .acts button.open { border-color: var(--line-2); color: var(--txt); }
+  .prow .tag { font: 9px/1 var(--mono); background: var(--txt); color: #111; padding: 3px 5px; }
+  .danger {
+    background: none; border: 1px solid var(--line-2); color: var(--dim);
+    font: 10px/1 var(--mono); padding: 8px 10px; cursor: pointer; margin-top: 4px;
+  }
+  /* Superpuesto arriba y a todo el ancho: los avisos no deben robar altura de
+     forma permanente, y el color lo hereda del icono que los abre. */
+  #toast {
+    position: fixed; top: 12px; left: 16px; right: 16px; z-index: 60;
+    background: var(--panel); border: 1px solid var(--line-2);
+    box-shadow: 0 6px 24px rgba(0,0,0,.55);
+    overflow: hidden;
+  }
+  #toast .tmsg {
+    display: block; padding: 11px 13px 12px;
+    font: 11px/1.5 var(--mono); color: var(--txt);
+  }
+  #toast .tbar {
+    display: block; height: 2px; width: 100%; transform-origin: left center;
+    background: var(--dim);
+  }
+  #toast.run .tbar { animation: tdrain linear forwards; }
+  @keyframes tdrain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    #toast.run .tbar { animation: none; }
+    #stage, .peek, .stagerow { transition: none; }
+    .pagesrail.anim, .stagerow.anim { animation: none; }
+  }
+  .log { max-width: 460px; margin: 0 auto; }
+  .log .lead { font: 10px/1.6 var(--mono); color: var(--dimmer); margin: 0 0 4px; }
+  .rel { padding: 16px 0; border-top: 1px solid var(--line); }
+  .rel h2 {
+    display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px;
+    font: 400 12px/1 var(--mono); letter-spacing: .1em; color: var(--txt);
+  }
+  .rel .when { font-size: 9px; color: var(--dimmer); letter-spacing: 0; }
+  .rel .tag { font: 9px/1 var(--mono); background: var(--txt); color: #111; padding: 3px 5px; }
+  .rel ul { margin: 0; padding-left: 15px; }
+  .rel li { font-size: 12px; line-height: 1.6; color: var(--dim); }
+  .rel li::marker { color: var(--line-2); }
+
+  /* ---- avisos ---- */
+  .notice {
+    display: flex; gap: 10px; align-items: flex-start;
+    margin: 12px 16px 0; padding: 10px 12px; font-size: 12px; line-height: 1.45;
+  }
+  .notice.warn { border: 1px solid rgba(251,191,36,.4); background: rgba(251,191,36,.1); color: #fde68a; }
+  .notice.err  { border: 1px solid rgba(248,113,113,.4); background: rgba(248,113,113,.1); color: #fecaca; }
+  .notice button {
+    flex: none; border: 0; cursor: pointer;
+    font: 11px/1 var(--mono); padding: 5px 9px;
+  }
+  .notice.warn button { background: var(--warn); color: #111; }
+  .notice.err button { background: none; color: var(--err); font-size: 14px; }
+
+  /* ---- lienzo ---- */
+  .stagewrap { padding: 14px 16px 0; }
+  /* Altura que consumen cabecera, meta, selector de layout, gap y tira. El
+     lienzo se limita a lo que queda, asi que en un movil normal no hay scroll:
+     en pantallas cortas se encoge en vez de empujar las herramientas fuera. */
+  :root { --reserved: 272px; }   /* informativo: el calculo real esta en RESERVED */
+  /* El area de trabajo tiene SIEMPRE la misma altura, independientemente del
+     nivel: asi nada salta al cambiar de distancia. En Post las paginas son mas
+     pequeñas y sobra aire; no pasa nada. */
+  .stagearea { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  /* Cambiar entre Post y Página es alejarse o acercarse: al alejarse el
+     contenido entra desde grande y se asienta; al acercarse, desde pequeño. */
+  @keyframes pullback { from { transform: scale(1.32); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes divein   { from { transform: scale(.74);  opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .pagesrail.anim { animation: pullback .3s cubic-bezier(.22,.61,.36,1); }
+  .stagerow.anim  { animation: divein .3s cubic-bezier(.22,.61,.36,1); }
+  .stagearea > * { max-height: 100%; }
+
+  /* Vista alejada del nivel Post: carrusel horizontal de paginas. */
+  .pagesrail {
+    display: flex; align-items: center; justify-content: safe center; gap: 10px;
+    width: 100%; height: 100%; overflow-x: auto; padding: 0 2px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .pagesrail::-webkit-scrollbar { display: none; }
+  .ptile { position: relative; flex: none; cursor: pointer; touch-action: none; }
+  .ptile canvas { display: block; outline: 1px solid var(--line); }
+  .ptile.on canvas { outline: 1px solid var(--line); }
+  .ptile.drop canvas { outline: 2px dashed var(--drop); }
+  .ptile.lift { opacity: .4; }
+  /* Acciones de la pagina seleccionada, colgadas encima de su miniatura. */
+  .ptile .tacts {
+    position: absolute; bottom: calc(100% + 6px); right: 0;
+    display: flex; gap: 5px; z-index: 7;
+  }
+  .ptile .tacts button {
+    width: 27px; height: 27px; display: grid; place-items: center; padding: 0;
+    background: rgba(20,20,20,.92); color: var(--dim);
+    border: 1px solid var(--line-2); cursor: pointer;
+  }
+  .ptile .tacts button.danger-item { color: #fb7185; }
+  .ptile .tacts button:disabled, .ptile .tacts button.off { opacity: .35; }
+  .ptile .tacts svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  .ptile .pn {
+    position: absolute; bottom: 2px; left: 2px; padding: 1px 3px;
+    font: 8px/1 var(--mono); color: #fff; background: rgba(10,10,10,.72);
+  }
+  .padd {
+    flex: none; display: grid; place-items: center;
+    border: 1px dashed var(--line-2); background: none; color: var(--dim);
+    cursor: pointer;
+  }
+  .padd.off { opacity: .3; cursor: default; }
+  .stagerow {
+    display: flex; align-items: center; justify-content: center;
+    gap: 3px; width: 100%;
+    transition: transform .24s cubic-bezier(.22,.61,.36,1);
+  }
+  .stagerow.dragging { transition: none; }
+  /* El cambio de nivel es un cambio de distancia: se anima para que se lea como
+     un acercamiento y no como un salto. */
+  #stage {
+    position: relative; flex: none; background: #fff; touch-action: manipulation;
+    transition: width .28s cubic-bezier(.22,.61,.36,1), height .28s cubic-bezier(.22,.61,.36,1);
+  }
+  /* Asomo de la pagina vecina: da continuidad al montar carruseles seguidos.
+     El ancho se reserva siempre, tambien en la primera y la ultima, para que el
+     lienzo no salte al cambiar de pagina. */
+  .peek {
+    flex: none; position: relative; overflow: hidden;
+    opacity: .45; cursor: pointer; background: rgba(255,255,255,.03);
+    transition: width .28s cubic-bezier(.22,.61,.36,1), opacity .2s ease;
+  }
+  /* Invisible pero ocupando: el hueco de los asomos se reserva siempre, tambien
+     en Foto y en los extremos del post. Si se quitara del flujo, el lienzo se
+     comeria esos 30px y la pagina cambiaria de tamaño al cambiar de nivel. */
+  .peek.empty { opacity: 0; cursor: default; background: none; }
+  .peek canvas { position: absolute; top: 0; height: 100%; width: auto; }
+  .cell { position: absolute; overflow: hidden; outline-offset: -1px; }
+  .cell.empty {
+    outline: 1px dashed rgba(255,255,255,.3);
+    background: rgba(0,0,0,.35);
+  }
+  .cell.filled { outline: 1px solid rgba(255,255,255,.18); touch-action: none; cursor: grab; }
+  /* La seleccion se marca con esquinas y no con un recuadro: un marco completo,
+     y encima blanco, se confunde con el gap entre fotos. */
+  .cell.sel { z-index: 3; }
+  .cell.sel::before, .cell.sel::after,
+  .ptile.on::before, .ptile.on::after {
+    content: ''; position: absolute; width: 15px; height: 15px;
+    border: 2px solid var(--sel); pointer-events: none; z-index: 6;
+  }
+  .cell.sel::before, .ptile.on::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+  .cell.sel::after,  .ptile.on::after  { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+  .cell img { position: absolute; pointer-events: none; user-select: none; display: block; }
+  .ph {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+    color: var(--dim); pointer-events: none;
+  }
+  .ph .sign { font: 300 20px/1 var(--mono); }
+  .ph .lbl { font: 9px/1 var(--mono); letter-spacing: .06em; }
+  /* input real, transparente, encima de la celda: el toque cae sobre el input */
+  .filepick {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; font-size: 0; cursor: pointer;
+  }
+  /* El asa vive en la esquina opuesta a las acciones, para no apretujarlas en
+     celdas estrechas, y arranca el gesto en un punto distinto al del encuadre:
+     asi no hay ambigüedad ni hace falta un modo aparte. */
+  .cell.movable { cursor: grab; }
+  .cell.lifting { opacity: .42; }
+  /* Destino del intercambio: esquinas discontinuas verdes en las OTRAS dos
+     esquinas, para no confundirse con las de seleccion, que son azules y
+     continuas. Van sobre una capa propia para poder coexistir con ellas. */
+  .cell.dropzone { z-index: 4; box-shadow: inset 0 0 0 100vmax rgba(74, 222, 128, .12); }
+  .cell .mark { position: absolute; inset: 0; pointer-events: none; z-index: 6; display: none; }
+  .cell.dropzone .mark { display: block; }
+  .cell.dropzone .mark::before, .cell.dropzone .mark::after {
+    content: ''; position: absolute; width: 15px; height: 15px;
+    border: 2px dashed var(--drop);
+  }
+  .cell.dropzone .mark::before { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+  .cell.dropzone .mark::after  { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+  /* Cuadricula de tercios sobre la celda seleccionada o sobre la pagina. */
+  .thirds { position: absolute; pointer-events: none; z-index: 5; }
+  .thirds i {
+    position: absolute; background: rgba(255,255,255,.5);
+    box-shadow: 0 0 1px rgba(0,0,0,.55);
+  }
+  .thirds i.v { top: 0; bottom: 0; width: 1px; }
+  .thirds i.h { left: 0; right: 0; height: 1px; }
+  .cropline {
+    position: absolute; top: 0; bottom: 0; pointer-events: none;
+    border-left: 1px dashed rgba(255,255,255,.5);
+    border-right: 1px dashed rgba(255,255,255,.5);
+  }
+  .croptag {
+    position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+    font: 9px/1 var(--mono); color: rgba(255,255,255,.65); pointer-events: none;
+  }
+
+  /* ---- panel ---- */
+  .hint { font: 10px/1.5 var(--mono); color: var(--dimmer); margin: 8px 0 0; }
+  .hint.warn { color: var(--warn); }
+  .notch {
+    flex: 1; min-width: 0; height: 34px; position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    touch-action: none; cursor: pointer; outline: none;
+  }
+  .notch:focus-visible { box-shadow: 0 0 0 1px var(--line-2); }
+  .notch .nd {
+    width: 4px; height: 4px; border-radius: 50%; background: #383838;
+    transition: transform .12s ease, background-color .12s ease;
+  }
+  .notch .nd.past { background: #6e6e6e; }
+  .notch .nd.on { background: var(--txt); transform: scale(2.1); }
+  @media (prefers-reduced-motion: reduce) { .notch .nd { transition: none; } }
+  .gapval { font: 10px/1 var(--mono); color: var(--dim); width: 34px; text-align: right; }
+  .lab { font: 10px/1 var(--mono); color: var(--dimmer); width: 30px; }
+  .ghost {
+    background: none; border: 0; color: var(--dim); cursor: pointer;
+    padding: 6px; display: grid; place-items: center;
+  }
+  .ghost svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
+  /* ---- layouts y tira ---- */
+  /* Mismo canal de 16px que el titular del layout y los swatches. Los botones
+     de los extremos se sacan su propio padding para que el glifo caiga sobre la
+     linea de la columna, no el borde de su caja. */
+  .pagebar {
+    display: flex; align-items: center; gap: 2px;
+    margin: 6px 16px 0;
+  }
+  .pagebar .ghost { width: 36px; height: 36px; padding: 0; }
+  .pagebar .ghost:first-child { margin-left: -9px; }
+  .pagebar .ghost:last-child { margin-right: -9px; }
+  .pagebar .pair { display: flex; align-items: center; gap: 2px; }
+  .pgnum {
+    font: 11px/1 var(--mono); color: var(--dim); letter-spacing: .06em;
+    min-width: 52px; text-align: center;
+  }
+  /* Sin separadores: la caja ya delimita el bloque y el espaciado basta para
+     distinguir las opciones. Menos lineas dentro de lineas. */
+  .menusheet { display: flex; flex-direction: column; gap: 1px; margin-top: 2px; }
+  .menusheet button {
+    text-align: left; background: none; border: 0;
+    color: var(--txt); font: 13px/1 system-ui, sans-serif;
+    padding: 13px 8px; margin: 0 -8px; cursor: pointer;
+  }
+  .menusheet button:active { background: rgba(255,255,255,.06); }
+  .menusheet button:disabled { color: var(--dimmer); cursor: default; background: none; }
+  .menusheet button.danger-item { color: #fb7185; }
+  .levels { padding-top: 12px; }
+  .levels > .segs { width: 100%; }
+  .levels > .segs button { flex: 1; padding: 8px 6px; }
+  /* Altura FIJA: la zona de herramientas mide igual en los tres niveles y hace
+     scroll por dentro si un nivel tiene mas controles. Asi el area de trabajo
+     nunca cambia de tamaño al saltar de nivel. */
+  .lvl {
+    padding-top: 12px; display: flex; flex-direction: column; gap: 13px;
+    height: 148px; overflow-y: auto;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .lvl::-webkit-scrollbar { display: none; }
+  .lvlhint { margin: 0; font: 10px/1.5 var(--mono); color: var(--dimmer); }
+  /* Cabecera de subnivel: volver + nombre de la herramienta. */
+  .toolback {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    background: none; border: 0; padding: 0 0 2px; cursor: pointer;
+    color: var(--txt); font: 11px/1 var(--mono); letter-spacing: .06em;
+  }
+  .toolback svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9; }
+  /* Fila deslizable con botones del mismo ancho: asi caben mas herramientas sin
+     que cambien de tamaño segun cuantas haya. */
+  .photoacts {
+    display: flex; gap: 8px; overflow-x: auto;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .photoacts::-webkit-scrollbar { display: none; }
+  /* Todas las herramientas son cajas cuadradas del mismo tamaño, en los tres
+     niveles: la fila se comporta igual en todas partes. */
+  .photoacts .pact {
+    position: relative; flex: 0 0 64px; width: 64px; height: 64px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 7px; padding: 0 3px;
+    background: none; border: 1px solid var(--line); color: var(--dim);
+    font: 9px/1 var(--mono); cursor: pointer;
+  }
+  .photoacts .pact > span { max-width: 100%; overflow: hidden; white-space: nowrap; }
+  .photoacts .pact .sw {
+    display: block; width: 17px; height: 17px; border: 1px solid rgba(255,255,255,.35);
+  }
+  /* Sin distintivos de texto: el dibujo ES el valor y la etiqueta el nombre de
+     la herramienta, para no llenar de texto una caja de 64px. */
+  .photoacts .pact.on { border-color: var(--txt); color: var(--txt); }
+  .photoacts .pact.off { opacity: .38; }
+  .photoacts .pact.danger-item { color: #fb7185; }
+  .photoacts .pact svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+  /* El glifo del gap es mas ancho que alto: lleva la cifra dentro. */
+  .photoacts .pact svg.wide { width: 42px; height: 20px; }
+  .cfghead {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: none; border: 0; padding: 10px 0; cursor: pointer; text-align: left;
+  }
+  .cfghead .caption { margin: 0; flex: none; }
+  .cfgsum {
+    flex: 1; min-width: 0; font: 10px/1 var(--mono); color: var(--dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cfghead .chev {
+    flex: none; width: 14px; height: 14px; fill: none; stroke: var(--dimmer);
+    stroke-width: 1.8; transition: transform .18s ease;
+  }
+  .cfghead[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .cfgbody { padding: 2px 0 12px; display: flex; flex-direction: column; gap: 15px; }
+  .cfgrow { display: flex; align-items: center; gap: 10px; }
+  .cfgrow .lab { width: 68px; flex: none; }
+  /* Las dos filas del giro comparten una reticula de cuatro columnas, asi que
+     los bloques de arriba y los de abajo quedan alineados. El valor ocupa las
+     dos columnas centrales. */
+  .rotgrid {
+    flex: 1; min-width: 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  }
+  .rotgrid button {
+    background: none; border: 1px solid var(--line); color: var(--dim);
+    font: 11px/1 var(--mono); padding: 10px 2px; cursor: pointer;
+    text-align: center; overflow: hidden;
+  }
+  .rotgrid button.on { background: var(--txt); border-color: var(--txt); color: #111; }
+  .rotgrid button:disabled { opacity: .35; cursor: default; }
+  .rotgrid .deg { grid-column: span 2; color: var(--txt); font-size: 12px; }
+  .rotgrid .deg.zero { border-color: var(--line-2); }
+  .rotgrid .deg:disabled { color: var(--dimmer); opacity: 1; }
+  .section { padding: 14px 16px 0; }
+  .caption {
+    font: 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--dimmer); margin: 0 0 8px;
+  }
+  .scroller {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .scroller::-webkit-scrollbar { display: none; }
+  .glyph {
+    flex: none; padding: 8px 10px; border: 1px solid var(--line);
+    background: none; cursor: pointer; line-height: 0;
+    min-width: 44px; min-height: 44px;
+    display: grid; place-items: center;
+  }
+  .glyph.on { border-color: var(--txt); background: var(--panel); }
+  .ghost:disabled { opacity: .25; }
+  .swatch {
+    position: relative; width: 22px; height: 22px; padding: 0;
+    border: 1px solid var(--line-2); cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .swatch.on { border-color: var(--txt); box-shadow: 0 0 0 1px var(--txt); }
+  .swatch svg { width: 12px; height: 12px; fill: none; stroke-width: 2.6; }
+  .swatch .pick {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer; border: 0; padding: 0;
+  }
+  /* Los dos distintivos informativos van juntos y pegados a la esquina inferior
+     izquierda, para dejar libres las esquinas que marcan seleccion y destino. */
+  .badges {
+    position: absolute; bottom: 0; left: 0; z-index: 4;
+    display: flex; align-items: flex-end; max-width: 100%;
+  }
+  .sizetag {
+    overflow: hidden; white-space: nowrap;
+    padding: 3px 5px; background: rgba(10,10,10,.72);
+    font: 9px/1.25 var(--mono); color: rgba(255,255,255,.82);
+    pointer-events: none;
+  }
+  .dupflag {
+    flex: none; width: 22px; height: 22px; display: grid; place-items: center;
+    padding: 0; background: #f97316; border: 0; cursor: pointer;
+  }
+  .dupflag svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 1.9; }
+
+  /* ---- previews ---- */
+  .frame { max-width: 460px; margin: 0 auto; border: 1px solid var(--line); }
+  .fhead { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .avatar { width: 26px; height: 26px; border-radius: 50%; background: #3f3f3f; }
+  /* Carrusel controlado: una pagina por gesto, sin inercia que se salte varias.
+     touch-action pan-y para que el scroll vertical de la pagina siga vivo. */
+  .rail { overflow: hidden; touch-action: pan-y; }
+  .track { display: flex; will-change: transform; }
+  .track > div { flex: 0 0 100%; }
+  .rail canvas { display: block; width: 100%; height: auto; }
+  .dots { display: flex; justify-content: center; gap: 5px; padding: 10px 0; }
+  .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: #4a4a4a;
+    border: 0; padding: 0; cursor: pointer;
+    transition: background-color .18s ease, transform .18s ease;
+  }
+  .dot.on { background: #e5e5e5; transform: scale(1.25); }
+  @media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
+  .mosaic { max-width: 460px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .tile { position: relative; overflow: hidden; background: var(--panel); aspect-ratio: 3 / 4; }
+  .tile canvas { position: absolute; display: block; }
+
+  /* ---- export ---- */
+  .sheet { position: fixed; inset: 0; z-index: 30; background: rgba(10,10,10,.97); overflow-y: auto; }
+  .sheet .bar { position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .shots { max-width: 460px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .shots a { display: block; border: 1px solid var(--line); text-decoration: none; }
+  .shots img { display: block; width: 100%; }
+  .shots span { display: block; padding: 6px 8px; font: 10px/1 var(--mono); color: var(--dim); }
+  .footnote { max-width: 460px; margin: 0 auto; padding: 0 16px 32px; font: 10px/1.6 var(--mono); color: var(--dimmer); }
+  .modal {
+    position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.72);
+    display: grid; place-items: center; padding: 24px;
+  }
+  .modal .box {
+    width: 100%; max-width: 340px; background: var(--panel);
+    border: 1px solid var(--line-2); padding: 16px;
+  }
+  .modal h3 {
+    margin: 0 0 12px; font: 400 12px/1 var(--mono);
+    letter-spacing: .1em; color: var(--txt);
+  }
+  .modal p { margin: 0 0 16px; font-size: 12.5px; line-height: 1.55; color: var(--dim); }
+  .modal .acts { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal button {
+    font: 11px/1 var(--mono); padding: 9px 12px; cursor: pointer;
+    border: 1px solid var(--line-2); background: none; color: var(--dim);
+  }
+  .modal button.go { background: var(--txt); border-color: var(--txt); color: #111; }
+  #busy {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 40;
+    background: var(--txt); color: #111; padding: 8px 14px; font: 11px/1 var(--mono);
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <button class="home" id="btn-home" title="Inicio"><h1>Carrete</h1></button>
+    <span class="grow"></span>
+    <button class="icobtn" id="btn-full" title="Pantalla completa"></button>
+    <button class="ver" id="ver" title="Ver cambios">v—</button>
+  </div>
+  <div class="toolrow" id="toolrow">
+    <div class="segs" id="segs-mode"></div>
+    <span class="grow"></span>
+    <button class="icobtn" id="btn-undo" title="Deshacer" disabled></button>
+    <button class="primary" id="btn-export">Exportar</button>
+  </div>
+</header>
+
+<p class="projmeta" id="meta"></p>
+
+<div class="notice err" id="err" hidden>
+  <span id="err-text" style="flex:1"></span>
+  <button id="err-close">✕</button>
+</div>
+
+<div class="notice warn" id="warn" hidden>
+  <span id="warn-text" style="flex:1"></span>
+  <button id="warn-convert">Convertir</button>
+</div>
+
+<main id="view-edit">
+  <div class="stagewrap">
+   <div class="stagearea" id="stagearea">
+    <div class="pagesrail" id="pagesrail" hidden></div>
+    <div class="stagerow" id="stagerow">
+      <div class="peek" id="peek-prev" title="Página anterior"></div>
+      <div id="stage"></div>
+      <div class="peek" id="peek-next" title="Página siguiente"></div>
+    </div>
+   </div>
+  </div>
+  <div class="pagebar" id="pagebar">
+    <button class="ghost" id="pg-prev" title="Página anterior">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <span class="pgnum" id="pg-num"></span>
+    <button class="ghost" id="pg-next" title="Página siguiente">
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+    <span class="grow"></span>
+  </div>
+
+  <div class="section levels">
+    <div class="segs" id="levels"></div>
+
+    <div class="lvl" id="lvl-post" hidden>
+      <div id="post-back"></div>
+      <div class="photoacts" id="page-acts"></div>
+      <div class="photoacts" id="post-tools"></div>
+      <p class="lvlhint" id="post-hint"></p>
+      <div class="cfgrow" id="row-ratio" hidden>
+        <span class="lab">proporción</span>
+        <div class="segs" id="segs-ratio"></div>
+      </div>
+      <div class="cfgrow" id="row-gap" hidden>
+        <span class="lab">gap</span>
+        <div class="notch" id="gap-notch" role="slider" tabindex="0"
+             aria-label="Separación entre fotos" aria-valuemin="0"></div>
+        <span class="gapval" id="gap-val"></span>
+      </div>
+      <div class="cfgrow" id="row-bg" hidden>
+        <span class="lab">color</span>
+        <span id="swatches" style="display:flex;gap:6px"></span>
+      </div>
+      <div class="cfgrow" id="row-fmt" hidden>
+        <span class="lab">formato</span>
+        <div class="segs" id="segs-fmt"></div>
+      </div>
+      <p class="lvlhint" id="fmt-hint" hidden></p>
+    </div>
+
+    <div class="lvl" id="lvl-page" hidden>
+      <div id="page-back"></div>
+      <div class="photoacts" id="page-tools"></div>
+      <div class="scroller" id="layouts" hidden></div>
+      <p class="lvlhint" id="page-hint"></p>
+    </div>
+
+    <div class="lvl" id="lvl-photo" hidden>
+      <div id="photo-back"></div>
+      <div class="photoacts" id="photo-acts"></div>
+      <div class="cfgrow" id="row-rotate" hidden>
+        <span class="lab">vuelta</span>
+        <div class="rotgrid" id="segs-rot"></div>
+      </div>
+      <div class="cfgrow" id="row-fine" hidden>
+        <span class="lab">ajuste</span>
+        <div class="rotgrid" id="fine-rot"></div>
+      </div>
+      <p class="lvlhint" id="photo-hint"></p>
+    </div>
+  </div>
+
+</main>
+
+<main id="view-feed" hidden>
+  <div class="section">
+    <div class="frame">
+      <div class="fhead"><div class="avatar"></div><span class="mono" style="font-size:11px">tu_cuenta</span></div>
+      <div class="rail" id="rail"><div class="track" id="track"></div></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:12px">desliza para ver la secuencia</p>
+  </div>
+</main>
+
+<main id="view-grid" hidden>
+  <div class="section">
+    <p class="caption">Cuadrícula del perfil · recorte 3:4</p>
+    <div class="mosaic" id="mosaic"></div>
+    <p class="hint">Instagram recorta la portada a 3:4 centrado. Con 4:5 pierdes las franjas laterales, así que no dejes caras ni texto en los bordes.</p>
+  </div>
+</main>
+
+<main id="view-projects" hidden>
+  <div class="section">
+    <div class="capbar">
+      <p class="caption">Proyectos</p>
+      <button class="fill" id="btn-new">nuevo proyecto</button>
+    </div>
+    <div class="log" id="projects"></div>
+  </div>
+</main>
+
+<main id="view-log" hidden>
+  <div class="section">
+    <p class="caption">Historial de versiones</p>
+    <div class="log" id="log"></div>
+  </div>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="bar">
+    <span class="mono" id="sheet-meta" style="font-size:12px"></span>
+    <span class="grow"></span>
+    <button class="ghost" id="sheet-close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="shots" id="shots"></div>
+  <p class="footnote">Descárgalas en orden. Mantén pulsada cada imagen para guardarla en la galería.</p>
+</div>
+
+<div id="busy" hidden></div>
+<div id="toast" hidden><span class="tmsg" id="toast-msg"></span><i class="tbar" id="toast-bar"></i></div>
+
+<script>
+"use strict";
+/* ============================================================================
+   CARRETE — editor de carruseles para Instagram · v1
+   ----------------------------------------------------------------------------
+   ARQUITECTURA
+
+   1. ESPACIO DEL POST. El post es un lienzo continuo. Las celdas no pertenecen
+      a una slide: viven en espacio de post, donde x se mide en unidades de
+      slide (0..N) e y en 0..1. Una slide es solo una VENTANA DE RECORTE: la
+      slide i es la region [i, i+1]. Una celda con { x: .5, w: 1 } ocupa media
+      slide 1 + media slide 2 y el renderer ya la dibuja bien, asi que los
+      layouts solapados no requeriran tocar render ni export.
+
+   2. TODO RELATIVO. Ni el preview ni el clamp usan pixeles medidos: celdas en %
+      y foto en multiplos del tamaño de su celda. Solo se mide el rect de la
+      celda al empezar un gesto, para traducir dedo -> punto focal.
+
+   3. TRANSFORMACIONES NORMALIZADAS: { scale >= 1 (1 = cover), fx, fy }. Lo que
+      ajustas sobre el preview de 1600px se aplica identico al exportar desde el
+      original completo.
+
+   4. CALIDAD. El File original nunca se toca. El preview es una copia reducida;
+      al exportar se vuelve a decodificar el original a ~1.6x el tamaño de
+      destino con el resampler del navegador.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------- version */
+
+const VERSION = '3.13.2';
+const BUILD = '17 ago 2026';
+
+/* Lo mas reciente arriba. Se muestra en la vista de Historial, a la que se
+   entra tocando la marca de version de la cabecera. */
+const CHANGELOG = [
+  { v: '3.13.2', when: '18 ago', notes: [
+    'Abrir una página ya no dispara el selector de fotos. El toque que la abre se resolvía después de repintar y caía sobre el input de la celda vacía, que ocupa toda la superficie. Ahora hay una guarda de 400 ms tras abrir una página, añadir una nueva o cambiar de nivel.',
+  ] },
+  { v: '3.13.1', when: '18 ago', notes: [
+    'Arreglado el salto al soltar el deslizamiento: la fila completaba el recorrido y luego hacía un segundo viaje animado de vuelta a su sitio, ya con la página nueva. Ahora el reposicionamiento va sin transición y es invisible.',
+  ] },
+  { v: '3.13.0', when: '18 ago', notes: [
+    'Al deslizar, la página vecina entra entera. Antes los asomos eran cajas de 51px recortadas, así que solo asomaba ese trozo y detrás quedaba el fondo negro.',
+    'Engancha al pasar del 45% del ancho de la página, o con un gesto rápido, y completa el recorrido con animación antes de repintar, sin salto.',
+  ] },
+  { v: '3.12.1', when: '18 ago', notes: [
+    'Fuera la herramienta de navegar: en el nivel Página se desliza para cambiar de página siempre, sin entrar en ningún modo.',
+    'Los gestos se separan por tipo en lugar de por modo: arrastrar lo atiende el lienzo y cambia de página; tocar lo atiende la foto y la selecciona. La celda escucha click en lugar de pointerdown, así que un arrastre nunca selecciona.',
+  ] },
+  { v: '3.12.0', when: '18 ago', notes: [
+    'Nueva herramienta "páginas" en el nivel Página: dentro de ella se desliza el lienzo para cambiar de página, una por gesto, sin salir a Post ni usar las flechas.',
+    'Mientras deslizas, el lienzo acompaña al dedo y los asomos de las vecinas entran con él. En la primera y la última hay resistencia.',
+    'Dentro de esa herramienta las fotos no responden al toque, así que no hay duda entre navegar y seleccionar.',
+  ] },
+  { v: '3.11.0', when: '18 ago', notes: [
+    'Formato de salida elegible: JPG al 95% o PNG sin pérdida, para no añadir recompresión al montar. Se guarda con el proyecto.',
+    'El export genera blobs en lugar de cadenas base64, que con PNG serían varios megas por página, y los libera al cerrar la hoja.',
+  ] },
+  { v: '3.10.3', when: '18 ago', notes: [
+    'La pestaña de Foto se ve apagada sin foto seleccionada, y al tocarla avisa de que hay que tocar una foto de la página.',
+    'Mismo trato para las demás opciones apagadas: mover sin dos fotos, o duplicar al llegar al límite de páginas. Un botón deshabilitado no puede explicar por qué no funciona.',
+  ] },
+  { v: '3.10.2', when: '18 ago', notes: [
+    'Las dos filas del giro comparten una retícula de cuatro columnas: los cuatro bloques de vuelta arriba, y abajo medio grado, el ángulo ocupando las dos columnas centrales, y medio grado. Todo alineado a la misma cuadrícula.',
+  ] },
+  { v: '3.10.1', when: '18 ago', notes: [
+    'El giro se descompone en vuelta y ajuste, que ahora son independientes: si has enderezado +1,5° y pulsas 90°, quedas en 91,5° en lugar de perder el ajuste.',
+    'La fila de ajuste se reduce a tres controles y ya no hay que deslizarla: medio grado a cada lado y el ángulo en medio, que además es el botón de volver a recto.',
+  ] },
+  { v: '3.10.0', when: '18 ago', notes: [
+    'Giro libre: además de 0, 90, 180 y 270, ajuste de medio grado en medio grado para endilar un horizonte, con la desviación respecto al cuarto de giro más cercano y un botón para volver a recto.',
+    'El encuadre gira con la foto en cualquier ángulo, no solo en múltiplos de 90.',
+    'Con ángulos libres el preview pasa a PNG, porque JPEG no tiene transparencia y pintaría de negro las esquinas vacías.',
+    'Al exportar se decodifica el original a la escala que necesita la caja girada, sin traerse la foto entera a memoria.',
+  ] },
+  { v: '3.9.3', when: '18 ago', notes: [
+    'Arreglado: en Post no se podía seleccionar una página. Fuera de la herramienta de mover, el primer movimiento del dedo anulaba el toque, y cualquier toque real mueve un píxel. Ahora solo lo anula el navegador cuando se queda el gesto para desplazar el carrusel.',
+  ] },
+  { v: '3.9.2', when: '18 ago', notes: [
+    'Arreglado el intercambio de fotos en el nivel Página: al soltar se apagaban las marcas antes de leer el destino, y esa misma función es la que lo guarda, así que el destino llegaba vacío y no se intercambiaba nada.',
+  ] },
+  { v: '3.9.1', when: '18 ago', notes: [
+    'Duplicar y borrar salen de la fila de herramientas y aparecen como dos iconos justo encima de la página seleccionada, así que se desplazan con el carrusel y se ve sobre qué actúan.',
+    'Se ocultan dentro de la herramienta de mover, donde estorbarían al arrastre.',
+  ] },
+  { v: '3.9.0', when: '18 ago', notes: [
+    'Mover es una herramienta, en Post y en Página: solo se arrastra dentro de ella, así que fuera no hay duda entre desplazar y reordenar.',
+    'Arreglado de paso: fuera de la herramienta, el carrusel de Post se desplaza arrastrando sobre las miniaturas. Antes solo se podía por los huecos entre ellas.',
+    'Fuera las asas de las fotos: dentro de la herramienta de mover se arrastra la foto entera, y el lienzo queda limpio.',
+    'Las flechas izq/der pasan dentro de la herramienta de mover; duplicar y borrar quedan como cajas del nivel Post.',
+  ] },
+  { v: '3.8.2', when: '18 ago', notes: [
+    'Fuera la herramienta de rellenar huecos del nivel Página: las fotos se ponen tocando cada hueco.',
+  ] },
+  { v: '3.8.1', when: '18 ago', notes: [
+    'Al empezar a arrastrar una foto o una página, la marca de selección pasa a la que estás moviendo. Antes podía quedarse en otra y se confundía qué estabas moviendo con qué ibas a editar.',
+  ] },
+  { v: '3.8.0', when: '18 ago', notes: [
+    'Al salir de Página a Post, el carrusel se coloca de golpe con esa página centrada y el alejamiento parte de ella: se lee como una sola cámara que retrocede.',
+    'El origen del zoom se toma de la posición real de la miniatura ya con el desplazamiento aplicado, así que en la primera y la última página, donde no se puede centrar, el efecto sigue saliendo del sitio correcto.',
+    'Salir de Post por la pestaña se comporta igual que tocar la miniatura.',
+  ] },
+  { v: '3.7.4', when: '18 ago', notes: [
+    'El icono del gap es una cota completa: bloque, línea azul, la cifra, línea azul, bloque. El número va dentro del dibujo.',
+    'La caja de layout dibuja la rejilla elegida con su proporción real centrada en el cuadro; antes se aplastaba al forzarla a cuadrada y no se distinguía.',
+  ] },
+  { v: '3.7.3', when: '18 ago', notes: [
+    'Fuera los distintivos de texto: el dibujo es el valor y la etiqueta el nombre de la herramienta. El cuadrado cambia de color pero sigue diciendo "color"; el de layout muestra la rejilla elegida.',
+    'El icono de girar muestra la orientación real de la foto, con una marca en el borde que era el de arriba.',
+    'Un solo sitio para añadir páginas: el rectángulo de línea discontinua al final del carrusel de Post. Fuera el + pequeño de la barra de página.',
+    'Eliminadas tres funciones duplicadas que se habían colado en parches anteriores.',
+  ] },
+  { v: '3.7.1', when: '18 ago', notes: [
+    'Cada caja dice las dos cosas: la etiqueta, qué hace la herramienta; un distintivo arriba a la derecha, cómo está ahora. Así ratio muestra 3:4, gap su valor, girar los grados y espejo o tercios si están puestos.',
+    'El dibujo del gap pasa a ser dos bloques con líneas de cota a los lados del hueco, como en un plano, para que se entienda que lo que se ajusta es esa distancia.',
+    'La caja de layout muestra la rejilla actual y cuántos huecos tiene.',
+  ] },
+  { v: '3.7.0', when: '18 ago', notes: [
+    'Los tres niveles funcionan igual: una fila de cajas cuadradas iguales, entras en una y vuelves con la flecha.',
+    'En Página, el layout es una herramienta: entras y ves la lista completa de rejillas. Rellenar huecos es otra caja.',
+    'En Post, las cajas de proporción, gap y fondo muestran el valor actual dentro: la forma del ratio, el dibujo de la separación real y el color elegido.',
+  ] },
+  { v: '3.6.0', when: '18 ago', notes: [
+    'Las herramientas tienen subniveles: entras en una, ajustas lo suyo y vuelves con la flecha al listado.',
+    'En Post, la proporción, el gap y el fondo son tres cajas en lugar de tres filas apiladas.',
+    'En Foto, girar abre un selector de ángulo: 0, 90, 180 o 270 grados, en lugar de ir sumando 90 a ciegas.',
+    'Al cambiar de nivel se vuelve siempre al listado de herramientas.',
+  ] },
+  { v: '3.5.3', when: '18 ago', notes: [
+    'En Post, el carrusel de páginas se desplaza para dejar a la vista la página abierta cuando navegas con las flechas o la mueves con izq/der.',
+    'Si has desplazado el carrusel a mano, se respeta: solo se recentra cuando cambia la página abierta.',
+  ] },
+  { v: '3.5.2', when: '18 ago', notes: [
+    'El tamaño de la foto vuelve a estar pegado a la esquina, agrupado con el aviso de foto repetida en un mismo bloque.',
+    'El destino del intercambio se marca con esquinas verdes discontinuas en las dos esquinas libres, no con el color de la etiqueta de tamaño. Selección: azul continuo; destino: verde discontinuo.',
+  ] },
+  { v: '3.5.1', when: '18 ago', notes: [
+    'Fuera los tercios en el nivel Página: solo se dibujan sobre la foto seleccionada, desde el nivel Foto, que es cuando sirven para encuadrar.',
+  ] },
+  { v: '3.5.0', when: '18 ago', notes: [
+    'El gap se ve en tiempo real también en el nivel Post: antes solo repintaba el lienzo, que ahí no es lo que se muestra.',
+    'El fondo vuelve a tener su propia fila, aunque la zona de herramientas tenga que deslizarse.',
+    'La selección se marca con esquinas azules en lugar de un recuadro blanco, que podía leerse como parte del gap.',
+  ] },
+  { v: '3.4.2', when: '18 ago', notes: [
+    'Al abrir una página desde Post, el acercamiento sale de la miniatura que has tocado y no del centro del área.',
+  ] },
+  { v: '3.4.1', when: '18 ago', notes: [
+    'Las pestañas ya no bailan al cambiar de nivel: en Post se ocultaba la barra de página y eso subía todo 46px, medidos sobre las capturas. La barra se queda en los tres niveles.',
+    'Animación al pasar de Página a Post y al revés: alejarse entra desde grande y acercarse desde pequeño, con el origen del zoom en la página que tenías abierta.',
+  ] },
+  { v: '3.4.0', when: '18 ago', notes: [
+    'En Foto los asomos se cierran y la página crece un 22% para ocupar ese espacio: acercarse a la foto ahora se nota.',
+    'El área se dimensiona para el caso Foto, así que en Página la página es la pequeña y sobra aire. El hueco sigue siendo idéntico en los tres niveles.',
+    'El cambio de nivel se anima, para que se lea como un acercamiento y no como un salto.',
+    'Añadida una garantía: si la cabecera y las herramientas ocupan más de lo previsto, el área cede lo justo para que la página no haga scroll.',
+  ] },
+  { v: '3.3.0', when: '18 ago', notes: [
+    'En el nivel Página asoma una quinta parte de la página anterior y de la siguiente, a la misma escala, suficiente para ver qué layout tienen.',
+    'La zona de herramientas tiene altura fija en los tres niveles y hace scroll por dentro cuando un nivel tiene más controles. El área de trabajo ya no cambia nunca de tamaño.',
+  ] },
+  { v: '3.2.0', when: '18 ago', notes: [
+    'En Post caben unas 4 páginas y media a la vez: el tamaño se calcula desde cuántas deben verse, no desde una fracción de la altura.',
+    'Al arrastrar una página hasta el borde, el carrusel se desplaza solo, con velocidad según lo cerca que esté el dedo. Sin eso no había forma de llevar la página 10 a la primera posición.',
+    'El destino se sigue recalculando mientras el carrusel se mueve, aunque tengas el dedo quieto.',
+    'Tras reordenar, la página movida queda centrada a la vista.',
+  ] },
+  { v: '3.1.5', when: '18 ago', notes: [
+    'Las miniaturas de Post salían deformadas: medidas sobre una captura, una de ellas tenía proporción 0,49 en lugar de 0,75. El ancho se calculaba a partir de la proporción intrínseca del canvas y no siempre se resolvía; ahora alto y ancho van en píxeles.',
+  ] },
+  { v: '3.1.4', when: '18 ago', notes: [
+    'El área de trabajo mide exactamente lo mismo en Post, Página y Foto. Su altura se calcula en píxeles en lugar de depender de una cadena de porcentajes que en Post colapsaba al alto del contenido.',
+    'El contenido va centrado en horizontal y en vertical dentro del área, así que en Post lo que sobra es aire alrededor de las miniaturas.',
+    'La altura se recalcula al girar el móvil o al ocultarse la barra del navegador.',
+  ] },
+  { v: '3.1.3', when: '18 ago', notes: [
+    'La página mantiene exactamente el mismo tamaño en Página y en Foto. Al ocultar los asomos se reserva su hueco: antes desaparecían del flujo y el lienzo se ensanchaba 30px, dando la impresión de que cambiaba la proporción.',
+  ] },
+  { v: '3.1.2', when: '18 ago', notes: [
+    'Los avisos flotantes son opacos: el tinte de color se superpone al panel en lugar de sustituirlo.',
+    'En el nivel Post, un toque selecciona la página y el segundo la abre en el nivel Página. El doble clic también.',
+  ] },
+  { v: '3.1.1', when: '18 ago', notes: [
+    'La altura del área ahora tiene en cuenta también el ancho disponible: antes en 4:5 reservaba 575px para un lienzo de 414 y dejaba franjas muertas.',
+  ] },
+  { v: '3.1.0', when: '18 ago', notes: [
+    'El área de trabajo mantiene siempre la misma altura en los tres niveles: nada salta al cambiar de distancia.',
+    'En Post las páginas van en carrusel horizontal, no en rejilla, al 64% de la altura y centradas, con aire alrededor.',
+    'La zona de herramientas tiene altura mínima común, y en Post el gap y el fondo comparten fila para no crecer tanto.',
+  ] },
+  { v: '3.0.1', when: '18 ago', notes: [
+    'Botones de mover a izquierda y derecha en el nivel Post, además del arrastre: paso a paso es más preciso y no depende del pulso.',
+  ] },
+  { v: '3.0.0', when: '18 ago', notes: [
+    'El nivel ahora también es una distancia. Post se aleja y muestra las páginas en pequeño, en rejilla, para verlas todas de un vistazo.',
+    'Las páginas se reordenan arrastrando una sobre la posición de otra: se mueve e inserta, no se intercambia. El destino se marca en verde y vibra.',
+    'Duplicar y borrar página pasan al panel del nivel Post, y desaparece el menú de tres puntos.',
+    'En el nivel Página asoman las vecinas; en Foto se ocultan.',
+  ] },
+  { v: '2.4.0', when: '18 ago', notes: [
+    'Botón de pantalla completa en la cabecera: oculta la barra del navegador y la de estado, y el lienzo aprovecha esa altura.',
+    'El icono cambia según el estado y se sincroniza si sales con el gesto de atrás.',
+  ] },
+  { v: '2.3.2', when: '18 ago', notes: [
+    'Los avisos flotantes ocupan el ancho de la pantalla con un margen, y toman el color del icono que los abre: naranja el de foto repetida, ámbar los límites.',
+    'Una barra inferior va vaciándose para mostrar el tiempo que queda.',
+  ] },
+  { v: '2.3.1', when: '18 ago', notes: [
+    'Vibración del selector de separación más firme (12 ms en lugar de 8) y un pulso más largo al llegar al primer o último paso, como cuando una ruedita hace fondo.',
+    'En el Historial hay una prueba de vibración, para saber si no se nota por el navegador o por los ajustes del móvil.',
+  ] },
+  { v: '2.3.0', when: '18 ago', notes: [
+    'El aviso de fotos repetidas ya no ocupa una franja permanente bajo el lienzo: queda el cuadradito naranja en la foto y, al tocarlo, sale un aviso superpuesto arriba con las páginas donde está.',
+    'Los avisos flotantes salen arriba y duran cinco segundos.',
+  ] },
+  { v: '2.2.3', when: '18 ago', notes: [
+    'Las herramientas de foto van en una fila deslizable con botones del mismo ancho, así que su tamaño no depende de cuántas haya.',
+    'Vuelve el botón de cambiar foto, junto a quitar: uno reemplaza y el otro deja el hueco vacío.',
+  ] },
+  { v: '2.2.2', when: '18 ago', notes: [
+    'Fuera el botón de cambiar foto: quitar y tocar el hueco son dos pasos, pero permiten dejarlo vacío y liberan espacio abajo.',
+  ] },
+  { v: '2.2.1', when: '18 ago', notes: [
+    'Convención de escritorio: fuera del nivel Foto, un toque en la imagen la selecciona y el segundo la abre para editarla. El doble clic también abre.',
+    'Así en Página se ve qué foto está seleccionada antes de bajar a Foto.',
+  ] },
+  { v: '2.2.0', when: '18 ago', notes: [
+    'Las tres pestañas se eligen libremente. Antes el nivel se forzaba a Foto en cada render mientras hubiera una foto seleccionada, así que tocar Página no hacía nada y no había forma de volver.',
+    'Terminar un intercambio ya no salta a Foto: sigues en Página ordenando.',
+    'Encuadrar y ampliar son del nivel Foto. Tocar una foto en cualquier otro nivel entra en Foto con esa foto seleccionada.',
+  ] },
+  { v: '2.1.1', when: '18 ago', notes: [
+    'Fuera el botón de capas: el nombre Carrete ya lleva al inicio.',
+  ] },
+  { v: '2.1.0', when: '18 ago', notes: [
+    'Efecto espejo en el nivel Foto, junto a girar. Se aplica sobre lo que ves, así que combina con cualquier giro.',
+    'El encuadre se voltea con la imagen: lo que estaba a un tercio del borde izquierdo queda a un tercio del derecho.',
+    'El espejo entra en el historial de deshacer, se guarda con el proyecto y se aplica también al exportar desde el original.',
+  ] },
+  { v: '2.0.3', when: '18 ago', notes: [
+    'Recuperados dos estilos que se perdieron en una limpieza: el de los avisos, cuyo icono se estiraba hasta ocupar la pantalla, y el de la cuadrícula de tercios, que era la razón real de que no se viera nada al activarla.',
+    'Los iconos llevan ahora tamaño propio, así que ninguno puede volver a estirarse por falta de CSS.',
+  ] },
+  { v: '2.0.2', when: '18 ago', notes: [
+    'Arreglado: el lienzo se dibujaba con el nivel del render anterior, así que lo que mostraba no coincidía con el panel. Ahora el nivel se resuelve antes de dibujar.',
+    'La cuadrícula de tercios vuelve a estar en el nivel Página, sobre la página entera, además de en Foto sobre la foto seleccionada.',
+  ] },
+  { v: '2.0.1', when: '18 ago', notes: [
+    'Al arrastrar el asa, el hueco de destino se marca en verde con borde discontinuo y un tinte, para no confundirlo con el borde blanco de selección.',
+    'Un pulso de vibración al entrar en cada hueco nuevo, así se confirma el destino sin mirar.',
+  ] },
+  { v: '2.0.0', when: '18 ago', notes: [
+    'Los ajustes se organizan en tres niveles con un solo panel: Post (proporción, gap, fondo), Página (rejilla y orden de las fotos) y Foto (girar, tercios, centrar, cambiar, quitar).',
+    'El nivel lo decide la selección: tocar una foto baja a Foto, deseleccionar vuelve a Página. No hay modos que recordar.',
+    'El lienzo queda limpio: los botones que tapaban la imagen se han ido al panel.',
+    'El asa de intercambio pasa a ser del nivel Página y aparece en todas las fotos, no solo en la seleccionada.',
+  ] },
+  { v: '1.10.0', when: '18 ago', notes: [
+    'Intercambiar fotos entre huecos: la celda seleccionada muestra un asa arriba a la derecha y se arrastra hasta otro hueco. El destino se marca con línea discontinua y el origen se atenúa.',
+    'El gesto arranca en el asa y no sobre la foto, así que no choca con el encuadre y no hace falta un modo aparte.',
+    'El encuadre viaja con la foto; si el hueco destino tiene otra proporción se reencuadra al entrar.',
+    'Vale también para mover a un hueco vacío, y es un solo paso de deshacer.',
+  ] },
+  { v: '1.9.4', when: '18 ago', notes: [
+    'El menú de la página va sin separadores: la caja ya delimita el bloque y quedaba abierto por arriba. Las opciones se distinguen por espaciado.',
+  ] },
+  { v: '1.9.3', when: '17 ago', notes: [
+    'El botón de proyectos y el nombre Carrete llevan al inicio: es navegación, no una vista más que se alterna.',
+    'Todos los proyectos de la lista tienen botón de abrir, también el último que estuvieses editando. Fuera la etiqueta de "abierto".',
+  ] },
+  { v: '1.9.2', when: '17 ago', notes: [
+    'Cada proporción muestra su forma dibujada, todas a la misma escala, para ver de un golpe cuál es más vertical y cuál más apaisada.',
+  ] },
+  { v: '1.9.1', when: '17 ago', notes: [
+    'El botón de proyectos sube a la fila del nombre y la versión: es un nivel por encima del editor, no una acción del documento.',
+    'En Proyectos y en Historial se oculta la fila de vistas, Exportar y los datos del post: solo se ve la lista.',
+  ] },
+  { v: '1.9.0', when: '17 ago', notes: [
+    'La proporción sale de la cabecera y se agrupa con el gap y el fondo en "Ajustes del post", plegable: son las tres cosas que se fijan una vez por post.',
+    'Plegado muestra el estado actual (4:5 · gap 0 · blanco), así que no hay que abrirlo para comprobarlo.',
+    'Cabecera: el nombre a la izquierda y la versión al final de su fila. Debajo, las vistas a la izquierda y proyectos, deshacer y Exportar a la derecha.',
+    'La cuadrícula de tercios pasa a la barra bajo el lienzo, junto a lo que afecta.',
+  ] },
+  { v: '1.8.2', when: '17 ago', notes: [
+    'El botón de opciones de la página era invisible: sus tres puntos eran trazos de longitud cero y el navegador no los pintaba. Por eso el de añadir parecía suelto.',
+    'La barra de página se alinea con la misma columna de 16px que el resto de los controles.',
+    'Arreglado también el punto del triángulo de aviso de fotos repetidas.',
+  ] },
+  { v: '1.8.1', when: '17 ago', notes: [
+    'Sin barra de scroll en el selector de layouts: una línea menos en pantalla.',
+  ] },
+  { v: '1.8.0', when: '17 ago', notes: [
+    'Fuera la tira de miniaturas de abajo: el lienzo gana ese espacio.',
+    'En su lugar, una barra fina bajo el lienzo con la página actual, flechas para navegar, añadir página y un menú de opciones.',
+    'El menú de la página incluye mover, duplicar y borrar. Borrar la 2 deja la 3 convertida en 2.',
+    'Navegar sigue siendo de un toque en los asomos laterales.',
+  ] },
+  { v: '1.7.1', when: '17 ago', notes: [
+    'Tope de 20 páginas, el máximo que admite un carrusel de Instagram: el botón de añadir se apaga al llegar y el contador aparece a partir de la 16.',
+  ] },
+  { v: '1.7.0', when: '17 ago', notes: [
+    'Asoma el borde de la página anterior y la siguiente a los lados del lienzo, para juzgar la continuidad del carrusel mientras montas.',
+    'Tocar el asomo salta a esa página.',
+    'El hueco de los asomos se reserva también en la primera y la última, así el lienzo no salta al navegar.',
+  ] },
+  { v: '1.6.1', when: '17 ago', notes: [
+    'El botón de nueva página ocupa exactamente el mismo recuadro que una miniatura, con cualquier ratio.',
+    'El separador de los accesos rápidos llega de arriba abajo de la barra.',
+    'Los glifos de layout tienen zona tocable de 44px: Chrome avisaba de que estaban demasiado juntos para saber a cuál apuntabas.',
+    'El icono de cambiar foto se lee mejor.',
+  ] },
+  { v: '1.6.0', when: '17 ago', notes: [
+    'La tira de páginas se queda pegada abajo y en una sola fila, con mover y borrar a la derecha: cambiar de página ya no obliga a bajar scroll.',
+    'El lienzo se ajusta a la altura disponible, así que en un móvil normal todo cabe sin scroll. En pantallas cortas se encoge en lugar de empujar las herramientas fuera de la vista.',
+    'El selector de layout y el gap siguen en el flujo normal: se tocan una vez por página y no merecen quitarle altura al lienzo.',
+  ] },
+  { v: '1.5.3', when: '17 ago', notes: [
+    'Cabecera reorganizada para móvil: la versión va bajo el logo y los datos del proyecto en su propia línea, en horizontal sobre el lienzo. Antes el nombre partía en tres líneas y Exportar se salía de la pantalla.',
+    'La pestaña de la cuadrícula del perfil se llama Perfil, para que las tres quepan sin cortarse.',
+  ] },
+  { v: '1.5.2', when: '17 ago', notes: [
+    'Borrar el último proyecto ya deja el estado vacío de verdad, en lugar de recrear uno y parecer que no ha hecho nada.',
+    'Sin proyecto abierto, el editor y el export quedan desactivados y se ve la lista.',
+    'Arreglado un guardado pendiente que podía resucitar un proyecto recién borrado.',
+  ] },
+  { v: '1.5.1', when: '17 ago', notes: [
+    'Cada foto muestra en pequeño las dimensiones y el peso del archivo original.',
+  ] },
+  { v: '1.5.0', when: '17 ago', notes: [
+    'Varios proyectos: lista con nombre editable, abrir, duplicar y borrar. Empezar uno nuevo ya no destruye el anterior.',
+    'El nombre del proyecto abierto se ve en la cabecera.',
+    'Al cambiar de proyecto solo se cargan en memoria sus fotos; las del resto se liberan.',
+    'Las fotos en disco se borran solo cuando no las usa ningún proyecto.',
+  ] },
+  { v: '1.4.0', when: '17 ago', notes: [
+    'Cuadrícula de tercios opcional para encuadrar: sobre la celda seleccionada, o sobre la página entera si no hay ninguna.',
+    'Fuera el aviso de nitidez al ampliar: al ampliar ya se ve.',
+    'IndexedDB reutiliza una sola conexión en lugar de abrir una por operación.',
+  ] },
+  { v: '1.3.0', when: '17 ago', notes: [
+    'El post sobrevive a recargar o cerrar el navegador: se guarda en el dispositivo, fotos incluidas.',
+    'Botón de deshacer, hasta 40 pasos. Cubre layouts, páginas, añadir y quitar fotos, girar, encuadrar y el gap. Un encuadre completo cuenta como un paso, no uno por píxel.',
+    'Acción de rellenar huecos cuando la página tiene dos o más libres, ahí sí con selección múltiple.',
+    'En el Historial, opción de empezar un post nuevo y borrar lo guardado.',
+  ] },
+  { v: '1.2.0', when: '17 ago', notes: [
+    'Aviso de fotos repetidas: un cuadradito naranja en la esquina de cada copia y una línea indicando en qué páginas está.',
+    'La repetición se detecta por el contenido del archivo, así que también la pilla si has importado la misma foto dos veces por separado.',
+    'El fondo ahora es blanco, negro o un color personalizado con el selector del sistema, y el elegido lleva un tick.',
+  ] },
+  { v: '1.1.3', when: '17 ago', notes: [
+    'El feed avanza exactamente una página por gesto, por muy fuerte que sea el swipe. Antes la inercia podía saltarse varias.',
+    'Resistencia al arrastrar más allá de la primera o la última.',
+  ] },
+  { v: '1.1.2', when: '17 ago', notes: [
+    'Cambiar a un layout con menos huecos avisa antes, diciendo cuántas fotos se conservan y cuántas se quitan. Si los huecos que desaparecen estaban vacíos, no pregunta.',
+    'Las fotos que dejan de usarse liberan memoria en lugar de quedarse cargadas.',
+  ] },
+  { v: '1.1.1', when: '17 ago', notes: [
+    'Cada slide vuelve a llevar su borde completo: mirando una sola, la imagen queda centrada.',
+  ] },
+  { v: '1.1.0', when: '17 ago', notes: [
+    'El gap ahora es la separación real: el valor elegido es lo que se ve, tanto entre fotos como en el borde. Antes la costura interior salía al doble que el borde.',
+    'La separación se elige sobre una escala de puntos (0 a 48) con vibración en cada paso, en lugar de un deslizador continuo.',
+  ] },
+  { v: '1.0.9', when: '17 ago', notes: [
+    'Historial de versiones como sección propia, con el detalle de cada cambio.',
+  ] },
+  { v: '1.0.8', when: '17 ago', notes: [
+    'Marca de versión visible en la cabecera y en el título de la pestaña.',
+  ] },
+  { v: '1.0.7', when: '17 ago', notes: [
+    'El selector de fotos ya no permite multiselección: una celda, una foto.',
+  ] },
+  { v: '1.0.6', when: '17 ago', notes: [
+    'El feed ya no muestra la barra de scroll.',
+    'Las bolitas siguen el swipe y llevan a su página al tocarlas.',
+  ] },
+  { v: '1.0.5', when: '17 ago', notes: [
+    'Fuera el panel de zoom: ampliar y encuadrar se hacen solo con gestos.',
+    'Girar, cambiar y quitar la foto, en tres cuadraditos sobre la celda.',
+    'El aviso de resolución solo aparece cuando de verdad afecta al resultado.',
+  ] },
+  { v: '1.0.4', when: '17 ago', notes: [
+    'Arreglado el encuadre del área de trabajo: perdía el aspecto de la celda y descartaba la posición vertical, así que arrastrar en vertical no hacía nada.',
+    'Preview y export coinciden al píxel, verificado sobre cientos de combinaciones.',
+  ] },
+  { v: '1.0.3', when: '17 ago', notes: [
+    'Girar conserva el zoom y rota el punto focal con la foto.',
+    'Al exportar una foto girada ya no se decodifica a resolución completa.',
+  ] },
+  { v: '1.0.2', when: '17 ago', notes: [
+    'El lienzo usa aspect-ratio y las celdas van en porcentajes: ya no depende de medir el contenedor.',
+    'Los previews de feed y cuadrícula renderizan a resolución fija.',
+  ] },
+  { v: '1.0.1', when: '17 ago', notes: [
+    'Inputs de fichero reales sobre cada celda, fuera del sandbox de artifacts.',
+    'Los errores de lectura se muestran en pantalla en lugar de fallar en silencio.',
+  ] },
+  { v: '1.0.0', when: '17 ago', notes: [
+    'Páginas con layout propio y 12 rejillas, sobre un lienzo de post continuo.',
+    'Celdas con máscara: la foto cubre su hueco y no puede invadir el vecino.',
+    'Selector de ratio, gap entre fotos y color de fondo.',
+    'Vistas de feed y de cuadrícula del perfil con el recorte 3:4 real.',
+    'Export a 1440 px decodificando siempre desde el original.',
+    'Aviso y conversión a sRGB para fotos en Adobe RGB, Display P3 o ProPhoto.',
+  ] },
+];
+
+/* --------------------------------------------------------------- constantes */
+
+const RATIOS = {
+  '4:5':    { w: 1440, h: 1800, label: '4:5' },
+  '3:4':    { w: 1440, h: 1920, label: '3:4' },
+  '1:1':    { w: 1440, h: 1440, label: '1:1' },
+  '1.91:1': { w: 1440, h: 754,  label: '1.91' },   // etiqueta corta: no cabe entera
+};
+
+const r = (x, y, w, h) => ({ x, y, w, h });
+
+const LAYOUTS = {
+  full: { name: 'Completa', cells: [r(0,0,1,1)] },
+  h2:   { name: '2 horizontales', cells: [r(0,0,1,1/2), r(0,1/2,1,1/2)] },
+  h3:   { name: '3 horizontales', cells: [r(0,0,1,1/3), r(0,1/3,1,1/3), r(0,2/3,1,1/3)] },
+  v2:   { name: '2 verticales', cells: [r(0,0,1/2,1), r(1/2,0,1/2,1)] },
+  v3:   { name: '3 verticales', cells: [r(0,0,1/3,1), r(1/3,0,1/3,1), r(2/3,0,1/3,1)] },
+  quad: { name: '4 esquinas', cells: [r(0,0,.5,.5), r(.5,0,.5,.5), r(0,.5,.5,.5), r(.5,.5,.5,.5)] },
+  t2b1: { name: '2 arriba + 1', cells: [r(0,0,.5,.5), r(.5,0,.5,.5), r(0,.5,1,.5)] },
+  t1b2: { name: '1 + 2 abajo', cells: [r(0,0,1,.5), r(0,.5,.5,.5), r(.5,.5,.5,.5)] },
+  l1r2: { name: '1 izq + 2 der', cells: [r(0,0,.5,1), r(.5,0,.5,.5), r(.5,.5,.5,.5)] },
+  l2r1: { name: '2 izq + 1 der', cells: [r(0,0,.5,.5), r(0,.5,.5,.5), r(.5,0,.5,1)] },
+  six:  { name: '6 (3×2)', cells: [
+    r(0,0,1/3,.5), r(1/3,0,1/3,.5), r(2/3,0,1/3,.5),
+    r(0,.5,1/3,.5), r(1/3,.5,1/3,.5), r(2/3,.5,1/3,.5)] },
+  t1b3: { name: '1 + 3 abajo', cells: [
+    r(0,0,1,.6), r(0,.6,1/3,.4), r(1/3,.6,1/3,.4), r(2/3,.6,1/3,.4)] },
+};
+
+const BGS = ['#ffffff', '#000000'];
+
+/* Escala de separacion, en px sobre el lienzo de 1440. Pasos cerrados en lugar
+   de un continuo: los valores utiles son pocos y asi se eligen de un gesto. */
+const GAPS = [0, 2, 4, 6, 8, 12, 16, 24, 32, 48];
+
+/* Tope de Instagram para un carrusel. Subio de 10 a 20 en 2024. */
+const MAX_SLIDES = 20;
+
+/* Los asomos muestran una quinta parte de la pagina vecina a cada lado, para
+   poder ver que layout tienen. Su ancho se deriva del de la pagina. */
+const PEEK_FRAC = 0.2;
+const PEEK_GAP = 3;
+
+/* En Foto los asomos desaparecen y la pagina se acerca: crece un 22%. El area
+   se dimensiona para ESE caso, asi que en Página la pagina es la pequeña y
+   sobra aire arriba y abajo. El hueco nunca cambia; el contenido si. */
+const FOTO_ZOOM = 1.22;
+
+/* La zona de herramientas mide siempre lo mismo y hace scroll por dentro si un
+   nivel tiene mas controles. Asi el area de trabajo nunca cambia de tamaño. */
+const TOOLS_H = 148;
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* Color de tinta legible sobre un fondo dado, para el tick del swatch. */
+function contrastOn(hex) {
+  const h = hex.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const lin = (v) => { v /= 255; return v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); };
+  const L = .2126 * lin(parseInt(n.slice(0, 2), 16)) +
+            .7152 * lin(parseInt(n.slice(2, 4), 16)) +
+            .0722 * lin(parseInt(n.slice(4, 6), 16));
+  return L > .4 ? '#111111' : '#ffffff';
+}
+const uid = () => Math.random().toString(36).slice(2, 9);
+const pct = (v) => (v * 100) + '%';
+
+function weight(bytes) {
+  if (!bytes && bytes !== 0) return '';
+  return bytes < 1024 * 1024
+    ? Math.round(bytes / 1024) + ' kB'
+    : (bytes / (1024 * 1024)).toFixed(1).replace('.', ',') + ' MB';
+}
+const newT = () => ({ scale: 1, fx: .5, fy: .5 });
+const newSlide = (layoutId = 'full') => ({
+  id: uid(), layoutId,
+  cells: LAYOUTS[layoutId].cells.map(() => ({ imgId: null, t: newT() })),
+});
+
+/* -------------------------------------------------------------- geometria */
+
+function imageUnits(scale, cellAspect, imgAspect) {
+  const wider = imgAspect > cellAspect;
+  return {
+    dwU: (wider ? imgAspect / cellAspect : 1) * scale,
+    dhU: (wider ? 1 : cellAspect / imgAspect) * scale,
+  };
+}
+
+/* La foto siempre cubre la celda: ni hueco vacio ni invadir la vecina. */
+function clampT(t, cellAspect, imgAspect) {
+  const scale = clamp(t.scale, 1, 8);
+  const u = imageUnits(scale, cellAspect, imgAspect);
+  const hx = Math.min(.5, .5 / u.dwU), hy = Math.min(.5, .5 / u.dhU);
+  return { scale, fx: clamp(t.fx, hx, 1 - hx), fy: clamp(t.fy, hy, 1 - hy) };
+}
+
+/* El gap es la separacion VISIBLE, no un margen por celda. En cada costura
+   interior se reparte a medias entre las dos celdas que la comparten
+   (gap/2 + gap/2 = gap) y en el borde de la slide se aplica entero.
+
+   Cada slide se trata como una pieza cerrada: el borde de la slide es borde,
+   aunque haya otra slide al lado. Se probo lo contrario (media costura en la
+   frontera, para que al deslizar no se viera el doble de aire) y se descarto:
+   mirando una slide sola, la imagen no quedaba centrada. */
+function edgeInset(isOuter, g) { return isOuter ? g : g / 2; }
+
+function postCells() {
+  const R = RATIOS[post.ratio];
+  const gx = post.gap / R.w, gy = post.gap / R.h;
+  const E = 1e-6;
+  const out = [];
+  post.slides.forEach((s, i) => {
+    LAYOUTS[s.layoutId].cells.forEach((c, ci) => {
+      const insL = edgeInset(c.x <= E, gx);
+      const insR = edgeInset(c.x + c.w >= 1 - E, gx);
+      const insT = edgeInset(c.y <= E, gy);
+      const insB = edgeInset(c.y + c.h >= 1 - E, gy);
+      const rect = {
+        x: i + c.x + insL, y: c.y + insT,
+        w: Math.max(.001, c.w - insL - insR),
+        h: Math.max(.001, c.h - insT - insB),
+      };
+      out.push({
+        slideIndex: i, cellIndex: ci, rect,
+        cellAspect: (rect.w * R.w) / (rect.h * R.h),
+        imgId: s.cells[ci].imgId, t: s.cells[ci].t,
+      });
+    });
+  });
+  return out;
+}
+
+/* Dibuja la region [x0, x0+1]. La usan el preview de feed/grid y el export. */
+function drawRegion(ctx, cells, x0, sw, sh, bg, getSource) {
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, sw, sh);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  for (const cell of cells) {
+    if (cell.rect.x + cell.rect.w <= x0 + 1e-4) continue;
+    if (cell.rect.x >= x0 + 1 - 1e-4) continue;
+    if (!cell.imgId) continue;
+    const src = getSource(cell.imgId);
+    if (!src) continue;
+    const rx = (cell.rect.x - x0) * sw, ry = cell.rect.y * sh;
+    const rw = cell.rect.w * sw, rh = cell.rect.h * sh;
+    const ia = src.w / src.h;
+    const t = clampT(cell.t, cell.cellAspect, ia);
+    const u = imageUnits(t.scale, cell.cellAspect, ia);
+    const dw = u.dwU * rw, dh = u.dhU * rh;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(rx, ry, rw, rh);
+    ctx.clip();
+    ctx.drawImage(src.el, rx + rw / 2 - t.fx * dw, ry + rh / 2 - t.fy * dh, dw, dh);
+    ctx.restore();
+  }
+}
+
+/* Ancho de dibujo en px de export. Solo depende de aspectos, no del origen. */
+function drawnWidth(cell, imgAspect, sw) {
+  return imageUnits(clamp(cell.t.scale, 1, 8), cell.cellAspect, imgAspect).dwU * cell.rect.w * sw;
+}
+
+/* -------------------------------------------------------- perfil de color */
+
+const CS_LABEL = {
+  AdobeRGB: 'Adobe RGB (1998)', DisplayP3: 'Display P3',
+  ProPhoto: 'ProPhoto RGB', sRGB: 'sRGB', unknown: 'sin perfil',
+};
+const OFF_PROFILE = ['AdobeRGB', 'DisplayP3', 'ProPhoto'];
+
+/* Identidad por CONTENIDO, no por id: cada importacion crea un id nuevo, asi
+   que la misma foto metida dos veces son dos entradas distintas. */
+async function fingerprint(file) {
+  try {
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      const buf = await file.arrayBuffer();
+      const d = await crypto.subtle.digest('SHA-256', buf);
+      return Array.prototype.map.call(new Uint8Array(d),
+        (b) => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) { /* sin crypto disponible */ }
+  return (file.name || '?') + '|' + file.size + '|' + (file.lastModified || 0);
+}
+
+async function detectColorSpace(file) {
+  try {
+    const buf = new Uint8Array(await file.slice(0, 262144).arrayBuffer());
+    let s = '';
+    for (let i = 0; i < buf.length; i++) {
+      const c = buf[i];
+      s += (c >= 32 && c < 127) ? String.fromCharCode(c) : '\u0000';
+    }
+    const flat = s.replace(/\u0000/g, '');
+    const hay = (needle) => s.includes(needle) || flat.includes(needle.replace(/ /g, ''));
+    if (hay('Adobe RGB')) return 'AdobeRGB';
+    if (hay('Display P3') || hay('DisplayP3')) return 'DisplayP3';
+    if (hay('ProPhoto')) return 'ProPhoto';
+    if (hay('sRGB')) return 'sRGB';
+  } catch (e) { /* perfil no legible */ }
+  return 'unknown';
+}
+
+const M_TO_XYZ = {
+  AdobeRGB:  [.5767309,.1855540,.1881852, .2973769,.6273491,.0752741, .0270343,.0706872,.9911085],
+  DisplayP3: [.4865709,.2656677,.1982173, .2289746,.6917385,.0792869, 0,.0451134,1.0439444],
+  ProPhoto:  [.7976749,.1351917,.0313534, .2880402,.7118741,.0000857, 0,0,.8252100],
+};
+const M_XYZ_SRGB = [3.2404542,-1.5371385,-.4985314, -.9692660,1.8760108,.0415560, .0556434,-.2040259,1.0572252];
+const sEnc = (v) => v <= .0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - .055;
+const sDec = (v) => v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4);
+
+function convertToSRGB(ctx, w, h, cs) {
+  const M = M_TO_XYZ[cs];
+  if (!M) return;
+  const gamma = cs === 'AdobeRGB' ? 563 / 256 : cs === 'ProPhoto' ? 1.8 : null;
+  const dec = gamma ? (v) => Math.pow(v, gamma) : sDec;
+  const lut = new Float32Array(256);
+  for (let i = 0; i < 256; i++) lut[i] = dec(i / 255);
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
+  const [a,b,c,e,f,g,i0,j,k] = M;
+  const [p,q,s2,t2,u2,v2,x2,y2,z2] = M_XYZ_SRGB;
+  for (let n = 0; n < d.length; n += 4) {
+    const R = lut[d[n]], G = lut[d[n+1]], B = lut[d[n+2]];
+    const X = a*R + b*G + c*B, Y = e*R + f*G + g*B, Z = i0*R + j*G + k*B;
+    d[n]   = clamp(sEnc(clamp(p*X + q*Y + s2*Z, 0, 1)) * 255, 0, 255);
+    d[n+1] = clamp(sEnc(clamp(t2*X + u2*Y + v2*Z, 0, 1)) * 255, 0, 255);
+    d[n+2] = clamp(sEnc(clamp(x2*X + y2*Y + z2*Z, 0, 1)) * 255, 0, 255);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+async function decodeBitmap(file, opts) {
+  try { return await createImageBitmap(file, opts || { imageOrientation: 'from-image' }); }
+  catch (e) { return await createImageBitmap(file); }
+}
+
+/* Dibuja un bitmap girado en un canvas nuevo. La rotacion se aplica a los
+   pixeles, no a la geometria: asi el resto del codigo la ignora por completo. */
+/* Caja envolvente de una imagen girada un angulo cualquiera. Con multiplos de 90
+   se reduce a intercambiar ancho y alto. */
+function rotSize(w, h, deg) {
+  const r = (deg || 0) * Math.PI / 180;
+  const c = Math.abs(Math.cos(r)), sn = Math.abs(Math.sin(r));
+  return { w: w * c + h * sn, h: w * sn + h * c };
+}
+
+function rotateOnto(bmp, rot, k, flip) {
+  const nat = rotSize(bmp.width, bmp.height, rot);
+  const cw = Math.max(1, Math.round(nat.w * k));
+  const ch = Math.max(1, Math.round(nat.h * k));
+  const cv = document.createElement('canvas');
+  cv.width = cw; cv.height = ch;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  ctx.imageSmoothingQuality = 'high';
+  /* El espejo se aplica FUERA del giro para que refleje lo que el usuario ve y
+     no el original: se gira la foto y despues se voltea el resultado. Voltear
+     no cambia la caja, solo el giro lo hace. */
+  ctx.translate(cw / 2, ch / 2);
+  if (flip) ctx.scale(-1, 1);
+  if (rot) ctx.rotate(rot * Math.PI / 180);
+  ctx.drawImage(bmp, -bmp.width * k / 2, -bmp.height * k / 2, bmp.width * k, bmp.height * k);
+  return { cv, ctx, w: cw, h: ch };
+}
+
+/* Preview ligero: el File original queda intacto para el export. */
+async function buildPreview(file, cs, convert, rot, flip) {
+  const bmp = await decodeBitmap(file);
+  const box = rotSize(bmp.width, bmp.height, rot);
+  const natW = Math.round(box.w), natH = Math.round(box.h);
+  const srcW = bmp.width, srcH = bmp.height;
+  const k = Math.min(1, 1600 / Math.max(natW, natH));
+  const out = rotateOnto(bmp, rot, k, flip);
+  if (convert) convertToSRGB(out.ctx, out.w, out.h, cs);
+  if (bmp.close) bmp.close();
+  /* Con angulos que no son multiplo de 90 las esquinas quedan transparentes, y
+     JPEG no tiene canal alfa: las pintaria de negro. Ahi hace falta PNG. */
+  const mime = ((rot || 0) % 90) !== 0 ? 'image/png' : 'image/jpeg';
+  const blob = await new Promise((res) => out.cv.toBlob(res, mime, .92));
+  const url = blob ? URL.createObjectURL(blob) : out.cv.toDataURL(mime, .92);
+  const el = await new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => rej(new Error('no se pudo decodificar el preview'));
+    im.src = url;
+  });
+  return { w: natW, h: natH, srcW: srcW, srcH: srcH, url, el };
+}
+
+/* ------------------------------------------------------- almacen persistente
+
+   Las fotos son Blobs, asi que localStorage no sirve: IndexedDB si guarda
+   ficheros tal cual. Se guarda el post (JSON pequeño) y el File original de
+   cada foto. Los previews NO se guardan: se regeneran al abrir, porque son
+   derivados y ocuparian el doble.
+   ------------------------------------------------------------------------- */
+
+const DB_NAME = 'carrete';
+
+let dbPromise = null;
+
+/* Una sola conexion reutilizada: abrir la base en cada operacion hacia decenas
+   de aperturas por guardado. */
+function idb() {
+  if (!dbPromise) {
+    dbPromise = new Promise((res, rej) => {
+      const rq = indexedDB.open(DB_NAME, 1);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        if (!db.objectStoreNames.contains('kv')) db.createObjectStore('kv');
+        if (!db.objectStoreNames.contains('files')) db.createObjectStore('files');
+      };
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => { dbPromise = null; rej(rq.error); };
+    });
+  }
+  return dbPromise;
+}
+
+function idbDo(store, mode, fn) {
+  return idb().then((db) => new Promise((res, rej) => {
+    const tx = db.transaction(store, mode);
+    const rq = fn(tx.objectStore(store));
+    if (rq) { rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); }
+    else { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }
+  }));
+}
+
+const idbGet  = (store, key) => idbDo(store, 'readonly',  (st) => st.get(key));
+const idbPut  = (store, key, val) => idbDo(store, 'readwrite', (st) => st.put(val, key));
+const idbDel  = (store, key) => idbDo(store, 'readwrite', (st) => st.delete(key));
+const idbKeys = (store) => idbDo(store, 'readonly', (st) => st.getAllKeys());
+
+let saveTimer = null;
+let loading = false;          // evita guardar mientras se esta cargando
+let projectId = null;
+let projects = [];            // indice: [{ id, name, updated, pages, ratio }]
+
+/* Claves: kv:index (lista), kv:project:<id> (el post), kv:ui (preferencias).
+   El almacen `files` es COMPARTIDO entre proyectos: una misma foto puede estar
+   en varios, asi que las huerfanas solo se borran comparando contra TODOS los
+   proyectos, nunca contra el que esta abierto. */
+
+function projectMeta() {
+  return {
+    id: projectId,
+    name: (projects.find((p) => p.id === projectId) || {}).name || 'Sin título',
+    updated: Date.now(),
+    pages: post.slides.length,
+    ratio: post.ratio,
+  };
+}
+
+function save() {
+  if (loading || !projectId) return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(doSave, 500);
+}
+
+async function doSave() {
+  if (loading || !projectId) return;
+  try {
+    await idbPut('kv', 'project:' + projectId, clonePost());
+    const meta = projectMeta();
+    const i = projects.findIndex((p) => p.id === projectId);
+    if (i >= 0) projects[i] = Object.assign({}, projects[i], meta);
+    else projects.push(meta);
+    await idbPut('kv', 'index', projects);
+    await idbPut('kv', 'ui', { projectId: projectId, customBg: customBg, showThirds: showThirds, current: current });
+    for (const id of Object.keys(images)) {
+      const im = images[id];
+      if (im.saved) continue;
+      await idbPut('files', id, {
+        name: im.name, cs: im.cs, key: im.key,
+        converted: im.converted, rot: im.rot || 0, flip: !!im.flip, file: im.file,
+      });
+      im.saved = true;
+    }
+  } catch (e) { /* sin persistencia: se sigue trabajando en memoria */ }
+}
+
+function freeImages() {
+  Object.keys(images).forEach((id) => {
+    const im = images[id];
+    if (im.url && im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+    delete images[id];
+  });
+}
+
+/* Carga en memoria solo las fotos que usa este post. */
+async function loadImagesFor(p) {
+  const need = {};
+  p.slides.forEach((sl) => sl.cells.forEach((c) => { if (c.imgId) need[c.imgId] = true; }));
+  const ids = Object.keys(need);
+  if (ids.length) setBusy('Cargando fotos…');
+  for (const id of ids) {
+    try {
+      const rec = await idbGet('files', id);
+      if (!rec || !rec.file) continue;
+      const pv = await buildPreview(rec.file, rec.cs, rec.converted, rec.rot || 0, !!rec.flip);
+      images[id] = Object.assign({ id: id, saved: true }, rec, pv);
+    } catch (e) { /* foto ilegible: la celda quedara vacia */ }
+  }
+  setBusy(null);
+}
+
+function applyPost(next) {
+  Object.keys(post).forEach((k) => { delete post[k]; });
+  Object.assign(post, next);
+  history.length = 0;
+  syncUndo();
+  current = clamp(current, 0, post.slides.length - 1);
+  feedIndex = 0;
+  sel = null;
+  syncGapIndex();
+}
+
+async function openProject(id) {
+  loading = true;
+  try {
+    const saved = await idbGet('kv', 'project:' + id);
+    if (!saved || !saved.slides || !saved.slides.length) return false;
+    freeImages();
+    projectId = id;
+    current = 0;
+    applyPost(saved);
+    await loadImagesFor(post);
+    return true;
+  } catch (e) {
+    return false;
+  } finally {
+    loading = false;
+  }
+}
+
+async function createProject(name, fromPost) {
+  const id = uid();
+  const base = fromPost || { ratio: '4:5', gap: 0, bg: '#ffffff', fmt: 'jpeg', slides: [newSlide('full')] };
+  projects.push({ id: id, name: name || defaultName(), updated: Date.now(),
+                  pages: base.slides.length, ratio: base.ratio });
+  await idbPut('kv', 'project:' + id, base);
+  await idbPut('kv', 'index', projects);
+  return id;
+}
+
+function defaultName() {
+  const d = new Date();
+  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return d.getDate() + ' ' + meses[d.getMonth()] + ' ' +
+    String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+async function newProject() {
+  if (!loading && projectId) await doSave();
+  const id = await createProject(null, null);
+  freeImages();
+  projectId = id;
+  current = 0;
+  applyPost({ ratio: post.ratio, gap: post.gap, bg: post.bg, slides: [newSlide('full')] });
+  mode = 'edit';
+  render();
+}
+
+async function duplicateProject(id) {
+  const src = await idbGet('kv', 'project:' + id);
+  if (!src) return;
+  const name = (projects.find((p) => p.id === id) || {}).name || 'Sin título';
+  const copy = JSON.parse(JSON.stringify(src));
+  if (copy.slides && copy.slides.length > MAX_SLIDES) copy.slides = copy.slides.slice(0, MAX_SLIDES);
+  const newId = await createProject(name + ' (copia)', copy);
+  await openProject(newId);
+  render();
+}
+
+async function deleteProject(id) {
+  /* Cancela cualquier guardado pendiente: si no, el timer escribiria despues
+     del borrado y resucitaria el proyecto. */
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  try { await idbDel('kv', 'project:' + id); } catch (e) { /* ya no estaba */ }
+  projects = projects.filter((p) => p.id !== id);
+  await idbPut('kv', 'index', projects);
+
+  if (id === projectId) {
+    if (projects.length) {
+      await openProject(projects[0].id);
+    } else {
+      /* Estado vacio de verdad: sin proyecto abierto. Borrar el ultimo no debe
+         recrear uno, o parece que la accion no ha hecho nada. */
+      freeImages();
+      projectId = null;
+      applyPost({ ratio: post.ratio, gap: post.gap, bg: post.bg, slides: [newSlide('full')] });
+      mode = 'projects';
+      await idbPut('kv', 'ui', { projectId: null, customBg: customBg, showThirds: showThirds, current: 0 });
+    }
+  }
+  await sweepFiles();
+  render();
+}
+
+async function renameProject(id, name) {
+  const i = projects.findIndex((p) => p.id === id);
+  if (i < 0) return;
+  projects[i].name = name || 'Sin título';
+  await idbPut('kv', 'index', projects);
+}
+
+/* Borra del disco las fotos que no usa NINGUN proyecto. */
+async function sweepFiles() {
+  try {
+    const used = {};
+    for (const p of projects) {
+      const doc = await idbGet('kv', 'project:' + p.id);
+      if (!doc || !doc.slides) continue;
+      doc.slides.forEach((sl) => sl.cells.forEach((c) => { if (c.imgId) used[c.imgId] = true; }));
+    }
+    const keys = await idbKeys('files');
+    const orphans = keys.filter((k) => !used[k] && !images[k]);
+    if (orphans.length) await idbDo('files', 'readwrite', (st) => { orphans.forEach((k) => st.delete(k)); });
+  } catch (e) { /* sin limpieza */ }
+}
+
+async function boot() {
+  loading = true;
+  try {
+    const stored = await idbGet('kv', 'index');
+    const firstRun = !stored;      // [] guardado significa "los borro a proposito"
+    projects = stored || [];
+    const ui = (await idbGet('kv', 'ui')) || {};
+    if (ui.customBg) customBg = ui.customBg;
+    showThirds = !!ui.showThirds;
+  
+    /* Migracion del formato anterior, que guardaba un unico post. */
+    const legacy = await idbGet('kv', 'post');
+    if (legacy && legacy.slides && !projects.length) {
+      projectId = await createProject('Post recuperado', legacy);
+      await idbDel('kv', 'post');
+    }
+
+    /* Primera vez: se crea uno y se entra directo al editor. Si el usuario los
+       borro todos, se respeta el estado vacio. */
+    if (firstRun && !projects.length) projectId = await createProject(null, clonePost());
+
+    if (!projects.length) {
+      projectId = null;
+      mode = 'projects';
+      loading = false;
+      render();
+      sweepFiles();
+      return;
+    }
+
+    const wanted = (ui.projectId && projects.some((p) => p.id === ui.projectId))
+      ? ui.projectId : (projectId || projects[0].id);
+    loading = false;
+    const ok = await openProject(wanted);
+    if (!ok) { projectId = wanted; }
+    if (typeof ui.current === 'number') current = clamp(ui.current, 0, post.slides.length - 1);
+    render();
+    sweepFiles();
+  } catch (e) {
+    loading = false;
+    render();
+  }
+}
+
+/* ------------------------------------------------------------------ estado */
+
+const post = { ratio: '4:5', gap: 0, bg: '#ffffff', fmt: 'jpeg', slides: [newSlide('full')] };
+const images = {};            // id -> { file, name, cs, converted, rot, w, h, url, el }
+let current = 0;
+let sel = null;               // { slideIndex, cellIndex }
+let mode = 'edit';
+let exportsOut = null;
+let gapIndex = 0;
+let feedIndex = 0;
+let customBg = '#e7e2d8';
+let showThirds = false;
+let level = 'page';   // post | page | photo
+let tool = null;      // subnivel abierto dentro del panel del nivel
+let toolLevel = null;
+let swapFrom = null;
+
+/* --------------------------------------------------------------- historial
+
+   El estado que se deshace es `post`, que es JSON puro y minusculo: clonarlo
+   cuesta nada. Las fotos no se clonan, se referencian por id. La rotacion vive
+   en el registro de la foto, no en el post, asi que cada entrada guarda tambien
+   los grados de cada foto para poder revertirlos.
+   ------------------------------------------------------------------------- */
+
+const history = [];
+const HISTORY_MAX = 40;
+
+function clonePost() { return JSON.parse(JSON.stringify(post)); }
+
+/* Giro y espejo viven en la foto, no en el post, asi que cada entrada del
+   historial guarda la orientacion de todas para poder revertirla. */
+function orientMap() {
+  const m = {};
+  Object.keys(images).forEach((id) => {
+    m[id] = { rot: images[id].rot || 0, flip: !!images[id].flip };
+  });
+  return m;
+}
+
+/* Se llama ANTES de modificar, con el estado que queremos poder recuperar. */
+function pushHistory(snapshot) {
+  history.push(snapshot || { post: clonePost(), orient: orientMap() });
+  if (history.length > HISTORY_MAX) history.shift();
+  syncUndo();
+}
+
+function syncUndo() {
+  const b = $('btn-undo');
+  if (b) b.disabled = history.length === 0 || !projectId;
+}
+
+async function undo() {
+  if (!history.length) return;
+  const entry = history.pop();
+  Object.keys(post).forEach((k) => { delete post[k]; });
+  Object.assign(post, entry.post);
+  current = clamp(current, 0, post.slides.length - 1);
+  feedIndex = clamp(feedIndex, 0, post.slides.length - 1);
+  sel = null;
+  syncGapIndex();
+  syncUndo();
+
+  /* Revertir rotaciones si alguna cambio respecto al momento del snapshot. */
+  const orient = entry.orient || {};
+  const pend = Object.keys(orient).filter((id) => images[id] &&
+    ((images[id].rot || 0) !== orient[id].rot || !!images[id].flip !== !!orient[id].flip));
+  if (pend.length) {
+    setBusy('Deshaciendo…');
+    for (const id of pend) {
+      const im = images[id];
+      const o = orient[id];
+      const pv = await buildPreview(im.file, im.cs, im.converted, o.rot, o.flip);
+      if (im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+      Object.assign(im, pv, { rot: o.rot, flip: o.flip, saved: false });
+    }
+    setBusy(null);
+  }
+  render();
+}
+
+function syncGapIndex() {
+  const i = GAPS.indexOf(post.gap);
+  gapIndex = i >= 0 ? i : 0;
+  if (i < 0) post.gap = GAPS[0];
+}
+
+/* navigator.vibrate es la API tosca del motor: no hay amplitud ni curva, asi que
+   lo unico que se puede modular es la duracion. Por debajo de ~10ms muchos
+   motores no llegan a arrancar. En iOS no existe. */
+const HAPTIC = { step: 12, stop: 22, drop: 10 };
+
+function haptic(ms) {
+  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* no disponible */ }
+}
+
+/* El tono del aviso es el del elemento que lo abre, para que se entienda de
+   donde viene. */
+const TONES = {
+  neutral: { line: 'var(--line-2)', text: 'var(--txt)', bg: 'var(--panel)', bar: 'var(--dim)' },
+  dup:     { line: '#f97316', text: '#ffedd5', bg: 'rgba(249,115,22,.15)', bar: '#f97316' },
+  warn:    { line: 'var(--warn)', text: '#fde68a', bg: 'rgba(251,191,36,.13)', bar: 'var(--warn)' },
+  danger:  { line: '#f87171', text: '#fecaca', bg: 'rgba(248,113,113,.13)', bar: '#f87171' },
+};
+const TOAST_MS = 5000;
+
+let toastTimer = null;
+
+function toast(msg, tone) {
+  const n = $('toast');
+  const t = TONES[tone] || TONES.neutral;
+  $('toast-msg').textContent = msg;
+  $('toast-msg').style.color = t.text;
+  n.style.borderColor = t.line;
+  /* El tinte se superpone al color solido del panel en lugar de sustituirlo:
+     asi el aviso es opaco y no se lee lo que hay debajo. */
+  n.style.background = 'linear-gradient(' + t.bg + ', ' + t.bg + '), var(--panel)';
+
+  const bar = $('toast-bar');
+  bar.style.background = t.bar;
+  /* Reinicia la animacion: sin quitar la clase y forzar un reflow, un segundo
+     aviso reutilizaria la cuenta del anterior. */
+  n.classList.remove('run');
+  void n.offsetWidth;
+  bar.style.animationDuration = TOAST_MS + 'ms';
+  n.hidden = false;
+  n.classList.add('run');
+
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { n.hidden = true; n.classList.remove('run'); }, TOAST_MS);
+}
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls) => { const n = document.createElement(tag); if (cls) n.className = cls; return n; };
+/* Con width/height propios, un icono sin regla CSS no puede estirarse hasta
+   llenar su contenedor. */
+const svg = (d) => `<svg viewBox="0 0 24 24" width="16" height="16">${d}</svg>`;
+const ICON = {
+  rotate: svg('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>'),
+  trash:  svg('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>'),
+  close:  svg('<path d="M18 6L6 18M6 6l12 12"/>'),
+  tick:   svg('<path d="M4 12.5l5 5L20 6.5"/>'),
+  undo:   svg('<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/>'),
+  grid:   svg('<path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>'),
+  center: svg('<path d="M12 3v18M3 12h18"/>'),
+  swap:   svg('<path d="M3 9h13l-4-4M21 15H8l4 4"/>'),
+  move:   svg('<path d="M12 3v18M3 12h18"/><path d="M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>'),
+  left:   svg('<path d="M15 18l-6-6 6-6"/>'),
+  right:  svg('<path d="M9 18l6-6-6-6"/>'),
+  ratio:  svg('<path d="M5 4h14v16H5z"/>'),
+  gapic:  svg('<path d="M4 4h16v6H4zM4 14h16v6H4z"/>'),
+  bg:     svg('<path d="M4 4h16v16H4z"/><path d="M4 14l16-10"/>'),
+  plus:   svg('<path d="M12 5v14M5 12h14"/>'),
+  copy:   svg('<path d="M9 9h11v11H9z"/><path d="M15 5H4v11"/>'),
+  expand: svg('<path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/>'),
+  shrink: svg('<path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5"/>'),
+  mirror: svg('<path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M8.5 8L4.5 12l4 4"/><path d="M15.5 8l4 4-4 4"/>'),
+  warn:   svg('<path d="M12 4l8.5 16h-17z"/><path d="M12 10.5v4"/><circle cx="12" cy="17.4" r=".9" fill="currentColor" stroke="none"/>'),
+};
+
+/* Confirmacion para acciones que destruyen trabajo ya hecho. */
+function confirmAsk(title, body, okLabel, onOk) {
+  const back = el('div', 'modal');
+  const box = el('div', 'box');
+  const h = el('h3');
+  h.textContent = title;
+  const p = el('p');
+  p.textContent = body;
+  const acts = el('div', 'acts');
+  const no = el('button');
+  no.textContent = 'Cancelar';
+  const yes = el('button', 'go');
+  yes.textContent = okLabel;
+  acts.appendChild(no);
+  acts.appendChild(yes);
+  box.appendChild(h);
+  box.appendChild(p);
+  box.appendChild(acts);
+  back.appendChild(box);
+
+  const close = () => {
+    back.remove();
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  no.addEventListener('click', close);
+  yes.addEventListener('click', () => { close(); onOk(); });
+  back.addEventListener('click', (e) => { if (e.target === back) close(); });
+  document.addEventListener('keydown', onKey);
+
+  document.body.appendChild(back);
+  no.focus();
+}
+
+/* Suelta los previews de fotos que ya no usa ninguna celda. */
+function pruneImages() {
+  const used = {};
+  const mark = (p) => p.slides.forEach((s) => s.cells.forEach((c) => { if (c.imgId) used[c.imgId] = true; }));
+  mark(post);
+  /* Una foto que ya no esta en el post sigue viva si el historial la necesita
+     para poder deshacer. */
+  history.forEach((h) => mark(h.post));
+  Object.keys(images).forEach((id) => {
+    if (used[id]) return;
+    const im = images[id];
+    if (im.url && im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+    delete images[id];
+  });
+}
+
+function setBusy(msg) {
+  const n = $('busy');
+  if (!msg) { n.hidden = true; return; }
+  n.textContent = msg;
+  n.hidden = false;
+}
+function setErr(msg) {
+  $('err').hidden = !msg;
+  if (msg) $('err-text').textContent = msg;
+}
+
+/* -------------------------------------------------------------- ingesta */
+
+async function ingest(files, slideIndex, cellIndex) {
+  setErr(null);
+  try {
+    setBusy(files.length > 1 ? 'Leyendo ' + files.length + ' fotos…' : 'Leyendo foto…');
+    const added = [];
+    for (const file of files) {
+      const cs = await detectColorSpace(file);
+      const key = await fingerprint(file);
+      const pv = await buildPreview(file, cs, false, 0, false);
+      const rec = { id: uid(), name: file.name, file, cs, key, converted: false, rot: 0, flip: false };
+      Object.assign(rec, pv);
+      images[rec.id] = rec;
+      added.push(rec);
+    }
+    pushHistory();
+    /* La primera va a la celda indicada y el resto a las siguientes que esten
+       vacias. Con el picker actual siempre llega una sola. */
+    const s = post.slides[slideIndex];
+    let ci = cellIndex, k = 0;
+    while (k < added.length && ci < s.cells.length) {
+      if (ci === cellIndex || !s.cells[ci].imgId) {
+        s.cells[ci] = { imgId: added[k].id, t: newT() };
+        k++;
+      }
+      ci++;
+    }
+    if (k < added.length) {
+      toast('Solo caben ' + k + (k === 1 ? ' foto' : ' fotos') + ' en los huecos libres; el resto se ha ignorado.', 'warn');
+    }
+    sel = { slideIndex, cellIndex };
+    render();
+  } catch (e) {
+    setErr('No se pudo leer la foto: ' + (e && e.message ? e.message : e));
+  } finally {
+    setBusy(null);
+  }
+}
+
+/* Gira el punto focal con la imagen, para cualquier angulo: se pasa a
+   coordenadas de la caja actual, se rota, y se normaliza contra la caja nueva.
+   Con espejo activo el sentido se invierte. */
+function turnFocal(t, delta, before, after, flip) {
+  const r = (flip ? -delta : delta) * Math.PI / 180;
+  const co = Math.cos(r), si = Math.sin(r);
+  const px = (t.fx - .5) * before.w, py = (t.fy - .5) * before.h;
+  return {
+    scale: t.scale,
+    fx: .5 + (px * co - py * si) / (after.w || 1),
+    fy: .5 + (px * si + py * co) / (after.h || 1),
+  };
+}
+
+async function setRotation(id, target) {
+  const im = images[id];
+  if (!im) return;
+  let deg = ((target % 360) + 360) % 360;
+  deg = Math.round(deg * 2) / 2;              // pasos de medio grado
+  if (Math.abs(deg - (im.rot || 0)) < 1e-6) return;
+  await applyRotation(id, deg);
+}
+
+async function rotateImage(id) {
+  await applyRotation(id, ((((images[id] || {}).rot || 0) + 90) % 360));
+}
+
+async function applyRotation(id, rot) {
+  const im = images[id];
+  if (!im) return;
+  pushHistory();
+  try {
+    setBusy('Girando…');
+    const from = im.rot || 0;
+    const sw = im.srcW || im.w, sh = im.srcH || im.h;
+    const before = rotSize(sw, sh, from);
+    const after = rotSize(sw, sh, rot);
+    const pv = await buildPreview(im.file, im.cs, im.converted, rot, im.flip);
+    if (im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+    Object.assign(im, pv, { rot: rot, saved: false });
+
+    /* El zoom SE CONSERVA: scale esta definido relativo al cover de la celda, y
+       el cover se recalcula solo con el nuevo aspecto. Lo unico que hay que
+       girar es el punto focal, que vive en coordenadas de la imagen: un giro de
+       90° en sentido horario lleva (fx, fy) -> (1 - fy, fx). */
+    const pending = [];
+    postCells().forEach((c) => {
+      if (c.imgId !== id) return;
+      const t0 = post.slides[c.slideIndex].cells[c.cellIndex].t;
+      pending.push({ c: c, t: turnFocal(t0, rot - from, before, after, im.flip) });
+    });
+    const ia = im.w / im.h;
+    pending.forEach((p) => {
+      post.slides[p.c.slideIndex].cells[p.c.cellIndex].t = clampT(p.t, p.c.cellAspect, ia);
+    });
+    render();
+  } catch (e) {
+    setErr('No se pudo girar: ' + (e && e.message ? e.message : e));
+  } finally {
+    setBusy(null);
+  }
+}
+
+/* Espejo horizontal. Como el giro, se aplica a los pixeles y el resto del
+   codigo lo ignora. El punto focal se voltea con la imagen: lo que estaba a un
+   tercio del borde izquierdo queda a un tercio del derecho. */
+async function mirrorImage(id) {
+  const im = images[id];
+  if (!im) return;
+  pushHistory();
+  try {
+    setBusy('Volteando…');
+    const flip = !im.flip;
+    const pv = await buildPreview(im.file, im.cs, im.converted, im.rot, flip);
+    if (im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+    Object.assign(im, pv, { flip: flip, saved: false });
+    const ia = im.w / im.h;
+    postCells().forEach((c) => {
+      if (c.imgId !== id) return;
+      const st = post.slides[c.slideIndex].cells[c.cellIndex];
+      st.t = clampT({ scale: st.t.scale, fx: 1 - st.t.fx, fy: st.t.fy }, c.cellAspect, ia);
+    });
+    render();
+  } catch (e) {
+    setErr('No se pudo voltear: ' + (e && e.message ? e.message : e));
+  } finally {
+    setBusy(null);
+  }
+}
+
+async function convertAll() {
+  const list = Object.values(images).filter((im) => !im.converted && OFF_PROFILE.indexOf(im.cs) >= 0);
+  try {
+    setBusy('Convirtiendo a sRGB…');
+    for (const im of list) {
+      const pv = await buildPreview(im.file, im.cs, true, im.rot, im.flip);
+      if (im.url.indexOf('blob:') === 0) URL.revokeObjectURL(im.url);
+      Object.assign(im, pv, { converted: true, saved: false });
+    }
+    render();
+  } catch (e) {
+    setErr('Falló la conversión: ' + (e && e.message ? e.message : e));
+  } finally {
+    setBusy(null);
+  }
+}
+
+/* --------------------------------------------------------------- paginas */
+
+function applyLayout(layoutId) {
+  pushHistory();
+  const s = post.slides[current];
+  const n = LAYOUTS[layoutId].cells.length;
+  const cells = [];
+  for (let i = 0; i < n; i++) cells.push(s.cells[i] || { imgId: null, t: newT() });
+  s.layoutId = layoutId;
+  s.cells = cells;
+  sel = null;
+  pruneImages();
+  render();
+}
+
+function setLayout(layoutId) {
+  const s = post.slides[current];
+  if (s.layoutId === layoutId) return;
+  const n = LAYOUTS[layoutId].cells.length;
+  let kept = 0, lost = 0;
+  s.cells.forEach((c, i) => { if (c.imgId) { if (i < n) kept++; else lost++; } });
+
+  /* Solo molesta si de verdad se pierde trabajo: cambiar a un layout con menos
+     huecos pero con esos huecos vacios no pregunta nada. */
+  if (!lost) { applyLayout(layoutId); return; }
+
+  const huecos = n === 1 ? '1 hueco' : n + ' huecos';
+  const keptTxt = kept === 0 ? 'No se conservará ninguna foto'
+    : kept === 1 ? 'Se conservará la primera foto'
+    : 'Se conservarán las ' + kept + ' primeras';
+  const lostTxt = lost === 1 ? 'y se quitará 1.' : 'y se quitarán ' + lost + '.';
+  confirmAsk(
+    '¿Cambiar de layout?',
+    'Este layout tiene ' + huecos + '. ' + keptTxt + ' ' + lostTxt,
+    'Cambiar y quitar',
+    () => applyLayout(layoutId)
+  );
+}
+
+function addSlide() {
+  armTapGuard();
+  if (post.slides.length >= MAX_SLIDES) {
+    toast('Instagram admite ' + MAX_SLIDES + ' páginas como máximo en un carrusel.', 'warn');
+    return;
+  }
+  pushHistory();
+  post.slides.splice(current + 1, 0, newSlide('full'));
+  current += 1;
+  sel = null;
+  render();
+}
+
+function removeSlide(i) {
+  pushHistory();
+  if (post.slides.length === 1) post.slides = [newSlide('full')];
+  else post.slides.splice(i, 1);
+  current = clamp(i > 0 ? i - 1 : 0, 0, post.slides.length - 1);
+  sel = null;
+  pruneImages();
+  render();
+}
+
+/* Reordenar es MOVER a una posicion, no intercambiar: la pagina se saca y se
+   inserta, y el resto corre. */
+function moveSlideTo(from, to) {
+  if (from === to || from < 0 || to < 0) return;
+  if (from >= post.slides.length || to >= post.slides.length) return;
+  pushHistory();
+  const moved = post.slides.splice(from, 1)[0];
+  post.slides.splice(to, 0, moved);
+  current = to;
+  sel = null;
+  render();
+}
+
+function moveSlide(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= post.slides.length) return;
+  pushHistory();
+  const tmp = post.slides[i];
+  post.slides[i] = post.slides[j];
+  post.slides[j] = tmp;
+  current = j;
+  render();
+}
+
+/* Fotos que ocupan mas de una celda en todo el post, agrupadas por contenido. */
+function duplicates() {
+  const byKey = {};
+  post.slides.forEach((s, i) => {
+    s.cells.forEach((c) => {
+      const im = c.imgId ? images[c.imgId] : null;
+      if (!im || !im.key) return;
+      if (!byKey[im.key]) byKey[im.key] = { count: 0, pages: {} };
+      byKey[im.key].count += 1;
+      byKey[im.key].pages[i + 1] = true;
+    });
+  });
+  const out = { keys: {}, groups: [] };
+  Object.keys(byKey).forEach((k) => {
+    if (byKey[k].count < 2) return;
+    out.keys[k] = byKey[k].count;
+    out.groups.push({
+      key: k, count: byKey[k].count,
+      pages: Object.keys(byKey[k].pages).map(Number).sort((a, b) => a - b),
+    });
+  });
+  return out;
+}
+
+/* ---------------------------------------------------------------- render */
+
+function localCells() {
+  return postCells()
+    .filter((c) => c.slideIndex === current)
+    .map((c) => { c.rect.xLocal = c.rect.x - current; return c; });
+}
+
+/* Ojo: necesita el cellAspect de la geometria, no el objeto de estado de la
+   celda (que solo tiene imgId y t). Si llega undefined, dhU sale NaN y el
+   navegador descarta height/top sin avisar. */
+function applyImgStyle(img, cellAspect, t, image) {
+  const ia = image.w / image.h;
+  const tc = clampT(t, cellAspect, ia);
+  const u = imageUnits(tc.scale, cellAspect, ia);
+  img.style.left = pct(.5 - tc.fx * u.dwU);
+  img.style.top = pct(.5 - tc.fy * u.dhU);
+  img.style.width = pct(u.dwU);
+  img.style.height = pct(u.dhU);
+}
+
+function buildCell(cell) {
+  const box = el('div', 'cell');
+  box.dataset.cell = String(cell.cellIndex);
+  box.style.left = pct(cell.rect.xLocal);
+  box.style.top = pct(cell.rect.y);
+  box.style.width = pct(cell.rect.w);
+  box.style.height = pct(cell.rect.h);
+
+  const image = cell.imgId ? images[cell.imgId] : null;
+  const stateCell = post.slides[cell.slideIndex].cells[cell.cellIndex];
+
+  if (!image) {
+    box.classList.add('empty');
+    const ph = el('div', 'ph');
+    ph.innerHTML = '<span class="sign">+</span><span class="lbl">añadir</span>';
+    box.appendChild(ph);
+    /* Input real encima de la celda: el toque cae directamente sobre el input,
+       sin ningun .click() por JS. */
+    const inp = el('input', 'filepick');
+    inp.type = 'file';
+    inp.accept = 'image/*';
+    /* preventDefault sobre el click de un input de fichero impide que se abra el
+       dialogo, que es justo lo que hace falta durante la guarda. */
+    inp.addEventListener('click', (e) => {
+      if (Date.now() < tapGuard) e.preventDefault();
+    });
+    /* Sin multiple: una celda es una foto, y el toque identifica la celda. */
+    inp.addEventListener('change', (e) => {
+      const files = Array.prototype.slice.call(e.target.files || []);
+      e.target.value = '';
+      if (files.length) ingest(files, cell.slideIndex, cell.cellIndex);
+    });
+    box.appendChild(inp);
+    return box;
+  }
+
+  box.classList.add('filled');
+  const badges = el('div', 'badges');
+  box.appendChild(badges);
+  const mark = el('i', 'mark');
+  box.appendChild(mark);
+
+  if (dupKeys[image.key]) {
+    /* Solo el iconito ocupa sitio; el detalle sale al tocarlo, superpuesto. */
+    const flag = el('button', 'dupflag');
+    flag.innerHTML = ICON.warn;
+    flag.title = 'Foto repetida — toca para ver dónde';
+    badges.appendChild(flag);
+    ['pointerdown', 'pointerup', 'dblclick'].forEach((ev) => {
+      flag.addEventListener(ev, (e) => e.stopPropagation());
+    });
+    flag.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pages = dupPages[image.key] || [];
+      const donde = pages.length === 1
+        ? 'dos veces en la página ' + pages[0]
+        : 'en las páginas ' + pages.slice(0, -1).join(', ') + ' y ' + pages[pages.length - 1];
+      toast('La misma foto está ' + donde + '.', 'dup');
+    });
+  }
+  /* Datos del ORIGINAL, no del preview: dimensiones tal como esta orientada
+     ahora y peso del fichero en disco. */
+  const tag = el('div', 'sizetag');
+  tag.textContent = image.w + '×' + image.h +
+    (image.file && image.file.size ? ' · ' + weight(image.file.size) : '');
+  badges.appendChild(tag);
+
+  const isSel = sel && sel.slideIndex === cell.slideIndex && sel.cellIndex === cell.cellIndex;
+  if (isSel) box.classList.add('sel');
+
+  const img = el('img');
+  img.src = image.url;
+  img.alt = '';
+  img.draggable = false;
+  applyImgStyle(img, cell.cellAspect, stateCell.t, image);
+  box.appendChild(img);
+
+  /* Los botones de la foto viven en el panel de nivel Foto: el lienzo queda
+     limpio y la imagen se ve entera.
+
+     Intercambiar es una herramienta del nivel Página: dentro de ella se arrastra
+     la foto entera, sin asa, porque ahi ningun otro gesto compite. Fuera de la
+     herramienta, arrastrar no mueve nada. */
+  if (level === 'page' && tool === 'move') {
+    box.classList.add('movable');
+    box.addEventListener('pointerdown', (e) => {
+      if (box.setPointerCapture) box.setPointerCapture(e.pointerId);
+      swapFrom = cell.cellIndex;
+      box.classList.add('lifting');
+      /* La que se mueve es la que se marca. Se toca el DOM en lugar de repintar,
+         porque un repintado destruiria el elemento a mitad de gesto. */
+      sel = { slideIndex: cell.slideIndex, cellIndex: cell.cellIndex };
+      Array.prototype.forEach.call(document.querySelectorAll('#stage .cell'), (b) => {
+        b.classList.toggle('sel', b === box);
+      });
+    });
+    box.addEventListener('pointermove', (e) => {
+      if (swapFrom === null) return;
+      e.preventDefault();
+      markDropzone(cellIndexAt(e.clientX, e.clientY));
+    });
+    const dropEnd = () => {
+      if (swapFrom === null) return;
+      /* El destino se lee ANTES de apagar las marcas: markDropzone(null) es
+         justo lo que lo borra. */
+      const target = dropTarget;
+      const from = swapFrom;
+      markDropzone(null);
+      lastDrop = null;
+      dropTarget = null;
+      swapFrom = null;
+      box.classList.remove('lifting');
+      if (target !== null && target !== from) swapCells(from, target);
+    };
+    box.addEventListener('pointerup', dropEnd);
+    box.addEventListener('pointercancel', dropEnd);
+    return box;
+  }
+
+  /* --- pan y pinch, con la mascara del overflow de la celda --- */
+  const ptrs = new Map();
+  let g = null;
+
+  const centroid = () => {
+    const pts = Array.from(ptrs.values());
+    const x = pts.reduce((a, q) => a + q.x, 0) / pts.length;
+    const y = pts.reduce((a, q) => a + q.y, 0) / pts.length;
+    const d = pts.length > 1 ? Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) : 0;
+    return { x, y, d };
+  };
+  const snapshot = () => ({
+    c: centroid(),
+    t: Object.assign({}, stateCell.t),
+    box: box.getBoundingClientRect(),
+  });
+
+  let beforeGesture = null;
+
+  const pick = () => { sel = { slideIndex: cell.slideIndex, cellIndex: cell.cellIndex }; render(); };
+  const openPhoto = () => {
+    sel = { slideIndex: cell.slideIndex, cellIndex: cell.cellIndex };
+    level = 'photo';
+    render();
+  };
+
+  /* En el nivel Página la celda escucha CLICK, no pointerdown: asi arrastrar
+     queda libre para que el lienzo cambie de pagina, y un toque limpio sigue
+     seleccionando. Un clic selecciona, dos abren, como en escritorio. */
+  if (level !== 'photo') {
+    box.addEventListener('click', () => { if (isSel) openPhoto(); else pick(); });
+    return box;
+  }
+
+  box.addEventListener('pointerdown', (e) => {
+    /* Ya dentro de Foto, tocar otra foto cambia de foto; sobre la seleccionada
+       el arrastre encuadra. */
+    if (!isSel) { pick(); return; }
+    if (box.setPointerCapture) box.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    g = snapshot();
+    /* Un encuadre entero es UN paso de deshacer, no uno por cada pixel. */
+    if (!beforeGesture) beforeGesture = { t: Object.assign({}, stateCell.t), snap: null };
+  });
+
+  box.addEventListener('pointermove', (e) => {
+    if (!g || !ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const c = centroid();
+    let scale = g.t.scale;
+    if (ptrs.size > 1 && g.c.d > 0 && c.d > 0) scale = clamp(g.t.scale * (c.d / g.c.d), 1, 8);
+    const ia = image.w / image.h;
+    const u = imageUnits(scale, cell.cellAspect, ia);
+    stateCell.t = clampT({
+      scale,
+      fx: g.t.fx - (c.x - g.c.x) / (u.dwU * g.box.width),
+      fy: g.t.fy - (c.y - g.c.y) / (u.dhU * g.box.height),
+    }, cell.cellAspect, ia);
+    applyImgStyle(img, cell.cellAspect, stateCell.t, image);   // sin re-render, para que vaya fluido
+  });
+
+  const endPtr = (e) => {
+    ptrs.delete(e.pointerId);
+    g = ptrs.size === 0 ? null : snapshot();
+    if (ptrs.size !== 0) return;
+    if (beforeGesture) {
+      const a = beforeGesture.t, b = stateCell.t;
+      if (a.scale !== b.scale || a.fx !== b.fx || a.fy !== b.fy) {
+        const snap = clonePost();
+        snap.slides[cell.slideIndex].cells[cell.cellIndex].t = a;
+        pushHistory({ post: snap, orient: orientMap() });
+        save();
+      }
+      beforeGesture = null;
+    }
+  };
+  box.addEventListener('pointerup', endPtr);
+  box.addEventListener('pointercancel', endPtr);
+
+  /* Refuerzo por si touch-action no basta: mientras hay gesto activo, el scroll
+     vertical de la pagina no debe robar el arrastre. */
+  box.addEventListener('touchmove', (e) => { if (g) e.preventDefault(); }, { passive: false });
+
+  box.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const ia = image.w / image.h;
+    stateCell.t = clampT(
+      Object.assign({}, stateCell.t, { scale: stateCell.t.scale * (e.deltaY < 0 ? 1.08 : 1 / 1.08) }),
+      cell.cellAspect, ia);
+    applyImgStyle(img, cell.cellAspect, stateCell.t, image);
+  }, { passive: false });
+
+  /* Doble clic: abre la foto si estamos fuera de Foto, y ya dentro recentra. */
+  box.addEventListener('dblclick', () => {
+    if (level !== 'photo' || !isSel) { openPhoto(); return; }
+    pushHistory();
+    stateCell.t = newT();
+    applyImgStyle(img, cell.cellAspect, stateCell.t, image);
+  });
+
+  return box;
+}
+
+let dupKeys = {};
+let dupPages = {};   // key -> paginas donde aparece esa misma foto
+
+/* Altura fija que consumen cabecera, datos, barra de pagina, pestañas y la zona
+   de herramientas. Todo lo que queda es para el area de trabajo. */
+const RESERVED = 218 + TOOLS_H;
+let stageH = 0;
+let stageW = 0;
+let peekW = 0;
+let areaH = 0;
+
+/* Altura del area de trabajo, en pixeles y calculada una sola vez por render.
+   Es IDENTICA en los tres niveles: lo que cambia es el tamaño del contenido
+   dentro, no el hueco. En CSS esto dependia de una cadena de porcentajes y en
+   Post colapsaba al alto del contenido. */
+function layoutStageArea() {
+  const R = RATIOS[post.ratio];
+  const area = $('stagearea');
+  const wrapW = (area.parentElement && area.parentElement.clientWidth) || 340;
+
+  /* La fila en Página es: asomo + hueco + pagina + hueco + asomo, con los
+     asomos a una fraccion del ancho de la pagina. */
+  let pageW = (wrapW - 2 * PEEK_GAP) / (1 + 2 * PEEK_FRAC);
+  let fotoW = Math.min(pageW * FOTO_ZOOM, wrapW);
+  let h = fotoW * R.h / R.w;
+
+  const cap = Math.max(150, Math.min(window.innerHeight - RESERVED, 460 * R.h / R.w));
+  if (h > cap) { h = cap; fotoW = h * R.w / R.h; pageW = fotoW / FOTO_ZOOM; }
+
+  areaH = Math.round(h);
+  stageW = Math.round(level === 'photo' ? fotoW : pageW);
+  stageH = Math.round(stageW * R.h / R.w);
+  peekW = Math.round(pageW * PEEK_FRAC);
+  applyStageSizes();
+  return stageH;
+}
+
+/* Separado para poder reaplicarlo tras ajustar la altura. */
+function applyStageSizes() {
+  $('stagearea').style.height = areaH + 'px';
+  const stage = $('stage');
+  stage.style.width = stageW + 'px';
+  stage.style.height = stageH + 'px';
+}
+
+/* Garantia dura de que nada hace scroll: si la suma de la cabecera, la barra y
+   las herramientas resulta ser mayor de lo previsto en RESERVED, el area cede.
+   Solo puede encoger, asi que no oscila. */
+function fitAreaToViewport() {
+  const extra = document.body.scrollHeight - window.innerHeight;
+  if (extra <= 1 || areaH <= 150) return;
+  const R = RATIOS[post.ratio];
+  areaH = Math.max(150, areaH - extra);
+  const fotoW = areaH * R.w / R.h;
+  const pageW = fotoW / FOTO_ZOOM;
+  stageW = Math.round(level === 'photo' ? fotoW : pageW);
+  stageH = Math.round(stageW * R.h / R.w);
+  peekW = Math.round(pageW * PEEK_FRAC);
+  applyStageSizes();
+  if (level === 'page') renderPeeks();
+}
+
+/* Dibuja el borde de la pagina vecina. No hay que "montar" nada: se le pide al
+   renderer la region [i, i+1] del lienzo del post y se recorta. */
+/* Intercambia dos huecos de la pagina actual. La transformacion viaja con la
+   foto: si la celda destino tiene otra proporcion, clampT reencuadra al vuelo. */
+function swapCells(a, b) {
+  if (a === null || b === null || a === b) return;
+  const cells = post.slides[current].cells;
+  if (!cells[a] || !cells[b]) return;
+  pushHistory();
+  const tmp = cells[a];
+  cells[a] = cells[b];
+  cells[b] = tmp;
+  /* Terminar un intercambio no debe sacarte del nivel Página: sigues ordenando. */
+  sel = null;
+  render();
+}
+
+function cellIndexAt(x, y) {
+  const node = document.elementFromPoint(x, y);
+  const box = node && node.closest ? node.closest('#stage .cell') : null;
+  return box && box.dataset.cell !== undefined ? parseInt(box.dataset.cell, 10) : null;
+}
+
+let lastDrop = null;
+let dropTarget = null;
+
+function markDropzone(idx) {
+  const valid = idx !== null && idx !== swapFrom ? idx : null;
+  dropTarget = valid;
+  /* Un pulso corto al entrar en un hueco nuevo: confirma el destino sin mirar. */
+  if (valid !== lastDrop) {
+    if (valid !== null) haptic(HAPTIC.drop);
+    lastDrop = valid;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#stage .cell'), (b) => {
+    const i = parseInt(b.dataset.cell, 10);
+    if (i === valid) b.classList.add('dropzone');
+    else b.classList.remove('dropzone');
+  });
+}
+
+function renderPeeks() {
+  const R = RATIOS[post.ratio];
+  const all = postCells();
+  [['peek-prev', current - 1, 'right'], ['peek-next', current + 1, 'left']].forEach((cfg) => {
+    const host = $(cfg[0]);
+    const idx = cfg[1];
+    host.innerHTML = '';
+    /* Ancho de pagina completa: lo que se ve al reposo lo recorta el area, y al
+       deslizar la vecina entra entera en lugar de quedarse en un trozo. */
+    host.style.width = stageW + 'px';
+    host.style.height = stageH + 'px';
+    if (level !== 'page' || idx < 0 || idx >= post.slides.length) {
+      host.className = 'peek empty';
+      host.onclick = null;
+      /* En Foto el asomo se cierra y ese ancho se lo lleva la pagina; en los
+         extremos del post se queda invisible pero ocupando, para que el lienzo
+         no salte al navegar dentro del mismo nivel. */
+      host.style.width = (level === 'page' ? stageW : 0) + 'px';
+      return;
+    }
+    host.className = 'peek';
+    const cv = el('canvas');
+    cv.width = 360;
+    cv.height = Math.round(360 * R.h / R.w);
+    drawRegion(cv.getContext('2d'), all, idx, cv.width, cv.height, post.bg, getSource);
+    /* A la misma escala que la pagina abierta, recortada por el ancho del asomo. */
+    cv.style.width = stageW + 'px';
+    cv.style.height = stageH + 'px';
+    cv.style.left = '0';
+    host.appendChild(cv);
+    host.onclick = () => { current = idx; sel = null; render(); };
+  });
+}
+
+function renderStage() {
+  const R = RATIOS[post.ratio];
+  if (prevLevel === 'post') {
+    animateZoom($('stagerow'), zoomFrom || '50% 50%');
+    zoomFrom = null;
+  }
+  const dup = duplicates();
+  dupKeys = dup.keys;
+  dupPages = {};
+  dup.groups.forEach((g) => { dupPages[g.key] = g.pages; });
+  const stage = $('stage');
+  stage.style.aspectRatio = R.w + ' / ' + R.h;
+  /* Tope por altura: ancho = altura disponible x (W/H). dvh tiene en cuenta la
+     barra del navegador en movil; el vh es el respaldo si no hay soporte. */
+  renderPeeks();
+  stage.style.background = post.bg;
+  stage.innerHTML = '';
+  localCells().forEach((c) => stage.appendChild(buildCell(c)));
+
+  /* Tercios: solo sobre la foto seleccionada, que es cuando sirven para
+     encuadrar. Sobre la pagina entera no aportaba nada. */
+  const thirdsTarget = showThirds && sel ? localCells().find(
+    (c) => c.slideIndex === sel.slideIndex && c.cellIndex === sel.cellIndex) : null;
+  if (thirdsTarget) {
+    const target = thirdsTarget;
+    const box = el('div', 'thirds');
+    box.style.left = pct(target.rect.xLocal);
+    box.style.top = pct(target.rect.y);
+    box.style.width = pct(target.rect.w);
+    box.style.height = pct(target.rect.h);
+    [1 / 3, 2 / 3].forEach((f) => {
+      const v = el('i', 'v'); v.style.left = pct(f); box.appendChild(v);
+      const h = el('i', 'h'); h.style.top = pct(f); box.appendChild(h);
+    });
+    stage.appendChild(box);
+  }
+
+  /* Fantasma del recorte 3:4 de la cuadricula, solo en la portada. */
+  const cropPct = Math.min(1, (R.h * 3 / 4) / R.w);
+  if (current === 0 && cropPct < 1) {
+    const line = el('div', 'cropline');
+    line.style.left = pct((1 - cropPct) / 2);
+    line.style.width = pct(cropPct);
+    stage.appendChild(line);
+    const tag = el('span', 'croptag');
+    tag.textContent = 'recorte 3:4 · cuadrícula';
+    stage.appendChild(tag);
+  }
+}
+
+/* Nivel Pagina: mismas cajas cuadradas. Layout es la unica herramienta por
+   ahora, con subnivel propio. */
+function renderPageLevel() {
+  const inLayout = tool === 'layout';
+  const inMove = tool === 'move';
+  $('page-back').hidden = !tool;
+  $('page-tools').hidden = !!tool;
+  $('layouts').hidden = !inLayout;
+
+  if (inMove) {
+    toolBack('page-back', 'mover');
+    $('page-hint').textContent = 'arrastra una foto sobre otra para intercambiarlas';
+    return;
+  }
+
+  const sl = post.slides[current];
+  const puestas = sl.cells.filter((c) => c.imgId).length;
+
+  if (inLayout) {
+    toolBack('page-back', 'layout');
+    renderLayouts();
+    $('page-hint').textContent = 'la rejilla de la página ' + (current + 1);
+    return;
+  }
+
+  const host = $('page-tools');
+  host.innerHTML = '';
+  toolBox(host, {
+    icon: layoutGlyph(sl.layoutId),
+    label: 'layout',
+    onClick: () => { tool = 'layout'; render(); },
+  });
+  toolBox(host, {
+    icon: ICON.move, label: 'mover', disabled: puestas < 2,
+    why: 'Hacen falta al menos dos fotos en la página para poder intercambiarlas.',
+    onClick: () => { tool = 'move'; render(); },
+  });
+  $('page-hint').textContent = post.slides.length > 1
+    ? 'desliza para cambiar de página · toca una foto y otra vez para editarla'
+    : 'toca un hueco para poner una foto · toca otra vez para editarla';
+}
+
+function renderLayouts() {
+  const host = $('layouts');
+  host.innerHTML = '';
+  Object.keys(LAYOUTS).forEach((key) => {
+    const b = el('button', 'glyph' + (post.slides[current].layoutId === key ? ' on' : ''));
+    b.title = LAYOUTS[key].name;
+    b.innerHTML = glyphSVG(key, post.slides[current].layoutId === key);
+    b.addEventListener('click', () => setLayout(key));
+    host.appendChild(b);
+  });
+}
+
+/* Glifo de layout para la caja de herramienta: se dibuja con su proporcion real
+   centrada dentro de un cuadro, para que no se aplaste al forzar 18x18. */
+function layoutGlyph(layoutId) {
+  const R = RATIOS[post.ratio];
+  const BOX = 20, MAX = 19;
+  const k = Math.min(MAX / R.w, MAX / R.h);
+  const w = R.w * k, h = R.h * k;
+  const ox = (BOX - w) / 2, oy = (BOX - h) / 2;
+  let inner = '';
+  LAYOUTS[layoutId].cells.forEach((c) => {
+    const cw = Math.max(0, c.w * w - 1.1), ch = Math.max(0, c.h * h - 1.1);
+    inner += '<rect x="' + (ox + c.x * w + .55).toFixed(2) + '" y="' + (oy + c.y * h + .55).toFixed(2) +
+      '" width="' + cw.toFixed(2) + '" height="' + ch.toFixed(2) +
+      '" fill="currentColor" stroke="none"/>';
+  });
+  return '<svg viewBox="0 0 ' + BOX + ' ' + BOX + '" width="20" height="20">' + inner + '</svg>';
+}
+
+/* Dibujo del giro: la foto orientada como esta, con una marca en el borde que
+   era el de arriba. A 90 grados la marca queda a la derecha. */
+function rotGlyph(deg) {
+  return '<svg viewBox="0 0 18 18" width="18" height="18">' +
+    '<g transform="rotate(' + (deg || 0) + ' 9 9)">' +
+    '<rect x="4" y="1.5" width="10" height="15" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+    '<path d="M6.5 4.5h5" stroke="currentColor" stroke-width="1.6" fill="none"/>' +
+    '</g></svg>';
+}
+
+/* Dibujo del gap, como una cota de plano: bloque, linea, el numero, linea,
+   bloque. El hueco se mantiene fijo para que el numero quepa siempre; el valor
+   exacto lo dice la cifra. */
+/* El formato de salida, escrito en el propio icono. */
+function fmtGlyph(fmt) {
+  return '<svg class="wide" viewBox="0 0 42 20" width="42" height="20">' +
+    '<rect x="1" y="2" width="40" height="16" fill="none" stroke="currentColor" stroke-width="1.2"/>' +
+    '<text x="21" y="14.5" text-anchor="middle" stroke="none" fill="currentColor" ' +
+    'font-family="ui-monospace, monospace" font-size="9">' +
+    (fmt === 'png' ? 'PNG' : 'JPG') + '</text></svg>';
+}
+
+function gapGlyph(gap) {
+  const W = 42, H = 20;
+  const gutter = 15;
+  const bw = (W - gutter) / 2;
+  const x1 = bw, x2 = bw + gutter;
+  return '<svg class="wide" viewBox="0 0 ' + W + ' ' + H + '" width="42" height="20">' +
+    '<rect x="0" y="3" width="' + bw + '" height="14" fill="currentColor" opacity=".45" stroke="none"/>' +
+    '<rect x="' + x2 + '" y="3" width="' + bw + '" height="14" fill="currentColor" opacity=".45" stroke="none"/>' +
+    '<path d="M' + x1 + ' 1v18M' + x2 + ' 1v18" stroke="var(--sel)" stroke-width="1.1" fill="none"/>' +
+    '<text x="' + (W / 2) + '" y="14" text-anchor="middle" stroke="none" fill="currentColor" ' +
+    'font-family="ui-monospace, monospace" font-size="10">' + gap + '</text>' +
+    '</svg>';
+}
+
+/* Rectangulo a la proporcion real. Todos se ajustan al mismo cuadro de 16px,
+   asi que la comparacion entre ellos es directa: se ve cual es mas vertical y
+   cual mas apaisado. */
+function ratioGlyph(key) {
+  const R = RATIOS[key];
+  const BOX = 18, MAX = 16;
+  const k = Math.min(MAX / R.w, MAX / R.h);
+  const w = R.w * k, h = R.h * k;
+  return '<svg width="' + BOX + '" height="' + BOX + '" viewBox="0 0 ' + BOX + ' ' + BOX + '">' +
+    '<rect x="' + ((BOX - w) / 2).toFixed(2) + '" y="' + ((BOX - h) / 2).toFixed(2) +
+    '" width="' + w.toFixed(2) + '" height="' + h.toFixed(2) +
+    '" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
+}
+
+/* El glifo se genera desde los mismos rects que dibujan el post. */
+function glyphSVG(layoutId, active, color) {
+  const R = RATIOS[post.ratio];
+  const W = 22, H = Math.round(W * R.h / R.w);
+  const fill = color || (active ? '#f5f5f5' : '#525252');
+  let inner = '';
+  LAYOUTS[layoutId].cells.forEach((c) => {
+    inner += '<rect x="' + (c.x * W + .6) + '" y="' + (c.y * H + .6) +
+      '" width="' + Math.max(0, c.w * W - 1.2) + '" height="' + Math.max(0, c.h * H - 1.2) +
+      '" fill="' + fill + '" rx=".5"/>';
+  });
+  return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + inner + '</svg>';
+}
+
+const LEVELS = [['post', 'Post'], ['page', 'Página'], ['photo', 'Foto']];
+
+function selectedPhotoCell() {
+  if (!sel) return null;
+  const c = localCells().find((q) => q.slideIndex === sel.slideIndex && q.cellIndex === sel.cellIndex);
+  return c && c.imgId && images[c.imgId] ? c : null;
+}
+
+/* El nivel se resuelve ANTES de dibujar: renderStage() depende de el (las asas
+   solo salen en Página, el encuadre solo en Foto) y se ejecuta primero.
+
+   El nivel lo elige el usuario, con las pestañas o tocando una foto. Aqui solo
+   se corrige el unico estado imposible: Foto sin foto seleccionada. Forzarlo en
+   cada render, como antes, hacia que la pestaña Página fuese inservible
+   mientras hubiera una foto seleccionada. */
+function resolveLevel() {
+  const photoCell = selectedPhotoCell();
+  if (!photoCell && level === 'photo') level = 'page';
+  return photoCell;
+}
+
+/* Guarda el centro en pantalla de la miniatura abierta, para que al salir de
+   Post por la pestaña el acercamiento salga de ella igual que al tocarla. */
+function captureZoomFromTile() {
+  const t = document.querySelector('.ptile[data-page="' + current + '"]');
+  if (!t) { zoomFrom = null; return; }
+  const tr = t.getBoundingClientRect();
+  const ar = $('stagearea').getBoundingClientRect();
+  zoomFrom = (tr.left + tr.width / 2 - ar.left) + 'px ' +
+             (tr.top + tr.height / 2 - ar.top) + 'px';
+}
+
+/* Caja de herramienta: identica en los tres niveles. */
+function toolBox(host, cfg) {
+  const apagada = !!cfg.disabled;
+  const b = el('button', 'pact' + (cfg.cls ? ' ' + cfg.cls : '') + (apagada ? ' off' : ''));
+  b.innerHTML = cfg.icon + '<span>' + cfg.label + '</span>';
+  if (apagada && cfg.why) {
+    /* Apagada pero pulsable, para poder decir por que. */
+    b.addEventListener('click', () => toast(cfg.why, 'warn'));
+  } else if (apagada) {
+    b.disabled = true;
+  } else if (cfg.onClick) {
+    b.addEventListener('click', cfg.onClick);
+  }
+  host.appendChild(b);
+  return b;
+}
+
+/* Cabecera de subnivel: un boton de volver con el nombre de la herramienta. */
+function toolBack(hostId, title) {
+  const host = $(hostId);
+  host.innerHTML = '';
+  const b = el('button', 'toolback');
+  b.innerHTML = ICON.left + '<span>' + title + '</span>';
+  b.addEventListener('click', () => { tool = null; render(); });
+  host.appendChild(b);
+}
+
+function renderLevels() {
+  const photoCell = selectedPhotoCell();
+  /* Al cambiar de nivel se vuelve al listado de herramientas. */
+  if (toolLevel !== level) { tool = null; toolLevel = level; }
+
+  const host = $('levels');
+  host.innerHTML = '';
+  LEVELS.forEach((pair) => {
+    /* La pestaña de Foto se ve apagada sin foto seleccionada, pero sigue siendo
+       pulsable: un boton deshabilitado no puede explicar por que no funciona. */
+    const sinFoto = pair[0] === 'photo' && !photoCell;
+    const b = el('button', (level === pair[0] ? 'on' : '') + (sinFoto ? ' off' : ''));
+    b.textContent = pair[1];
+    b.addEventListener('click', () => {
+      if (sinFoto) {
+        toast('Toca una foto de la página para poder editarla.', 'warn');
+        return;
+      }
+      if (level === 'post' && pair[0] !== 'post') captureZoomFromTile();
+      level = pair[0];
+      armTapGuard();
+      render();
+    });
+    host.appendChild(b);
+  });
+
+  $('lvl-post').hidden = level !== 'post';
+  $('lvl-page').hidden = level !== 'page';
+  $('lvl-photo').hidden = level !== 'photo';
+
+  if (level === 'post') renderPostLevel();
+  if (level === 'page') renderPageLevel();
+  if (level === 'photo') renderPhotoLevel(photoCell);
+}
+
+/* Nivel foto: lo que antes eran botones encima de la imagen. Fuera del lienzo
+   la foto se ve entera. */
+function renderPhotoLevel(cell) {
+  const host = $('photo-acts');
+  host.innerHTML = '';
+  if (!cell) { $('photo-back').hidden = true; $('row-rotate').hidden = true; $('row-fine').hidden = true; return; }
+  const image = images[cell.imgId];
+  const stateCell = post.slides[cell.slideIndex].cells[cell.cellIndex];
+
+  /* Subnivel de giro: angulos concretos en lugar de sumar 90 a ciegas. */
+  const inRotate = tool === 'rotate';
+  $('photo-back').hidden = !inRotate;
+  $('row-rotate').hidden = !inRotate;
+  host.hidden = inRotate;
+  if (inRotate) {
+    toolBack('photo-back', 'girar');
+    $('row-fine').hidden = false;
+    const rot = image.rot || 0;
+
+    /* El giro se descompone en vuelta + ajuste, y son independientes: cambiar de
+       cuarto de vuelta conserva el enderezado, que es lo que uno espera. */
+    const base = ((Math.round(rot / 90) * 90) % 360 + 360) % 360;
+    const off = Math.round((rot - Math.round(rot / 90) * 90) * 2) / 2;
+
+    const seg = $('segs-rot');
+    seg.innerHTML = '';
+    [0, 90, 180, 270].forEach((deg) => {
+      const b = el('button', deg === base ? 'on' : '');
+      b.textContent = deg + '°';
+      b.addEventListener('click', () => setRotation(cell.imgId, deg + off));
+      seg.appendChild(b);
+    });
+
+    /* Ajuste: medio grado por toque. El valor del medio es tambien el boton de
+       volver a recto, asi que no hace falta un control aparte. */
+    const fine = $('fine-rot');
+    fine.innerHTML = '';
+    const nudge = (d, label) => {
+      const b = el('button');
+      b.textContent = label;
+      b.disabled = Math.abs(off + d) > 20;
+      if (!b.disabled) b.addEventListener('click', () => setRotation(cell.imgId, base + off + d));
+      fine.appendChild(b);
+    };
+    nudge(-0.5, '−½°');
+    const val = el('button', 'deg' + (off !== 0 ? ' zero' : ''));
+    val.textContent = (off > 0 ? '+' : off < 0 ? '−' : '') +
+      Math.abs(off).toString().replace('.', ',') + '°';
+    val.title = off === 0 ? 'Sin inclinación' : 'Volver a recto';
+    val.disabled = off === 0;
+    if (off !== 0) val.addEventListener('click', () => setRotation(cell.imgId, base));
+    fine.appendChild(val);
+    nudge(0.5, '+½°');
+
+    $('photo-hint').textContent = 'toca el ángulo para volver a recto · al inclinar, las esquinas quedan vacías: amplía para taparlas';
+    return;
+  }
+  $('row-fine').hidden = true;
+
+  toolBox(host, {
+    icon: rotGlyph(image.rot || 0), label: 'girar',
+    onClick: () => { tool = 'rotate'; render(); },
+  });
+  toolBox(host, {
+    icon: ICON.mirror, label: 'espejo', cls: image.flip ? 'on' : '',
+    onClick: () => mirrorImage(cell.imgId),
+  });
+
+  toolBox(host, {
+    icon: ICON.grid, label: 'tercios', cls: showThirds ? 'on' : '',
+    onClick: () => { showThirds = !showThirds; render(); },
+  });
+
+  toolBox(host, {
+    icon: ICON.center, label: 'centrar',
+    onClick: () => { pushHistory(); stateCell.t = newT(); render(); },
+  });
+
+  /* Cambiar foto: input real encima del boton, como en las celdas vacias.
+     Quitar sigue existiendo para el caso de querer dejar el hueco vacio. */
+  const swapBtn = toolBox(host, { icon: ICON.swap, label: 'cambiar' });
+  const inp = el('input', 'filepick');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.addEventListener('change', (e) => {
+    const files = Array.prototype.slice.call(e.target.files || []);
+    e.target.value = '';
+    if (files.length) ingest(files, cell.slideIndex, cell.cellIndex);
+  });
+  swapBtn.appendChild(inp);
+
+  toolBox(host, { icon: ICON.trash, label: 'quitar', cls: 'danger-item', onClick: () => {
+    pushHistory();
+    stateCell.imgId = null;
+    stateCell.t = newT();
+    sel = null;
+    pruneImages();
+    render();
+  } });
+
+  $('photo-hint').textContent = image.name + ' · ' + image.w + '×' + image.h +
+    (image.rot ? ' · ' + image.rot + '°' : '') + (image.flip ? ' · espejo' : '') +
+    '  —  arrastra para encuadrar, pinza para ampliar';
+}
+
+let gridFrom = null;
+let prevLevel = null;
+let railCentered = -1;
+let zoomFrom = null;   // punto del area desde el que se abre la pagina
+
+/* El toque que abre una pagina se resuelve DESPUES de repintar, y donde estaba
+   la miniatura aparece una celda vacia con su input de fichero cubriendola. Sin
+   esta guarda, ese mismo toque abre el selector de fotos sin haberlo pedido. */
+let tapGuard = 0;
+function armTapGuard() { tapGuard = Date.now() + 400; }
+
+/* Dispara la animacion de zoom solo cuando se cruza la frontera Post <-> resto,
+   y con el origen puesto en la pagina seleccionada para que el acercamiento
+   parezca ir hacia ella. */
+function animateZoom(el, origin) {
+  el.classList.remove('anim');
+  void el.offsetWidth;
+  if (origin) el.style.transformOrigin = origin;
+  el.classList.add('anim');
+}
+
+/* Al arrastrar una pagina hasta el borde, el carrusel se desplaza solo: sin
+   esto no habria forma de llevar la pagina 10 a la primera posicion. */
+const railAuto = { dir: 0, speed: 0, raf: null, x: 0, y: 0 };
+
+function railAutoScroll(rail, clientX, clientY) {
+  const r = rail.getBoundingClientRect();
+  const ZONE = 56;
+  railAuto.x = clientX;
+  railAuto.y = clientY;
+  let dir = 0, deep = 0;
+  if (clientX < r.left + ZONE) { dir = -1; deep = (r.left + ZONE - clientX) / ZONE; }
+  else if (clientX > r.right - ZONE) { dir = 1; deep = (clientX - (r.right - ZONE)) / ZONE; }
+  railAuto.dir = dir;
+  railAuto.speed = clamp(deep, 0, 1) * 16;   // px por fotograma
+  if (dir && !railAuto.raf) {
+    const step = () => {
+      if (!railAuto.dir || gridFrom === null) { railAuto.raf = null; return; }
+      rail.scrollLeft += railAuto.dir * railAuto.speed;
+      /* Con el dedo quieto en el borde no llegan mas pointermove, asi que el
+         destino se recalcula aqui mientras el contenido pasa por debajo. */
+      markPageDrop(pageIndexAt(railAuto.x, railAuto.y));
+      railAuto.raf = requestAnimationFrame(step);
+    };
+    railAuto.raf = requestAnimationFrame(step);
+  }
+}
+
+function stopRailAutoScroll() {
+  railAuto.dir = 0;
+  if (railAuto.raf) { cancelAnimationFrame(railAuto.raf); railAuto.raf = null; }
+}
+
+function renderPagesGrid() {
+  const R = RATIOS[post.ratio];
+  const host = $('pagesrail');
+  const all = postCells();
+  /* Al vaciar el contenedor el scroll se pierde. Se guarda para respetar el
+     desplazamiento manual, y solo se recentra cuando cambia la pagina abierta. */
+  const prevScroll = host.scrollLeft;
+  host.innerHTML = '';
+
+  /* El tamaño sale de cuantas paginas deben verse a la vez, no de una fraccion
+     de la altura: con 4,3 visibles siempre queda una cortada, que es lo que
+     indica que hay mas deslizando.
+     Alto Y ancho en pixeles, tambien en el canvas: no se deja que el navegador
+     deduzca el ancho de la proporcion intrinseca. */
+  const railW = host.clientWidth || 340;
+  const TARGET = 4.3, GAP = 10;
+  let tileW = Math.max(52, Math.floor((railW - GAP * Math.floor(TARGET)) / TARGET));
+  let tileH = Math.round(tileW * R.h / R.w);
+  if (tileH > areaH) { tileH = areaH; tileW = Math.round(tileH * R.w / R.h); }
+  post.slides.forEach((sl, i) => {
+    const tile = el('div', 'ptile' + (i === current ? ' on' : ''));
+    tile.style.height = tileH + 'px';
+    tile.style.width = tileW + 'px';
+    tile.dataset.page = String(i);
+    const cv = el('canvas');
+    cv.width = 300;
+    cv.height = Math.round(300 * R.h / R.w);
+    cv.style.width = tileW + 'px';
+    cv.style.height = tileH + 'px';
+    drawRegion(cv.getContext('2d'), all, i, cv.width, cv.height, post.bg, getSource);
+    tile.appendChild(cv);
+    const n = el('span', 'pn');
+    n.textContent = String(i + 1).padStart(2, '0');
+    tile.appendChild(n);
+
+    /* Duplicar y borrar, justo encima de la pagina a la que afectan. Al estar
+       dentro de la miniatura, se desplazan con el carrusel. Se ocultan dentro de
+       la herramienta de mover, donde estorbarian al arrastre. */
+    if (i === current && tool !== 'move') {
+      const acts = el('div', 'tacts');
+      const mk = (icon, title, cls, disabled, fn, why) => {
+        const b = el('button', (cls || '') + (disabled ? ' off' : ''));
+        b.innerHTML = icon;
+        b.title = title;
+        ['pointerdown', 'pointerup'].forEach((ev) =>
+          b.addEventListener(ev, (e) => e.stopPropagation()));
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (disabled) { if (why) toast(why, 'warn'); return; }
+          fn();
+        });
+        acts.appendChild(b);
+      };
+      mk(ICON.copy, 'Duplicar página', '', post.slides.length >= MAX_SLIDES, duplicateSlide,
+        'Instagram admite ' + MAX_SLIDES + ' páginas como máximo en un carrusel.');
+      mk(ICON.trash, 'Borrar página', 'danger-item', false, () =>
+        confirmAsk('¿Borrar la página ' + (i + 1) + '?',
+          'Se quitará del post. Puedes deshacerlo después.', 'Borrar',
+          () => removeSlide(i)));
+      tile.appendChild(acts);
+    }
+
+    /* Fuera de la herramienta de mover, la miniatura deja pasar el gesto: asi el
+       carrusel se desplaza arrastrando sobre ella y no solo por los huecos. */
+    const movable = tool === 'move';
+    tile.style.touchAction = movable ? 'none' : 'pan-x';
+
+    let start = null, dragging = false;
+    tile.addEventListener('pointerdown', (e) => {
+      start = { x: e.clientX, y: e.clientY };
+      dragging = false;
+      if (movable && tile.setPointerCapture) tile.setPointerCapture(e.pointerId);
+    });
+    tile.addEventListener('pointermove', (e) => {
+      if (!start) return;
+      /* Fuera de la herramienta de mover no hay arrastre, pero el toque sigue
+         valiendo: no se puede anular `start` aqui, porque cualquier toque real
+         mueve el dedo un pixel y entonces el pointerup no haria nada. Si el
+         navegador se queda el gesto para desplazar el carrusel, llega
+         pointercancel y ahi si se anula. */
+      if (!movable) return;
+      if (!dragging && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
+        dragging = true;
+        gridFrom = i;
+        tile.classList.add('lift');
+        /* La pagina que se mueve pasa a ser la marcada. */
+        current = i;
+        railCentered = i;
+        Array.prototype.forEach.call(document.querySelectorAll('.ptile'), (t) => {
+          t.classList.toggle('on', t === tile);
+        });
+      }
+      if (!dragging) return;
+      e.preventDefault();
+      markPageDrop(pageIndexAt(e.clientX, e.clientY));
+      railAutoScroll(host, e.clientX, e.clientY);
+    });
+    const openPage = () => {
+      /* Se guarda el centro de ESTA miniatura para que el acercamiento salga de
+         ella y no del centro del area: asi se lee como "se abre esta pagina". */
+      const tr = tile.getBoundingClientRect();
+      const ar = $('stagearea').getBoundingClientRect();
+      zoomFrom = (tr.left + tr.width / 2 - ar.left) + 'px ' +
+                 (tr.top + tr.height / 2 - ar.top) + 'px';
+      current = i;
+      sel = null;
+      level = 'page';
+      armTapGuard();
+      render();
+    };
+    tile.addEventListener('dblclick', openPage);
+
+    const end = (e) => {
+      if (!start) return;
+      start = null;
+      tile.classList.remove('lift');
+      /* Igual que con las fotos: un toque selecciona, el segundo abre. */
+      if (!dragging) {
+        if (i === current) openPage(); else goPage(i);
+        return;
+      }
+      stopRailAutoScroll();
+      const to = pageIndexAt(e.clientX, e.clientY);
+      markPageDrop(null);
+      dragging = false;
+      const from = gridFrom;
+      gridFrom = null;
+      if (to !== null && to !== from) moveSlideTo(from, to);
+      else render();
+    };
+    tile.addEventListener('pointerup', end);
+    tile.addEventListener('pointercancel', () => {
+      start = null; dragging = false; gridFrom = null;
+      stopRailAutoScroll();
+      markPageDrop(null);
+      tile.classList.remove('lift');
+    });
+
+    host.appendChild(tile);
+  });
+
+  const full = post.slides.length >= MAX_SLIDES;
+  const add = el('button', 'padd' + (full ? ' off' : ''));
+  add.style.height = tileH + 'px';
+  add.style.width = tileW + 'px';
+  add.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28">' +
+    '<path d="M12 5.5v13M5.5 12h13" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+  add.title = full ? 'Máximo de ' + MAX_SLIDES + ' páginas'
+                   : 'Añadir página al final (' + post.slides.length + '/' + MAX_SLIDES + ')';
+  add.disabled = full;
+  add.addEventListener('click', () => {
+    current = post.slides.length - 1;
+    addSlide();
+  });
+  host.appendChild(add);
+
+  /* Colocacion del carrusel. Se hace al final, con el boton de añadir ya puesto,
+     porque el maximo desplazamiento depende del contenido completo. */
+  const entering = prevLevel !== null && prevLevel !== 'post';
+  const target = (tileW + GAP) * current + tileW / 2 - host.clientWidth / 2;
+
+  if (entering) {
+    /* Sin animacion de scroll: se coloca de golpe para que la pagina que
+       estabas viendo quede centrada ANTES de empezar el zoom. Asi el
+       alejamiento parte de ella y se lee como una sola camara. */
+    host.scrollLeft = target;
+    railCentered = current;
+  } else if (railCentered !== current) {
+    host.scrollLeft = prevScroll;
+    if (host.scrollTo) host.scrollTo({ left: target, behavior: 'smooth' });
+    else host.scrollLeft = target;
+    railCentered = current;
+  } else {
+    host.scrollLeft = prevScroll;
+  }
+
+  if (entering) {
+    /* El origen se toma de la posicion REAL, ya con el scroll aplicado y
+       limitado por el navegador. En la primera o la ultima pagina no se puede
+       centrar, y asi el zoom sale igualmente de donde esta la miniatura. */
+    const cx = (tileW + GAP) * current + tileW / 2 - host.scrollLeft;
+    animateZoom(host, cx + 'px 50%');
+  }
+}
+
+function pageIndexAt(x, y) {
+  const node = document.elementFromPoint(x, y);
+  const t = node && node.closest ? node.closest('.ptile') : null;
+  return t && t.dataset.page !== undefined ? parseInt(t.dataset.page, 10) : null;
+}
+
+let lastPageDrop = null;
+function markPageDrop(idx) {
+  const valid = idx !== null && idx !== gridFrom ? idx : null;
+  if (valid !== lastPageDrop) {
+    if (valid !== null) haptic(HAPTIC.drop);
+    lastPageDrop = valid;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.ptile'), (t) => {
+    if (parseInt(t.dataset.page, 10) === valid) t.classList.add('drop');
+    else t.classList.remove('drop');
+  });
+}
+
+const POST_TOOLS = [
+  ['move', 'mover', null, null],
+  ['ratio', 'proporción', 'ratio', 'row-ratio'],
+  ['gap', 'gap', 'gapic', 'row-gap'],
+  ['bg', 'color', 'bg', 'row-bg'],
+  ['fmt', 'formato', 'fmt', 'row-fmt'],
+];
+
+function renderPostLevel() {
+  const inTool = !!tool;
+  $('post-back').hidden = !inTool;
+  $('post-tools').hidden = inTool;
+  $('post-hint').hidden = false;
+  POST_TOOLS.forEach((t) => { if (t[3]) $(t[3]).hidden = t[0] !== tool; });
+  $('page-acts').hidden = tool !== 'move';
+
+  if (inTool) {
+    const t = POST_TOOLS.find((x) => x[0] === tool);
+    toolBack('post-back', t ? t[1] : '');
+    if (tool === 'move') {
+      renderPageActs();
+      $('post-hint').textContent = 'arrastra una página a su nueva posición, o usa izq/der';
+    } else {
+      $('post-hint').hidden = true;
+    }
+    renderConfig();
+    return;
+  }
+
+  const host = $('post-tools');
+  host.innerHTML = '';
+  toolBox(host, {
+    icon: ICON.move, label: 'mover',
+    onClick: () => { tool = 'move'; render(); },
+  });
+
+  /* El icono muestra el valor actual: no hay que entrar para saber en que estas. */
+  toolBox(host, {
+    icon: ratioGlyph(post.ratio),
+    label: 'ratio',
+    onClick: () => { tool = 'ratio'; render(); },
+  });
+  toolBox(host, {
+    icon: gapGlyph(post.gap),
+    label: 'gap',
+    onClick: () => { tool = 'gap'; render(); },
+  });
+  const bg = toolBox(host, {
+    icon: '<span class="sw"></span>',
+    label: 'color',
+    onClick: () => { tool = 'bg'; render(); },
+  });
+  bg.querySelector('.sw').style.background = post.bg;
+  toolBox(host, {
+    icon: fmtGlyph(post.fmt),
+    label: 'formato',
+    onClick: () => { tool = 'fmt'; render(); },
+  });
+  $('post-hint').textContent = 'arrastra una página, o muévela con izq/der · tócala para abrirla';
+  renderConfig();
+}
+
+/* Acciones de la pagina abierta, dentro del nivel Post. */
+/* Dentro de la herramienta de mover: las flechas, para el ajuste fino. */
+function renderPageActs() {
+  const host = $('page-acts');
+  host.innerHTML = '';
+  const n = post.slides.length;
+  toolBox(host, { icon: ICON.left, label: 'izq', disabled: current === 0,
+    onClick: () => moveSlide(current, -1) });
+  toolBox(host, { icon: ICON.right, label: 'der', disabled: current === n - 1,
+    onClick: () => moveSlide(current, 1) });
+}
+
+
+
+
+function renderPagebar() {
+  const n = post.slides.length;
+  $('pg-num').textContent = String(current + 1).padStart(2, '0') + ' / ' + n;
+  $('pg-prev').disabled = current === 0;
+  $('pg-next').disabled = current === n - 1;
+}
+
+function goPage(i) {
+  const n = post.slides.length;
+  if (i < 0 || i >= n) return;
+  zoomFrom = null;
+  current = i;
+  sel = null;
+  render();
+}
+
+
+function duplicateSlide() {
+  if (post.slides.length >= MAX_SLIDES) {
+    toast('Instagram admite ' + MAX_SLIDES + ' páginas como máximo en un carrusel.', 'warn');
+    return;
+  }
+  pushHistory();
+  const src = post.slides[current];
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = uid();
+  post.slides.splice(current + 1, 0, copy);
+  current += 1;
+  sel = null;
+  render();
+}
+
+function renderFeed() {
+  const cells = postCells();
+  const rail = $('rail'), track = $('track'), dots = $('dots');
+  track.innerHTML = ''; dots.innerHTML = '';
+  const R = RATIOS[post.ratio];
+  post.slides.forEach((s, i) => {
+    const holder = el('div');
+    const cv = el('canvas');
+    cv.width = 1080;
+    cv.height = Math.round(1080 * R.h / R.w);
+    drawRegion(cv.getContext('2d'), cells, i, cv.width, cv.height, post.bg, getSource);
+    holder.appendChild(cv);
+    track.appendChild(holder);
+    const d = el('button', 'dot');
+    d.title = 'Página ' + (i + 1);
+    /* Tocar una bolita es un salto explicito: ahi si se permite ir lejos. */
+    d.addEventListener('click', () => goFeed(i, true));
+    dots.appendChild(d);
+  });
+  feedIndex = clamp(feedIndex, 0, post.slides.length - 1);
+  goFeed(feedIndex, false);
+}
+
+function goFeed(i, animate) {
+  feedIndex = clamp(i, 0, post.slides.length - 1);
+  placeTrack(0, animate);
+  syncDots();
+}
+
+function placeTrack(dragPx, animate) {
+  const track = $('track');
+  const w = $('rail').clientWidth || 1;
+  track.style.transition = animate ? 'transform .3s cubic-bezier(.22,.61,.36,1)' : 'none';
+  track.style.transform = 'translate3d(' + (-feedIndex * w + dragPx) + 'px,0,0)';
+}
+
+function syncDots() {
+  Array.prototype.forEach.call($('dots').children, (d, k) => {
+    if (k === feedIndex) d.classList.add('on'); else d.classList.remove('on');
+  });
+}
+
+function renderGrid() {
+  const cells = postCells();
+  const R = RATIOS[post.ratio];
+  const cropPct = Math.min(1, (R.h * 3 / 4) / R.w);
+  const host = $('mosaic');
+  host.innerHTML = '';
+  const tile = el('div', 'tile');
+  const cv = el('canvas');
+  cv.width = 540;
+  cv.height = Math.round(540 * R.h / R.w);
+  drawRegion(cv.getContext('2d'), cells, 0, cv.width, cv.height, post.bg, getSource);
+  cv.style.width = pct(1 / cropPct);
+  cv.style.left = pct(-(1 / cropPct - 1) / 2);
+  cv.style.top = '50%';
+  cv.style.transform = 'translateY(-50%)';
+  cv.style.height = 'auto';
+  tile.appendChild(cv);
+  host.appendChild(tile);
+  for (let i = 0; i < 8; i++) host.appendChild(el('div', 'tile'));
+}
+
+function getSource(id) {
+  const im = images[id];
+  return im ? { el: im.el, w: im.w, h: im.h } : null;
+}
+
+const BG_NAME = { '#ffffff': 'blanco', '#000000': 'negro' };
+
+function renderChrome() {
+  const R = RATIOS[post.ratio];
+  const pname = (projects.find((p) => p.id === projectId) || {}).name;
+  $('meta').textContent = !projectId ? 'ningún proyecto abierto'
+    : (pname ? pname + ' · ' : '') +
+      post.slides.length + (post.slides.length >= MAX_SLIDES - 4 ? '/' + MAX_SLIDES : '') +
+      (post.slides.length === 1 ? ' página · ' : ' páginas · ') + R.w + '×' + R.h;
+  $('btn-export').disabled = !projectId;
+
+
+  const modes = $('segs-mode');
+  modes.innerHTML = '';
+  [['edit', 'Editar'], ['feed', 'Feed'], ['grid', 'Perfil']].forEach((pair) => {
+    const b = el('button', mode === pair[0] ? 'on' : '');
+    b.textContent = pair[1];
+    b.addEventListener('click', () => { mode = pair[0]; render(); });
+    modes.appendChild(b);
+  });
+
+  $('ver').className = mode === 'log' ? 'ver on' : 'ver';
+
+  renderConfig();
+
+  const off = Object.values(images).filter((im) => !im.converted && OFF_PROFILE.indexOf(im.cs) >= 0);
+  if (off.length) {
+    const names = Array.from(new Set(off.map((i) => CS_LABEL[i.cs]))).join(', ');
+    $('warn-text').textContent = off.length + (off.length === 1 ? ' foto no está' : ' fotos no están') +
+      ' en sRGB (' + names + '). Instagram asume sRGB, así que los colores saldrán distintos a lo que ves aquí.';
+    $('warn').hidden = false;
+  } else {
+    $('warn').hidden = true;
+  }
+}
+
+/* Proporcion, gap y fondo se fijan una vez por post: van juntos y plegados.
+   Plegado se muestra el estado, para no tener que abrirlo solo para mirarlo. */
+function renderConfig() {
+  const ratios = $('segs-ratio');
+  ratios.innerHTML = '';
+  Object.keys(RATIOS).forEach((k) => {
+    const b = el('button', 'ratio' + (post.ratio === k ? ' on' : ''));
+    b.innerHTML = ratioGlyph(k) + '<span>' + RATIOS[k].label + '</span>';
+    b.title = k;
+    b.addEventListener('click', () => { post.ratio = k; render(); });
+    ratios.appendChild(b);
+  });
+
+  const tickFor = (hex) => {
+    const t = el('span');
+    t.innerHTML = ICON.tick;
+    t.firstChild.setAttribute('stroke', contrastOn(hex));
+    return t;
+  };
+  const sw = $('swatches');
+  sw.innerHTML = '';
+  BGS.forEach((c) => {
+    const b = el('button', 'swatch' + (post.bg === c ? ' on' : ''));
+    b.style.background = c;
+    b.title = c === '#ffffff' ? 'Fondo blanco' : 'Fondo negro';
+    if (post.bg === c) b.appendChild(tickFor(c));
+    b.addEventListener('click', () => { post.bg = c; render(); });
+    sw.appendChild(b);
+  });
+  const isCustom = BGS.indexOf(post.bg) === -1;
+  const cust = el('span', 'swatch' + (isCustom ? ' on' : ''));
+  cust.style.background = customBg;
+  cust.title = 'Color personalizado';
+  if (isCustom) cust.appendChild(tickFor(customBg));
+  const pick = el('input', 'pick');
+  pick.type = 'color';
+  pick.value = customBg;
+  pick.addEventListener('input', () => {
+    customBg = pick.value;
+    post.bg = customBg;
+    render();
+  });
+  cust.appendChild(pick);
+  sw.appendChild(cust);
+
+  renderNotches();
+
+  const fmt = $('segs-fmt');
+  fmt.innerHTML = '';
+  [['jpeg', 'JPG'], ['png', 'PNG']].forEach((pair) => {
+    const b = el('button', (post.fmt || 'jpeg') === pair[0] ? 'on' : '');
+    b.textContent = pair[1];
+    b.addEventListener('click', () => { post.fmt = pair[0]; render(); });
+    fmt.appendChild(b);
+  });
+  $('fmt-hint').hidden = tool !== 'fmt';
+  $('fmt-hint').textContent = post.fmt === 'png'
+    ? 'PNG no recomprime: no añade pérdida al montar, pero cada página pesa unos 4 MB.'
+    : 'JPG al 95%. Suficiente en casi todo, y unos 800 kB por página.';
+}
+
+function renderProjects() {
+  const host = $('projects');
+  host.innerHTML = '';
+  if (!projects.length) {
+    const p = el('p', 'lead');
+    p.textContent = 'No hay ningún proyecto. Crea uno para empezar a montar un carrusel.';
+    host.appendChild(p);
+    return;
+  }
+  const sorted = projects.slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  sorted.forEach((pr) => {
+    const row = el('div', 'prow');
+    const top = el('div', 'top');
+    const name = el('input', 'name');
+    name.value = pr.name || 'Sin título';
+    name.addEventListener('change', () => { renameProject(pr.id, name.value.trim()); });
+    top.appendChild(name);
+    row.appendChild(top);
+
+    const sub = el('p', 'sub');
+    const d = pr.updated ? new Date(pr.updated) : null;
+    sub.textContent = (pr.pages || 1) + (pr.pages === 1 ? ' página' : ' páginas') +
+      ' · ' + (pr.ratio || '4:5') +
+      (d ? ' · ' + d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) +
+           ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : '');
+    row.appendChild(sub);
+
+    const acts = el('div', 'acts');
+    const open = el('button', 'open');
+    open.textContent = 'abrir';
+    open.addEventListener('click', async () => {
+      /* Si ya es el que esta cargado, no hay nada que releer: se entra directo.
+         Eso es cosa nuestra, el usuario ve el mismo boton en todas las filas. */
+      if (pr.id === projectId) { mode = 'edit'; sel = null; render(); return; }
+      await doSave();
+      const ok = await openProject(pr.id);
+      if (ok) { mode = 'edit'; render(); }
+    });
+    acts.appendChild(open);
+    const dup = el('button');
+    dup.textContent = 'duplicar';
+    dup.addEventListener('click', () => duplicateProject(pr.id));
+    acts.appendChild(dup);
+
+    const del = el('button');
+    del.textContent = 'borrar';
+    del.addEventListener('click', () => {
+      confirmAsk('¿Borrar el proyecto?',
+        '"' + (pr.name || 'Sin título') + '" y sus fotos se borrarán de este dispositivo. No se puede deshacer.',
+        'Borrar', () => deleteProject(pr.id));
+    });
+    acts.appendChild(del);
+    row.appendChild(acts);
+    host.appendChild(row);
+  });
+}
+
+function renderLog() {
+  const host = $('log');
+  host.innerHTML = '';
+  const lead = el('p', 'lead');
+  lead.textContent = 'build ' + BUILD + ' · toca la versión de arriba para volver';
+  host.appendChild(lead);
+
+  /* Diagnostico: si la vibracion no se nota, esto dice si el problema es el
+     navegador o los ajustes del movil. */
+  const diag = el('p', 'lead');
+  diag.style.cursor = 'pointer';
+  diag.textContent = navigator.vibrate
+    ? 'vibración: disponible · toca aquí para probarla'
+    : 'vibración: no disponible en este navegador';
+  if (navigator.vibrate) {
+    diag.addEventListener('click', () => {
+      haptic([0, HAPTIC.step, 90, HAPTIC.step, 90, HAPTIC.stop]);
+      toast('Tres pulsos. Si no los notas, revisa la vibración al tocar en los ajustes del móvil.');
+    });
+  }
+  host.appendChild(diag);
+  CHANGELOG.forEach((rel) => {
+    const box = el('div', 'rel');
+    const h = el('h2');
+    const num = el('span');
+    num.textContent = 'v' + rel.v;
+    h.appendChild(num);
+    if (rel.v === VERSION) {
+      const tag = el('span', 'tag');
+      tag.textContent = 'actual';
+      h.appendChild(tag);
+    }
+    const when = el('span', 'when');
+    when.textContent = rel.when;
+    h.appendChild(when);
+    box.appendChild(h);
+    const ul = el('ul');
+    rel.notes.forEach((n) => {
+      const li = el('li');
+      li.textContent = n;
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    host.appendChild(box);
+  });
+}
+
+function renderNotches() {
+  const host = $('gap-notch');
+  host.innerHTML = '';
+  GAPS.forEach((g, i) => {
+    const d = el('span', 'nd' + (i === gapIndex ? ' on' : (i < gapIndex ? ' past' : '')));
+    host.appendChild(d);
+  });
+  host.setAttribute('aria-valuemax', String(GAPS[GAPS.length - 1]));
+  host.setAttribute('aria-valuenow', String(GAPS[gapIndex]));
+  $('gap-val').textContent = GAPS[gapIndex] + 'px';
+}
+
+function setGapIndex(i, feedback) {
+  const next = clamp(Math.round(i), 0, GAPS.length - 1);
+  if (next === gapIndex) return;
+  const atStop = next === 0 || next === GAPS.length - 1;
+  gapIndex = next;
+  post.gap = GAPS[next];
+  /* Clic de rueda en cada paso, y un pulso mas largo al llegar a un tope, como
+     cuando una ruedita fisica hace fondo. */
+  if (feedback) haptic(atStop ? HAPTIC.stop : HAPTIC.step);
+  renderNotches();
+  /* Repinta el nivel que se esta viendo: en Post lo que hay es el carrusel de
+     miniaturas, no el lienzo, y antes no se enteraba del cambio. */
+  if (mode !== 'edit') return;
+  if (level === 'post') renderPagesGrid(); else renderStage();
+}
+
+function render() {
+  /* Sin proyecto abierto no hay nada que editar ni exportar. */
+  if (!projectId && mode !== 'log') mode = 'projects';
+  /* Proyectos e historial son un nivel por encima del documento: mientras estas
+     ahi no se muestran los controles del documento. */
+  const docLevel = mode === 'edit' || mode === 'feed' || mode === 'grid';
+  $('toolrow').hidden = !docLevel;
+  $('meta').hidden = !docLevel;
+  renderChrome();
+  $('view-edit').hidden = mode !== 'edit';
+  $('view-feed').hidden = mode !== 'feed';
+  $('view-grid').hidden = mode !== 'grid';
+  $('view-log').hidden = mode !== 'log';
+  $('view-projects').hidden = mode !== 'projects';
+  if (mode === 'edit') {
+    resolveLevel();
+    /* El nivel tambien es una distancia: Post ve varias paginas pequeñas,
+       Página la actual con las vecinas asomando, Foto solo la actual. */
+    const zoomOut = level === 'post';
+    layoutStageArea();
+    $('pagesrail').hidden = !zoomOut;
+    $('stagerow').hidden = zoomOut;
+    /* La barra de pagina se queda en los tres niveles: si se oculta en Post,
+       todo lo de abajo sube 46px y las pestañas dejan de estar alineadas. */
+    if (zoomOut) renderPagesGrid(); else renderStage();
+    renderLevels();
+    renderPagebar();
+    fitAreaToViewport();
+    prevLevel = level;
+  }
+  if (mode === 'feed') renderFeed();
+  if (mode === 'grid') renderGrid();
+  if (mode === 'log') renderLog();
+  if (mode === 'projects') renderProjects();
+  syncUndo();
+  /* render() se ejecuta despues de cada cambio de estado, asi que es el punto
+     natural para persistir. La escritura va con debounce. */
+  save();
+}
+
+/* ---------------------------------------------------------------- export */
+
+async function exportPost() {
+  const R = RATIOS[post.ratio];
+  const cells = postCells();
+  const cache = new Map();
+
+  async function decodeFor(im, needW) {
+    const key = im.id + ':' + Math.ceil(needW / 256);
+    if (cache.has(key)) return cache.get(key);
+    /* Decodifica desde el ORIGINAL a ~1.6x el destino: el resampler del
+       navegador hace el trabajo y drawImage solo da el ultimo paso. */
+    /* Cuanto hay que escalar el ORIGINAL para que su caja girada mida lo que
+       necesita la celda. Sirve igual para 90 grados que para 2. */
+    const factor = clamp((needW * 1.6) / (im.w || 1), 0.02, 1);
+    const srcW = im.srcW || im.w;
+    const opts = {
+      resizeQuality: 'high', imageOrientation: 'from-image',
+      resizeWidth: Math.max(1, Math.round(srcW * factor)),
+    };
+    let bmp = await decodeBitmap(im.file, opts);
+    let rec;
+    if (im.rot || im.flip || im.converted) {
+      const out = rotateOnto(bmp, im.rot, 1, im.flip);
+      if (im.converted) convertToSRGB(out.ctx, out.w, out.h, im.cs);
+      rec = { el: out.cv, w: out.w, h: out.h };
+    } else {
+      rec = { el: bmp, w: bmp.width, h: bmp.height };
+    }
+    cache.set(key, rec);
+    return rec;
+  }
+
+  try {
+    setErr(null);
+    setBusy('Exportando…');
+    const out = [];
+    for (let i = 0; i < post.slides.length; i++) {
+      setBusy('Exportando ' + (i + 1) + '/' + post.slides.length + '…');
+      const cv = el('canvas');
+      cv.width = R.w; cv.height = R.h;
+      const local = new Map();
+      for (const cell of cells) {
+        if (cell.rect.x + cell.rect.w <= i + 1e-4 || cell.rect.x >= i + 1 - 1e-4) continue;
+        const im = cell.imgId ? images[cell.imgId] : null;
+        if (!im) continue;
+        local.set(cell.imgId, await decodeFor(im, drawnWidth(cell, im.w / im.h, R.w)));
+      }
+      drawRegion(cv.getContext('2d'), cells, i, R.w, R.h, post.bg, (id) => local.get(id) || null);
+      const png = post.fmt === 'png';
+      const mime = png ? 'image/png' : 'image/jpeg';
+      /* toBlob en lugar de toDataURL: un PNG de 1440x1800 en base64 son varios
+         megas de cadena, y diez de esos no caben en memoria en un movil. */
+      const blob = await new Promise((res) => cv.toBlob(res, mime, .95));
+      out.push({
+        url: blob ? URL.createObjectURL(blob) : cv.toDataURL(mime, .95),
+        name: String(i + 1).padStart(2, '0') + (png ? '.png' : '.jpg'),
+      });
+    }
+    exportsOut = out;
+    showSheet();
+  } catch (e) {
+    setErr('Falló el export: ' + (e && e.message ? e.message : e));
+  } finally {
+    setBusy(null);
+  }
+}
+
+function showSheet() {
+  const R = RATIOS[post.ratio];
+  $('sheet-meta').textContent = exportsOut.length + ' imágenes · ' + R.w + '×' + R.h +
+    ' · ' + (post.fmt === 'png' ? 'PNG' : 'JPG');
+  const host = $('shots');
+  host.innerHTML = '';
+  exportsOut.forEach((ex) => {
+    const a = el('a');
+    a.href = ex.url;
+    a.download = ex.name;
+    const img = el('img');
+    img.src = ex.url;
+    const cap = el('span');
+    cap.textContent = ex.name + ' ↓';
+    a.appendChild(img);
+    a.appendChild(cap);
+    host.appendChild(a);
+  });
+  $('sheet').hidden = false;
+}
+
+/* ------------------------------------------------------------------ init */
+
+document.title = 'Carrete v' + VERSION;
+$('ver').textContent = 'v' + VERSION;
+$('ver').addEventListener('click', () => {
+  mode = mode === 'log' ? 'edit' : 'log';
+  render();
+});
+
+/* Inicio: no alterna vista, lleva al listado. Se sale de ahi abriendo un
+   proyecto, que es la unica forma de tener documento. */
+/* Pantalla completa: la API necesita un gesto del usuario, no se puede pedir al
+   cargar. Con la app servida por https se podria instalar como PWA en modo
+   standalone y no haria falta el boton. */
+function fullscreenOn() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function syncFullscreenBtn() {
+  const b = $('btn-full');
+  if (!b) return;
+  const on = fullscreenOn();
+  b.innerHTML = on ? ICON.shrink : ICON.expand;
+  b.title = on ? 'Salir de pantalla completa' : 'Pantalla completa';
+  b.style.color = on ? 'var(--txt)' : '';
+}
+
+async function toggleFullscreen() {
+  const root = document.documentElement;
+  try {
+    if (fullscreenOn()) {
+      await (document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen());
+    } else if (root.requestFullscreen) {
+      await root.requestFullscreen({ navigationUI: 'hide' });
+    } else if (root.webkitRequestFullscreen) {
+      root.webkitRequestFullscreen();
+    } else {
+      toast('Este navegador no permite pantalla completa desde la web.', 'warn');
+    }
+  } catch (e) {
+    toast('No se pudo cambiar a pantalla completa.', 'warn');
+  }
+  syncFullscreenBtn();
+}
+
+function goHome() { mode = 'projects'; sel = null; render(); }
+$('btn-home').addEventListener('click', goHome);
+$('btn-full').addEventListener('click', toggleFullscreen);
+['fullscreenchange', 'webkitfullscreenchange'].forEach((ev) =>
+  document.addEventListener(ev, syncFullscreenBtn));
+syncFullscreenBtn();
+$('btn-new').addEventListener('click', newProject);
+/* Los niveles no son modos que haya que recordar: la seleccion decide. Tocar
+   una foto baja a Foto, deseleccionar vuelve a Página. */
+
+$('btn-undo').innerHTML = ICON.undo;
+$('btn-undo').addEventListener('click', undo);
+
+$('btn-export').addEventListener('click', exportPost);
+$('sheet-close').addEventListener('click', () => {
+  $('sheet').hidden = true;
+  if (exportsOut) {
+    exportsOut.forEach((ex) => {
+      if (ex.url && ex.url.indexOf('blob:') === 0) URL.revokeObjectURL(ex.url);
+    });
+    exportsOut = null;
+  }
+});
+$('err-close').addEventListener('click', () => setErr(null));
+$('warn-convert').addEventListener('click', convertAll);
+$('pg-prev').addEventListener('click', () => goPage(current - 1));
+$('pg-next').addEventListener('click', () => goPage(current + 1));
+/* Una pagina por gesto: al soltar solo se avanza o retrocede UNO, por muy
+   fuerte que haya sido el swipe. La inercia nativa haria saltar varias. */
+(function wireFeed() {
+  const rail = $('rail');
+  let start = null, axis = null, drag = 0;
+
+  rail.addEventListener('pointerdown', (e) => {
+    start = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId };
+    axis = null;
+    drag = 0;
+  });
+
+  rail.addEventListener('pointermove', (e) => {
+    if (!start || e.pointerId !== start.id) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    if (!axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (axis === 'x' && rail.setPointerCapture) rail.setPointerCapture(e.pointerId);
+    }
+    if (axis !== 'x') return;
+    e.preventDefault();
+    const w = rail.clientWidth || 1;
+    const atEdge = (dx > 0 && feedIndex === 0) ||
+                   (dx < 0 && feedIndex === post.slides.length - 1);
+    drag = atEdge ? dx * .3 : clamp(dx, -w, w);   // resistencia en los extremos
+    placeTrack(drag, false);
+  });
+
+  const release = (e) => {
+    if (!start || (e.pointerId !== undefined && e.pointerId !== start.id)) return;
+    if (axis === 'x') {
+      const w = rail.clientWidth || 1;
+      const ms = Math.max(1, Date.now() - start.t);
+      const speed = Math.abs(drag) / ms;
+      const enough = Math.abs(drag) > w * .15 || speed > .35;
+      goFeed(feedIndex + (enough ? (drag < 0 ? 1 : -1) : 0), true);
+    }
+    start = null; axis = null; drag = 0;
+  };
+  rail.addEventListener('pointerup', release);
+  rail.addEventListener('pointercancel', release);
+  rail.addEventListener('touchmove', (e) => { if (axis === 'x') e.preventDefault(); }, { passive: false });
+})();
+
+let resizeTimer = null;
+/* Deslizar el lienzo para cambiar de pagina, dentro de la herramienta de
+   navegar. Una pagina por gesto, como en el feed: el lienzo acompaña al dedo y
+   al soltar avanza o vuelve a su sitio. */
+(function wireStageSwipe() {
+  const row = $('stagerow');
+  let start = null, axis = null, drag = 0;
+
+  /* Siempre disponible en el nivel Página, salvo dentro de la herramienta de
+     mover, que usa el arrastre para reordenar. */
+  const activo = () => mode === 'edit' && level === 'page' && tool !== 'move';
+
+  row.addEventListener('pointerdown', (e) => {
+    if (!activo()) return;
+    start = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId };
+    axis = null;
+    drag = 0;
+    row.classList.add('dragging');
+  });
+
+  row.addEventListener('pointermove', (e) => {
+    if (!start || e.pointerId !== start.id) return;
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    if (!axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (axis === 'x' && row.setPointerCapture) row.setPointerCapture(e.pointerId);
+    }
+    if (axis !== 'x') return;
+    e.preventDefault();
+    const borde = (dx > 0 && current === 0) ||
+                  (dx < 0 && current === post.slides.length - 1);
+    drag = borde ? dx * .3 : dx;
+    row.style.transform = 'translateX(' + drag + 'px)';
+  });
+
+  const release = (e) => {
+    if (!start || (e.pointerId !== undefined && e.pointerId !== start.id)) return;
+    const era = axis;
+    const ms = Math.max(1, Date.now() - start.t);
+    const d = drag;
+    start = null; axis = null; drag = 0;
+    row.classList.remove('dragging');
+
+    if (era !== 'x') { row.style.transform = ''; return; }
+
+    /* Engancha al pasar del 45% del ancho de la pagina, o con un gesto rapido.
+       Cambiar de pagina aqui conserva la herramienta abierta, porque el nivel no
+       cambia. */
+    const ancho = stageW || 200;
+    const suficiente = Math.abs(d) > ancho * .45 || (Math.abs(d) / ms) > .5;
+    const paso = suficiente ? (d < 0 ? 1 : -1) : 0;
+    const destino = clamp(current + paso, 0, post.slides.length - 1);
+
+    if (!paso || destino === current) { row.style.transform = ''; return; }
+
+    /* Se completa el recorrido y despues se repinta. El reposicionamiento a cero
+       tiene que ir SIN transicion: si no, la fila hace un segundo viaje animado
+       de vuelta, ya con el contenido nuevo, y eso es lo que se ve como un salto.
+       Al llegar al final del recorrido, la vecina ocupa exactamente el centro,
+       asi que reponer la posicion y el contenido a la vez es invisible. */
+    row.style.transform = 'translateX(' + (paso > 0 ? -(ancho + 3) : (ancho + 3)) + 'px)';
+    setTimeout(() => {
+      row.classList.add('dragging');
+      row.style.transform = '';
+      goPage(destino);
+      requestAnimationFrame(() => requestAnimationFrame(() => row.classList.remove('dragging')));
+    }, 240);
+  };
+  row.addEventListener('pointerup', release);
+  row.addEventListener('pointercancel', release);
+  row.addEventListener('touchmove', (e) => { if (axis === 'x') e.preventDefault(); }, { passive: false });
+})();
+
+window.addEventListener('resize', () => {
+  if (mode === 'feed') { placeTrack(0, false); return; }
+  if (mode !== 'edit') return;
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(render, 120);
+});
+
+(function wireGap() {
+  const track = $('gap-notch');
+  let dragging = false;
+  const pick = (clientX) => {
+    const r = track.getBoundingClientRect();
+    const t = clamp((clientX - r.left) / (r.width || 1), 0, 1);
+    return t * (GAPS.length - 1);
+  };
+  track.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    if (track.setPointerCapture) track.setPointerCapture(e.pointerId);
+    pushHistory();          // todo el arrastre cuenta como un solo paso
+    setGapIndex(pick(e.clientX), true);
+  });
+  track.addEventListener('pointermove', (e) => { if (dragging) setGapIndex(pick(e.clientX), true); });
+  const stop = () => { dragging = false; };
+  track.addEventListener('pointerup', stop);
+  track.addEventListener('pointercancel', stop);
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { setGapIndex(gapIndex + 1, true); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { setGapIndex(gapIndex - 1, true); e.preventDefault(); }
+  });
+})();
+window.addEventListener('error', (e) => setErr('Error: ' + e.message));
+
+render();
+boot();
+</script>
+</body>
+</html>

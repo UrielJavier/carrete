@@ -1,0 +1,37 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(0, 0, 0, 0.72);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.box {
+  width: 100%;
+  max-width: 340px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
+  padding: var(--s-8);
+}
+
+.title {
+  margin: 0 0 var(--s-6);
+  font: 400 var(--fs-md) / 1 var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--c-text);
+}
+
+.body {
+  margin: 0 0 var(--s-8);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--c-text-dim);
+}
+
+.actions {
+  display: flex;
+  gap: var(--s-4);
+  justify-content: flex-end;
+}

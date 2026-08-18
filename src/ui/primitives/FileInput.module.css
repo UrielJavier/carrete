@@ -1,0 +1,13 @@
+/* Input de fichero REAL, transparente, encima del contenido. Nada de .click()
+   por JavaScript: los navegadores lo bloquean en contextos con sandbox, y aqui el
+   gesto cae directamente sobre el input. */
+
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 0;
+  cursor: pointer;
+}

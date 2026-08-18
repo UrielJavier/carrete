@@ -1,0 +1,85 @@
+/* EL LIENZO.
+   El area tiene SIEMPRE la misma altura, independientemente del nivel: lo que
+   cambia es el tamaño del contenido dentro, no el hueco. Se calcula en pixeles y
+   no en CSS porque una cadena de porcentajes colapsaba en el nivel Post. */
+
+.wrap {
+  padding: var(--s-7) var(--gutter) 0;
+}
+
+.area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  transition: transform var(--dur) var(--ease);
+}
+
+.row.dragging {
+  transition: none;
+}
+
+.stage {
+  position: relative;
+  flex: none;
+  background: var(--c-page);
+  touch-action: manipulation;
+  transition: width var(--dur) var(--ease), height var(--dur) var(--ease);
+}
+
+/* Asomo de la pagina vecina. Es una pagina COMPLETA recortada por el area, no una
+   caja estrecha: asi al deslizar la vecina entra entera. El hueco se reserva
+   siempre, tambien en los extremos, para que el lienzo no cambie de tamaño. */
+.peek {
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  opacity: 0.45;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  transition: width var(--dur) var(--ease), opacity var(--dur-fast) ease;
+}
+
+.peek.empty {
+  opacity: 0;
+  cursor: default;
+  background: none;
+}
+
+.peek canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Fantasma del recorte 3:4 que Instagram aplica en la cuadricula del perfil. */
+.cropline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-left: 1px dashed rgba(255, 255, 255, 0.45);
+  border-right: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
+.croptag {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: var(--fs-micro) / 1 var(--font-mono);
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage, .peek { transition: none; }
+}

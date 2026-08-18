@@ -1,0 +1,86 @@
+/* Un solo componente para todos los botones de la aplicacion. Las variantes son
+   modificadores, no componentes distintos, para que el foco, el estado
+   deshabilitado y la zona tocable se resuelvan una vez. */
+
+.base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: var(--fs-sm) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.base:disabled {
+  cursor: default;
+}
+
+/* Apagado pero pulsable: un boton deshabilitado no puede explicar por que no
+   funciona, asi que cuando hay motivo se usa esto en su lugar. */
+.muted {
+  opacity: 0.38;
+}
+
+.base:disabled:not(.muted) {
+  opacity: 0.35;
+}
+
+/* ── variantes ── */
+
+.primary {
+  background: var(--c-text);
+  color: var(--c-ink-on-light);
+  padding: var(--s-4) var(--s-6);
+  flex: none;
+}
+
+.outline {
+  border: 1px solid var(--c-line);
+  padding: 7px 9px;
+  position: relative;
+}
+
+.outline.on {
+  border-color: var(--c-text);
+  color: var(--c-text);
+}
+
+.ghost {
+  padding: var(--s-3);
+  display: grid;
+  place-items: center;
+}
+
+.icon {
+  border: 1px solid var(--c-line);
+  padding: var(--s-3) 7px;
+  display: grid;
+  place-items: center;
+}
+
+.icon.on {
+  color: var(--c-text);
+  border-color: var(--c-text);
+}
+
+.plain {
+  padding: 0;
+}
+
+.danger {
+  color: var(--c-danger);
+}
+
+/* ── tamaños de icono, uniformes ── */
+
+.base :global(svg) {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  flex: none;
+}

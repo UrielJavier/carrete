@@ -1,0 +1,233 @@
+/**
+ * ESTADO. Un reducer plano sobre `post`, mas el historial de deshacer.
+ *
+ * `post` es JSON puro, asi que clonarlo cuesta microsegundos. Las fotos viven
+ * aparte en un mapa por id y NO se clonan: cada entrada del historial guarda
+ * ademas la orientacion de cada foto (giro y espejo), porque eso vive en el
+ * registro de la foto y no en el post.
+ */
+
+import { MAX_SLIDES, clamp } from '../core/layouts.js';
+import {
+  newPost, newSlide, clonePost, applyLayout, moveSlideTo, swapCells,
+} from '../core/post.js';
+import { newT } from '../core/geometry.js';
+
+export const HISTORY_MAX = 40;
+
+export function initialState() {
+  return {
+    post: newPost(),
+    images: {},          // id -> { file, name, cs, key, converted, rot, flip, w, h, srcW, srcH, url, el }
+    history: [],         // [{ post, orient }]
+    current: 0,
+    sel: null,           // { slideIndex, cellIndex }
+    level: 'page',       // post | page | photo
+    tool: null,          // subnivel abierto
+    mode: 'edit',        // edit | feed | grid | projects | log
+  };
+}
+
+const orientMap = (images) => {
+  const m = {};
+  Object.keys(images).forEach((id) => {
+    m[id] = { rot: images[id].rot || 0, flip: !!images[id].flip };
+  });
+  return m;
+};
+
+/** Se llama ANTES de modificar, con el estado que queremos poder recuperar. */
+export function snapshot(state) {
+  return { post: clonePost(state.post), orient: orientMap(state.images) };
+}
+
+function withHistory(state, next) {
+  const history = state.history.concat([snapshot(state)]);
+  if (history.length > HISTORY_MAX) history.shift();
+  return { ...next, history };
+}
+
+const replaceSlide = (post, i, slide) => ({
+  ...post,
+  slides: post.slides.map((s, k) => (k === i ? slide : s)),
+});
+
+export function reducer(state, action) {
+  switch (action.type) {
+    case 'set':
+      return { ...state, ...action.patch };
+
+    case 'level':
+      return { ...state, level: action.level, tool: null };
+
+    case 'tool':
+      return { ...state, tool: action.tool };
+
+    case 'goPage':
+      if (action.i < 0 || action.i >= state.post.slides.length) return state;
+      return { ...state, current: action.i, sel: null };
+
+    case 'select':
+      return { ...state, sel: action.sel };
+
+    case 'layout':
+      return withHistory(state, {
+        ...state,
+        post: replaceSlide(state.post, state.current, applyLayout(state.post.slides[state.current], action.layoutId)),
+        sel: null,
+      });
+
+    case 'addSlide': {
+      if (state.post.slides.length >= MAX_SLIDES) return state;
+      const slides = state.post.slides.slice();
+      slides.splice(state.current + 1, 0, newSlide('full'));
+      return withHistory(state, {
+        ...state,
+        post: { ...state.post, slides },
+        current: state.current + 1,
+        sel: null,
+      });
+    }
+
+    case 'duplicateSlide': {
+      if (state.post.slides.length >= MAX_SLIDES) return state;
+      const copy = JSON.parse(JSON.stringify(state.post.slides[state.current]));
+      copy.id = Math.random().toString(36).slice(2, 9);
+      const slides = state.post.slides.slice();
+      slides.splice(state.current + 1, 0, copy);
+      return withHistory(state, {
+        ...state,
+        post: { ...state.post, slides },
+        current: state.current + 1,
+        sel: null,
+      });
+    }
+
+    case 'removeSlide': {
+      const slides = state.post.slides.length === 1
+        ? [newSlide('full')]
+        : state.post.slides.filter((_, k) => k !== action.i);
+      return withHistory(state, {
+        ...state,
+        post: { ...state.post, slides },
+        current: clamp(action.i > 0 ? action.i - 1 : 0, 0, slides.length - 1),
+        sel: null,
+      });
+    }
+
+    case 'moveSlide': {
+      const slides = moveSlideTo(state.post.slides, action.from, action.to);
+      if (slides === state.post.slides) return state;
+      return withHistory(state, {
+        ...state,
+        post: { ...state.post, slides },
+        current: action.to,
+        sel: null,
+      });
+    }
+
+    case 'swapCells':
+      return withHistory(state, {
+        ...state,
+        post: replaceSlide(state.post, state.current, swapCells(state.post.slides[state.current], action.a, action.b)),
+        sel: null,
+      });
+
+    case 'patchCell': {
+      const slide = state.post.slides[action.slideIndex];
+      if (!slide) return state;
+      const cells = slide.cells.map((c, i) => (i === action.cellIndex ? { ...c, ...action.patch } : c));
+      const next = { ...state, post: replaceSlide(state.post, action.slideIndex, { ...slide, cells }) };
+      return action.history ? withHistory(state, next) : next;
+    }
+
+    case 'putImages': {
+      /* Coloca las fotos importadas en la celda indicada y las siguientes vacias. */
+      const images = { ...state.images };
+      action.added.forEach((a) => { images[a.id] = a; });
+      const slide = state.post.slides[action.slideIndex];
+      const cells = slide.cells.map((c) => ({ ...c }));
+      let ci = action.cellIndex;
+      let k = 0;
+      while (k < action.added.length && ci < cells.length) {
+        if (ci === action.cellIndex || !cells[ci].imgId) {
+          cells[ci] = { imgId: action.added[k].id, t: newT() };
+          k++;
+        }
+        ci++;
+      }
+      return withHistory(state, {
+        ...state,
+        images,
+        post: replaceSlide(state.post, action.slideIndex, { ...slide, cells }),
+        sel: { slideIndex: action.slideIndex, cellIndex: action.cellIndex },
+      });
+    }
+
+    case 'patchImage': {
+      const im = state.images[action.id];
+      if (!im) return state;
+      const images = { ...state.images, [action.id]: { ...im, ...action.patch } };
+      const post = action.cellPatches
+        ? action.cellPatches.reduce(
+            (p, cp) => replaceSlide(p, cp.slideIndex, {
+              ...p.slides[cp.slideIndex],
+              cells: p.slides[cp.slideIndex].cells.map((c, i) => (i === cp.cellIndex ? { ...c, t: cp.t } : c)),
+            }),
+            state.post
+          )
+        : state.post;
+      const next = { ...state, images, post };
+      return action.history ? withHistory(state, next) : next;
+    }
+
+    case 'dropImages': {
+      const images = { ...state.images };
+      action.ids.forEach((id) => { delete images[id]; });
+      return { ...state, images };
+    }
+
+    case 'postSetting':
+      return withHistory(state, { ...state, post: { ...state.post, ...action.patch } });
+
+    case 'gap':
+      /* Sin historial en cada paso: lo empuja el gesto completo desde la UI. */
+      return { ...state, post: { ...state.post, gap: action.gap } };
+
+    case 'loadPost':
+      return {
+        ...state,
+        post: action.post,
+        images: action.images || {},
+        history: [],
+        current: clamp(action.current || 0, 0, action.post.slides.length - 1),
+        sel: null,
+        tool: null,
+      };
+
+    case 'undo': {
+      if (!state.history.length) return state;
+      const history = state.history.slice();
+      const entry = history.pop();
+      return {
+        ...state,
+        post: entry.post,
+        history,
+        current: clamp(state.current, 0, entry.post.slides.length - 1),
+        sel: null,
+        pendingOrient: entry.orient,   // lo aplica App con un efecto asincrono
+      };
+    }
+
+    case 'orientApplied': {
+      const { pendingOrient, ...rest } = state;
+      return { ...rest, images: action.images || state.images };
+    }
+
+    case 'pushHistory':
+      return withHistory(state, state);
+
+    default:
+      return state;
+  }
+}

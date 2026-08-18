@@ -1,0 +1,58 @@
+/* Aviso persistente, con accion. Solo para lo que el usuario debe resolver, no
+   para informar: eso va en Toast, que desaparece. */
+
+.notice {
+  display: flex;
+  gap: var(--s-5);
+  align-items: flex-start;
+  margin: var(--s-6) var(--gutter) 0;
+  padding: var(--s-5) var(--s-6);
+  font-size: var(--fs-md);
+  line-height: 1.45;
+}
+
+.notice :global(svg) {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-top: 1px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.notice p {
+  margin: 0;
+  flex: 1;
+}
+
+.warn {
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: var(--c-warn-tint);
+  color: var(--c-on-warn);
+}
+
+.danger {
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  background: var(--c-danger-tint);
+  color: var(--c-on-danger);
+}
+
+.action {
+  flex: none;
+  border: 0;
+  cursor: pointer;
+  font: var(--fs-sm) / 1 var(--font-mono);
+  padding: var(--s-3) var(--s-5);
+  background: var(--c-warn);
+  color: var(--c-ink-on-light);
+}
+
+.close {
+  flex: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+}

@@ -1,0 +1,110 @@
+/**
+ * SISTEMA DE DISEÑO — la unica fuente de valores.
+ *
+ * Ningun componente escribe un color, un tamaño de fuente o una duracion a mano:
+ * todo sale de aqui. Asi cambiar el aspecto de la aplicacion es cambiar este
+ * fichero, y no buscar hex sueltos por veinte modulos.
+ *
+ * La paleta es deliberadamente neutra: la aplicacion muestra fotos y cualquier
+ * color alrededor falsea como se perciben. El color solo se usa para significar
+ * estado, y cada tono tiene UN significado:
+ *
+ *   acento  azul     seleccion
+ *   drop    verde    destino de un arrastre
+ *   warn    ambar    limite o advertencia recuperable
+ *   dup     naranja  foto repetida
+ *   danger  rojo     accion destructiva
+ */
+
+:root {
+  /* ── superficie ── */
+  --c-bg: #0a0a0a;
+  --c-surface: #141414;
+  --c-surface-2: rgba(20, 20, 20, 0.5);
+  --c-line: #262626;
+  --c-line-strong: #404040;
+
+  /* ── texto ── */
+  --c-text: #f5f5f5;
+  --c-text-dim: #8a8a8a;
+  --c-text-faint: #5c5c5c;
+
+  /* ── estado ── */
+  --c-accent: #6ea8fe;
+  --c-drop: #4ade80;
+  --c-warn: #fbbf24;
+  --c-dup: #f97316;
+  --c-danger: #fb7185;
+
+  /* tintes al 12-16% para fondos de aviso, sobre superficie opaca */
+  --c-warn-tint: rgba(251, 191, 36, 0.12);
+  --c-dup-tint: rgba(249, 115, 22, 0.1);
+  --c-danger-tint: rgba(248, 113, 113, 0.1);
+  --c-drop-tint: rgba(74, 222, 128, 0.12);
+
+  /* ── tinta sobre fondos de color y grises intermedios ──
+     Estos existen porque los modulos los necesitaban a mano; tenerlos aqui es lo
+     que permite cambiar el aspecto sin recorrer los ficheros. */
+  --c-on-warn: #fde68a;
+  --c-on-danger: #fecaca;
+  --c-page: #ffffff;          /* el papel del lienzo */
+  --c-ink-invert: #ffffff;    /* tinta sobre fondos de color saturado */
+  --c-ink-on-light: #111111;  /* tinta sobre el blanco de los estados activos */
+  --c-track: #383838;         /* recorrido sin cubrir de un selector */
+  --c-track-past: #6e6e6e;    /* recorrido ya cubierto */
+  --c-glyph: #525252;         /* dibujos inactivos */
+  --c-placeholder: #3f3f3f;   /* huecos de contenido simulado */
+  --c-dot: #4a4a4a;           /* punto de carrusel inactivo */
+  --c-dot-on: #e5e5e5;
+  --c-checker-a: #2a2a2a;     /* damero que representa la transparencia */
+  --c-checker-b: #1c1c1c;
+
+  /* ── tipografia ── */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-nano: 8.5px;
+  --fs-micro: 9px;
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-md: 12px;
+  --fs-lg: 13px;
+  --ls-wide: 0.12em;
+  --ls-brand: 0.22em;
+
+  /* ── espaciado ── */
+  --s-1: 2px;
+  --s-2: 4px;
+  --s-3: 6px;
+  --s-4: 8px;
+  --s-5: 10px;
+  --s-6: 12px;
+  --s-7: 14px;
+  --s-8: 16px;
+  --s-10: 20px;
+
+  /* ── medidas de la aplicacion ── */
+  --gutter: 16px;          /* el canal en el que se alinea todo */
+  --hit: 44px;             /* zona tocable minima */
+  --tool-size: 64px;       /* caja de herramienta, cuadrada */
+  --tools-h: 148px;        /* altura FIJA de la zona de herramientas */
+  --stage-cap: 460px;      /* tope de ancho del lienzo */
+
+  /* ── movimiento ── */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast: 0.18s;
+  --dur: 0.28s;
+
+  /* ── capas ── */
+  --z-stage-mark: 6;
+  --z-header: 20;
+  --z-overlay: 30;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0s;
+    --dur: 0s;
+  }
+}

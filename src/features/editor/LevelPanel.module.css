@@ -1,0 +1,139 @@
+/* Un solo panel para los tres niveles, con altura FIJA y scroll propio: asi la
+   zona de herramientas mide igual en todos y el area de trabajo nunca cambia de
+   tamaño al saltar de nivel. */
+
+.panel {
+  padding: var(--s-6) var(--gutter) 0;
+}
+
+.tabs {
+  width: 100%;
+}
+
+.body {
+  padding-top: var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-6);
+  height: var(--tools-h);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Cabecera de subnivel: volver, con el nombre de la herramienta. */
+.back {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0 0 var(--s-1);
+  cursor: pointer;
+  color: var(--c-text);
+  font: var(--fs-sm) / 1 var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.back :global(svg) {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+}
+
+/* Selector de rejillas: zona tocable de 44px, que es lo que reclamaba el
+   navegador cuando estaban demasiado juntas. */
+.layouts {
+  display: flex;
+  gap: var(--s-5);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.layouts::-webkit-scrollbar {
+  display: none;
+}
+
+.glyph {
+  flex: none;
+  padding: var(--s-4) var(--s-5);
+  border: 1px solid var(--c-line);
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  min-width: var(--hit);
+  min-height: var(--hit);
+  display: grid;
+  place-items: center;
+  color: var(--c-glyph);
+}
+
+.glyph.on {
+  border-color: var(--c-text);
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+/* Las dos filas del giro comparten una reticula de cuatro columnas, asi que los
+   bloques de arriba y los de abajo quedan alineados. El angulo ocupa las dos
+   columnas centrales. */
+.rotgrid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+}
+
+.rotgrid button {
+  background: none;
+  border: 1px solid var(--c-line);
+  color: var(--c-text-dim);
+  font: var(--fs-sm) / 1 var(--font-mono);
+  padding: var(--s-5) 2px;
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden;
+}
+
+.rotgrid button.on {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-ink-on-light);
+}
+
+.rotgrid button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.deg {
+  grid-column: span 2;
+  color: var(--c-text) !important;
+  font-size: var(--fs-md) !important;
+}
+
+.deg.tilted {
+  border-color: var(--c-line-strong) !important;
+}
+
+.deg:disabled {
+  color: var(--c-text-faint) !important;
+  opacity: 1 !important;
+}
+
+.gapval {
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+  width: 36px;
+  text-align: right;
+}

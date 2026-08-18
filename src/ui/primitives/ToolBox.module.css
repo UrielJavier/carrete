@@ -1,0 +1,73 @@
+/* Caja de herramienta: cuadrada, del mismo tamaño en los tres niveles. El dibujo
+   ES el valor actual y la etiqueta el nombre de la herramienta, asi que la caja
+   no necesita texto extra. */
+
+.row {
+  display: flex;
+  gap: var(--s-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.box {
+  position: relative;
+  flex: 0 0 var(--tool-size);
+  width: var(--tool-size);
+  height: var(--tool-size);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 3px;
+  background: none;
+  border: 1px solid var(--c-line);
+  color: var(--c-text-dim);
+  font: var(--fs-micro) / 1 var(--font-mono);
+  cursor: pointer;
+}
+
+.box > span {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.box.on {
+  border-color: var(--c-text);
+  color: var(--c-text);
+}
+
+.box.danger {
+  color: var(--c-danger);
+}
+
+.box.off {
+  opacity: 0.38;
+}
+
+.box :global(svg) {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+/* Los glifos que llevan cifra dentro son mas anchos que altos. */
+.box :global(svg.wide) {
+  width: 42px;
+  height: 20px;
+}
+
+.swatch {
+  display: block;
+  width: 17px;
+  height: 17px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}

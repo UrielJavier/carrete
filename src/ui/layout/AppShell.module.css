@@ -1,0 +1,87 @@
+/* Armazon de la aplicacion. Dos niveles de cabecera:
+     fila 1  la aplicacion   (siempre)
+     fila 2  el documento    (solo cuando hay uno abierto)
+   Asi Proyectos e Historial no muestran controles que no aplican. */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  background: rgba(10, 10, 10, 0.96);
+  border-bottom: 1px solid var(--c-line);
+  backdrop-filter: blur(8px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: 11px var(--gutter) var(--s-4);
+}
+
+.docbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 0 var(--gutter) var(--s-5);
+}
+
+.grow {
+  flex: 1;
+}
+
+.home {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.brand {
+  margin: 0;
+  font: 400 var(--fs-lg) / 1 var(--font-mono);
+  letter-spacing: var(--ls-brand);
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+
+.version {
+  font: var(--fs-nano) / 1 var(--font-mono);
+  color: var(--c-text-faint);
+  letter-spacing: 0.04em;
+  background: none;
+  border: 1px solid var(--c-line);
+  padding: 3px var(--s-3);
+  cursor: pointer;
+}
+
+.version.on {
+  color: var(--c-ink-on-light);
+  background: var(--c-text);
+  border-color: var(--c-text);
+}
+
+.projmeta {
+  margin: 9px var(--gutter) 0;
+  font: var(--fs-xs) / 1.4 var(--font-mono);
+  color: var(--c-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.section {
+  padding: var(--s-7) var(--gutter) 0;
+}
+
+.busy {
+  position: fixed;
+  bottom: var(--s-10);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-modal);
+  background: var(--c-text);
+  color: var(--c-ink-on-light);
+  padding: var(--s-4) var(--s-7);
+  font: var(--fs-sm) / 1 var(--font-mono);
+}

@@ -1,0 +1,203 @@
+import React, { useRef } from 'react';
+import { clamp } from '../../core/layouts.js';
+import { imageUnits, clampT, newT } from '../../core/geometry.js';
+import { weight } from '../../core/format.js';
+import { FileInput } from '../../ui/primitives/index.js';
+import { Icon } from '../../ui/icons.jsx';
+import s from './Cell.module.css';
+
+/**
+ * Los gestos se reparten por NIVEL, y cada uno es exclusivo:
+ *
+ *   Post / Página   tocar selecciona; el arrastre pertenece al lienzo
+ *   Página + mover  arrastrar la foto la intercambia
+ *   Foto            arrastrar encuadra, pinza amplia
+ *
+ * En los dos primeros la celda escucha CLICK y no pointerdown, porque un click
+ * solo se dispara si nadie ha interceptado el gesto: asi arrastrar para cambiar de
+ * pagina nunca selecciona por accidente.
+ */
+export default function Cell({
+  cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef,
+  onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
+}) {
+  const boxRef = useRef(null);
+  const ptrs = useRef(new Map());
+  const gesture = useRef(null);
+  const before = useRef(null);
+
+  const pos = {
+    left: `${cell.rect.xLocal * 100}%`,
+    top: `${cell.rect.y * 100}%`,
+    width: `${cell.rect.w * 100}%`,
+    height: `${cell.rect.h * 100}%`,
+  };
+
+  if (!image) {
+    return (
+      <div className={`${s.cell} ${s.empty}`} data-cell={cell.cellIndex} style={pos}>
+        <div className={s.placeholder}>
+          <span className={s.sign}>+</span>
+          <span className={s.lbl}>añadir</span>
+        </div>
+        <FileInput onFiles={onFiles} guardRef={guardRef} />
+      </div>
+    );
+  }
+
+  const ia = image.w / image.h;
+  const t = clampT(cell.t, cell.cellAspect, ia);
+  const u = imageUnits(t.scale, cell.cellAspect, ia);
+
+  const imgStyle = {
+    left: `${(0.5 - t.fx * u.dwU) * 100}%`,
+    top: `${(0.5 - t.fy * u.dhU) * 100}%`,
+    width: `${u.dwU * 100}%`,
+    height: `${u.dhU * 100}%`,
+  };
+
+  const moving = level === 'page' && tool === 'move';
+  const framing = level === 'photo';
+  const cls = [
+    s.cell, s.filled,
+    selected && s.selected,
+    isDrop && s.dropzone,
+    isLifting && s.lifting,
+    moving && s.movable,
+    framing && s.framing,
+  ].filter(Boolean).join(' ');
+
+  const chrome = (
+    <>
+      <div className={s.badges}>
+        {dupCount > 1 && (
+          <button
+            type="button"
+            className={s.dupflag}
+            title="Foto repetida — toca para ver dónde"
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); onDupInfo(); }}
+          >
+            <Icon.warn />
+          </button>
+        )}
+        <div className={s.sizetag}>
+          {image.w}×{image.h}
+          {image.file?.size ? ` · ${weight(image.file.size)}` : ''}
+        </div>
+      </div>
+      <i className={s.mark} />
+      {framing && selected && showThirds && (
+        <div className={s.thirds}>
+          <i className="v" style={{ left: '33.333%' }} />
+          <i className="v" style={{ left: '66.666%' }} />
+          <i className="h" style={{ top: '33.333%' }} />
+          <i className="h" style={{ top: '66.666%' }} />
+        </div>
+      )}
+    </>
+  );
+
+  /* Herramienta de mover: se arrastra la foto entera, sin asa, porque en ese modo
+     ningun otro gesto compite. */
+  if (moving) {
+    return (
+      <div
+        ref={boxRef}
+        className={cls}
+        data-cell={cell.cellIndex}
+        style={pos}
+        onPointerDown={(e) => {
+          boxRef.current?.setPointerCapture?.(e.pointerId);
+          onSwapStart(cell.cellIndex);
+        }}
+        onPointerMove={(e) => { e.preventDefault(); onSwapOver(e.clientX, e.clientY); }}
+        onPointerUp={onSwapEnd}
+        onPointerCancel={onSwapEnd}
+      >
+        <img src={image.url} alt="" draggable={false} style={imgStyle} />
+        {chrome}
+      </div>
+    );
+  }
+
+  if (!framing) {
+    return (
+      <div
+        ref={boxRef}
+        className={cls}
+        data-cell={cell.cellIndex}
+        style={pos}
+        onClick={() => (selected ? onOpen() : onSelect())}
+      >
+        <img src={image.url} alt="" draggable={false} style={imgStyle} />
+        {chrome}
+      </div>
+    );
+  }
+
+  const centroid = () => {
+    const pts = [...ptrs.current.values()];
+    return {
+      x: pts.reduce((a, q) => a + q.x, 0) / pts.length,
+      y: pts.reduce((a, q) => a + q.y, 0) / pts.length,
+      d: pts.length > 1 ? Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) : 0,
+    };
+  };
+  /* El rect solo se mide al empezar el gesto: es lo unico que necesita pixeles. */
+  const snap = () => ({ c: centroid(), t: { ...t }, box: boxRef.current.getBoundingClientRect() });
+
+  return (
+    <div
+      ref={boxRef}
+      className={cls}
+      data-cell={cell.cellIndex}
+      style={pos}
+      onPointerDown={(e) => {
+        if (!selected) { onSelect(); return; }
+        boxRef.current?.setPointerCapture?.(e.pointerId);
+        ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        gesture.current = snap();
+        if (!before.current) before.current = { ...t };
+      }}
+      onPointerMove={(e) => {
+        const g = gesture.current;
+        if (!g || !ptrs.current.has(e.pointerId)) return;
+        ptrs.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const c = centroid();
+        let scale = g.t.scale;
+        if (ptrs.current.size > 1 && g.c.d > 0 && c.d > 0) {
+          scale = clamp((g.t.scale * c.d) / g.c.d, 1, 8);
+        }
+        const un = imageUnits(scale, cell.cellAspect, ia);
+        onTransform(
+          clampT({
+            scale,
+            fx: g.t.fx - (c.x - g.c.x) / (un.dwU * g.box.width),
+            fy: g.t.fy - (c.y - g.c.y) / (un.dhU * g.box.height),
+          }, cell.cellAspect, ia),
+          false
+        );
+      }}
+      onPointerUp={(e) => {
+        ptrs.current.delete(e.pointerId);
+        if (ptrs.current.size) { gesture.current = snap(); return; }
+        gesture.current = null;
+        /* Un encuadre completo es UN paso de deshacer, no uno por pixel. */
+        const b = before.current;
+        before.current = null;
+        if (b && (b.scale !== t.scale || b.fx !== t.fx || b.fy !== t.fy)) onTransform(t, true);
+      }}
+      onPointerCancel={() => { ptrs.current.clear(); gesture.current = null; before.current = null; }}
+      onWheel={(e) => {
+        e.preventDefault();
+        onTransform(clampT({ ...t, scale: t.scale * (e.deltaY < 0 ? 1.08 : 1 / 1.08) }, cell.cellAspect, ia), true);
+      }}
+      onDoubleClick={() => onTransform(newT(), true)}
+    >
+      <img src={image.url} alt="" draggable={false} style={imgStyle} />
+      {chrome}
+    </div>
+  );
+}

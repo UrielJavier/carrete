@@ -1,0 +1,37 @@
+/* Tipografia de la aplicacion. Tres roles y nada mas: titulo de seccion, dato
+   tecnico y pista de ayuda. */
+
+.caption {
+  margin: 0;
+  font: var(--fs-xs) / 1 var(--font-mono);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--c-text-faint);
+}
+
+.hint {
+  margin: 0;
+  font: var(--fs-xs) / 1.5 var(--font-mono);
+  color: var(--c-text-faint);
+}
+
+.meta {
+  margin: 0;
+  font: var(--fs-xs) / 1.4 var(--font-mono);
+  color: var(--c-text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label {
+  flex: none;
+  width: 68px;
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-faint);
+}
+
+.value {
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+}

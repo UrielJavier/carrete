@@ -1,0 +1,17 @@
+/* Fila de ajuste: etiqueta a la izquierda y control ocupando el resto. Todas las
+   filas de la aplicacion comparten el ancho de etiqueta, asi que los controles
+   quedan alineados entre si. */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+
+.control {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}

@@ -1,0 +1,48 @@
+/** Reset y valores por defecto. Nada especifico de un componente vive aqui. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+body {
+  font: var(--fs-lg) / 1.5 var(--font-sans);
+  overscroll-behavior-y: contain;
+}
+
+/* Sin esto, un trazo de longitud cero (los tres puntos de un menu, el punto de
+   un triangulo de aviso) no dibuja nada. */
+svg {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Damero: representa "sin fondo". Se usa en el lienzo, en los asomos y en las
+   miniaturas cuando el post tiene fondo transparente. */
+.checker {
+  background-color: var(--c-checker-b);
+  background-image:
+    linear-gradient(45deg, var(--c-checker-a) 25%, transparent 25%, transparent 75%, var(--c-checker-a) 75%),
+    linear-gradient(45deg, var(--c-checker-a) 25%, transparent 25%, transparent 75%, var(--c-checker-a) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}

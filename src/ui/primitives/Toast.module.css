@@ -1,0 +1,37 @@
+/* Superpuesto arriba y a todo el ancho: los avisos no deben robar altura de forma
+   permanente. El tinte se apila sobre el color solido del panel para que el aviso
+   sea opaco y no se lea la aplicacion por detras. */
+
+.toast {
+  position: fixed;
+  top: var(--s-6);
+  left: var(--gutter);
+  right: var(--gutter);
+  z-index: var(--z-toast);
+  border: 1px solid var(--c-line-strong);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.msg {
+  display: block;
+  padding: 11px var(--s-6) var(--s-6);
+  font: var(--fs-sm) / 1.5 var(--font-mono);
+}
+
+.bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  animation: drain linear forwards;
+}
+
+@keyframes drain {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { animation: none; }
+}

@@ -1,0 +1,22 @@
+/* La cuadricula del perfil recorta la portada a 3:4 centrado. Con 4:5 se pierden
+   las franjas laterales, y esta vista existe para poder verlo antes de publicar. */
+
+.mosaic {
+  max-width: var(--stage-cap);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-surface);
+  aspect-ratio: 3 / 4;
+}
+
+.tile canvas {
+  position: absolute;
+  display: block;
+}

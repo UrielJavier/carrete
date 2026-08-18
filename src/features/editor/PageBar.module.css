@@ -1,0 +1,28 @@
+/* Barra de pagina. Se alinea al mismo canal de 16px que el resto de la columna:
+   los botones de los extremos se sacan su propio padding para que el glifo caiga
+   sobre la linea de la columna y no el borde de su caja. */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin: var(--s-3) var(--gutter) 0;
+}
+
+.bar button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.bar button:first-child {
+  margin-left: -9px;
+}
+
+.num {
+  font: var(--fs-sm) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+  letter-spacing: 0.06em;
+  min-width: 52px;
+  text-align: center;
+}

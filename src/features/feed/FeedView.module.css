@@ -1,0 +1,72 @@
+/* Vista de feed. El carrusel avanza EXACTAMENTE una pagina por gesto, por muy
+   fuerte que sea el deslizamiento: la inercia nativa se saltaria varias, y el
+   trabajo de esta vista es predecir lo que hara Instagram. */
+
+.frame {
+  max-width: var(--stage-cap);
+  margin: 0 auto;
+  border: 1px solid var(--c-line);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--s-6);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--c-placeholder);
+}
+
+.user {
+  font: var(--fs-sm) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.viewport {
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.track {
+  display: flex;
+  will-change: transform;
+}
+
+.track > div {
+  flex: 0 0 100%;
+}
+
+.track canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  padding: var(--s-5) 0;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-dot);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+
+.dot.on {
+  background: var(--c-dot-on);
+  transform: scale(1.25);
+}

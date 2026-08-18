@@ -1,0 +1,114 @@
+/* Vista alejada del nivel Post: carrusel horizontal de paginas.
+   El tamaño sale de cuantas deben verse a la vez, no de una fraccion de la
+   altura: con 4,3 visibles siempre queda una cortada, que es lo que indica que
+   hay mas deslizando. */
+
+.rail {
+  display: flex;
+  align-items: center;
+  justify-content: safe center;
+  gap: var(--s-5);
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  padding: 0 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.tile {
+  position: relative;
+  flex: none;
+  cursor: pointer;
+}
+
+.tile canvas {
+  display: block;
+  outline: 1px solid var(--c-line);
+}
+
+/* Seleccion por esquinas, igual que en las fotos. */
+.on::before,
+.on::after {
+  content: '';
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--c-accent);
+  pointer-events: none;
+  z-index: var(--z-stage-mark);
+}
+
+.on::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.on::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+.drop canvas {
+  outline: 2px dashed var(--c-drop);
+}
+
+.lift {
+  opacity: 0.4;
+}
+
+.num {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  padding: 1px 3px;
+  font: var(--fs-nano) / 1 var(--font-mono);
+  color: var(--c-ink-invert);
+  background: rgba(10, 10, 10, 0.72);
+}
+
+/* Acciones de la pagina seleccionada, colgadas ENCIMA de su miniatura: al estar
+   dentro de ella, se desplazan con el carrusel sin sincronizar nada. */
+.acts {
+  position: absolute;
+  bottom: calc(100% + var(--s-3));
+  right: 0;
+  display: flex;
+  gap: 5px;
+  z-index: 7;
+}
+
+.acts button {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: rgba(20, 20, 20, 0.92);
+  color: var(--c-text-dim);
+  border: 1px solid var(--c-line-strong);
+  cursor: pointer;
+}
+
+.acts button.danger { color: var(--c-danger); }
+.acts button.off { opacity: 0.35; }
+
+.acts :global(svg) {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.add {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--c-line-strong);
+  background: none;
+  color: var(--c-text-dim);
+  cursor: pointer;
+}
+
+.add.off {
+  opacity: 0.3;
+  cursor: default;
+}

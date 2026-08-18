@@ -1,0 +1,36 @@
+/* Escala de pasos cerrados dibujada como puntos. Los valores utiles son pocos, y
+   asi se eligen de un gesto con vibracion en cada paso. */
+
+.track {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  touch-action: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.track:focus-visible {
+  box-shadow: 0 0 0 1px var(--c-line-strong);
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--c-track);
+  transition: transform var(--dur-fast) ease, background-color var(--dur-fast) ease;
+}
+
+.past {
+  background: var(--c-track-past);
+}
+
+.on {
+  background: var(--c-text);
+  transform: scale(2.1);
+}
