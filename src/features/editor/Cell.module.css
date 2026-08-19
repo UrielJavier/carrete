@@ -203,13 +203,15 @@
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
 }
 
-.thirds i.v {
+/* Las clases v/h se escriben literales en el JSX; en un CSS Module hay que marcarlas
+   como globales o se hashean y las líneas quedan sin dimensiones (invisibles). */
+.thirds i:global(.v) {
   top: 0;
   bottom: 0;
   width: 1px;
 }
 
-.thirds i.h {
+.thirds i:global(.h) {
   left: 0;
   right: 0;
   height: 1px;
