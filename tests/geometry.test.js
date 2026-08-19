@@ -7,17 +7,17 @@ import { newPost, newSlide } from '../src/core/post.js';
 
 const post = (over = {}) => ({ ...newPost(), ...over });
 
-describe('imageUnits: la foto siempre cubre la celda', () => {
-  it('una foto mas ancha que la celda desborda por los lados', () => {
+describe('imageUnits: la foto entra entera en la celda (contain)', () => {
+  it('una foto mas ancha entra a lo ancho y deja hueco arriba/abajo', () => {
     const u = imageUnits(1, 0.8, 1.5);
-    expect(u.dhU).toBe(1);
-    expect(u.dwU).toBeCloseTo(1.875, 5);
+    expect(u.dwU).toBe(1);
+    expect(u.dhU).toBeCloseTo(0.5333, 4);
   });
 
-  it('una foto mas estrecha desborda por arriba y abajo', () => {
+  it('una foto mas estrecha entra a lo alto y deja hueco a los lados', () => {
     const u = imageUnits(1, 1.5, 0.8);
-    expect(u.dwU).toBe(1);
-    expect(u.dhU).toBeCloseTo(1.875, 5);
+    expect(u.dhU).toBe(1);
+    expect(u.dwU).toBeCloseTo(0.5333, 4);
   });
 
   it('el zoom multiplica los dos ejes', () => {
@@ -28,17 +28,17 @@ describe('imageUnits: la foto siempre cubre la celda', () => {
   });
 });
 
-describe('clampT: ni hueco vacio ni invadir la vecina', () => {
-  it('a zoom 1 no hay libertad en el eje que ya encaja', () => {
+describe('clampT: centra sin zoom y da libertad con zoom', () => {
+  it('a zoom 1 la foto entra entera y queda centrada, sin libertad', () => {
     const t = clampT({ scale: 1, fx: 0.1, fy: 0.1 }, 0.8, 1.5);
+    expect(t.fx).toBeCloseTo(0.5, 10);
     expect(t.fy).toBeCloseTo(0.5, 10);
-    expect(t.fx).toBeGreaterThan(0.1);
   });
 
   it('con zoom aparece libertad en los dos ejes', () => {
-    const t = clampT({ scale: 3, fx: 0.1, fy: 0.1 }, 0.8, 1.5);
-    expect(t.fx).toBeCloseTo(0.1, 10);
-    expect(t.fy).toBeCloseTo(0.1667, 3);
+    const t = clampT({ scale: 3, fx: 0.3, fy: 0.4 }, 0.8, 1.5);
+    expect(t.fx).toBeCloseTo(0.3, 10);
+    expect(t.fy).toBeCloseTo(0.4, 10);
   });
 
   it('el zoom nunca baja de 1 ni sube de 8', () => {
@@ -145,12 +145,14 @@ describe('postCells: espacio de post', () => {
   });
 });
 
-describe('drawnWidth detecta ampliaciones', () => {
-  it('una foto horizontal a sangre en 4:5 necesita mas ancho del que tiene', () => {
+describe('drawnWidth: ancho de dibujo en contain', () => {
+  it('una foto horizontal a sangre en 4:5 entra por el ancho de la celda', () => {
     const cs = postCells(post({ slides: [newSlide('full')] }));
     const need = drawnWidth({ ...cs[0], t: newT() }, 1776 / 1184, 1440);
-    expect(Math.round(need)).toBe(2700);
-    expect(need / 1776).toBeGreaterThan(1.5);
+    /* Contain: la apaisada encaja por el ancho de la celda (el lienzo), sin exigir
+       más ancho; y cabe de sobra en el original (no amplía). */
+    expect(Math.round(need)).toBe(1440);
+    expect(need).toBeLessThan(1776);
   });
 });
 

@@ -4,10 +4,19 @@
    no en CSS porque una cadena de porcentajes colapsaba en el nivel Post. */
 
 .wrap {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding: var(--s-7) var(--gutter) 0;
 }
 
+/* El area de trabajo ocupa TODO el alto disponible (no la altura corta derivada de
+   la proporción de la página). El contenido se centra dentro; en Foto la celda usa
+   ese alto real para hacerse lo más grande posible. */
 .area {
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;

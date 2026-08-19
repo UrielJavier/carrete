@@ -10,17 +10,31 @@ import s from '../LevelPanel.module.css';
  *  la foto se ve entera mientras la encuadras. */
 export default function PhotoPanel({
   image, tool, showThirds,
-  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove,
+  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove, onNudge,
 }) {
   if (tool === 'rotate') {
     return (
       <>
-        <Back label="girar" onBack={onBack} />
+        <Back label="girar" sub="gira o endereza la foto" onBack={onBack} />
         <RotateControls rot={image.rot || 0} onSet={onRotate} />
-        <Hint>
-          toca el ángulo para volver a recto · al inclinar, las esquinas quedan
-          vacías: amplía para taparlas
-        </Hint>
+        <Hint>al inclinar, las esquinas quedan vacías: amplía para taparlas.</Hint>
+      </>
+    );
+  }
+
+  if (tool === 'move') {
+    /* Empuja el encuadre un pasito por toque, para cuadrar al píxel cuando hay zoom.
+       Las flechas mueven la FOTO en su dirección (como arrastrarla). */
+    const N = 0.005;
+    return (
+      <>
+        <Back label="mover" sub="ajuste fino de la foto" onBack={onBack} />
+        <div className={s.dpad}>
+          <button type="button" title="Izquierda" onClick={() => onNudge(N, 0)}><Icon.left /></button>
+          <button type="button" title="Arriba" onClick={() => onNudge(0, N)}><Icon.up /></button>
+          <button type="button" title="Abajo" onClick={() => onNudge(0, -N)}><Icon.down /></button>
+          <button type="button" title="Derecha" onClick={() => onNudge(-N, 0)}><Icon.right /></button>
+        </div>
       </>
     );
   }
@@ -32,6 +46,7 @@ export default function PhotoPanel({
         <ToolBox icon={<Icon.mirror />} label="espejo" on={!!image.flip} onClick={onMirror} />
         <ToolBox icon={<Icon.grid />} label="tercios" on={showThirds} onClick={onThirds} />
         <ToolBox icon={<Icon.center />} label="centrar" onClick={() => onCenter(newT())} />
+        <ToolBox icon={<Icon.move />} label="mover" onClick={() => onTool('move')} />
         <ToolBox icon={<Icon.swap />} label="cambiar">
           <FileInput onFiles={onReplace} />
         </ToolBox>

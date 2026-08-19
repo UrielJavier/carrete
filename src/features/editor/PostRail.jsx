@@ -21,13 +21,15 @@ const EDGE_ZONE = 56;
  * pagina 10 a la primera posicion.
  */
 export default function PostRail({
-  post, cells, current, tool, areaH, getSource,
+  post, cells, current, tool, areaH, getSource, enter,
   onSelect, onOpen, onMove, onDuplicate, onDelete, onAdd, onLimit,
 }) {
   const railRef = useRef(null);
   const railW = useElementWidth(railRef);
   const [from, setFrom] = useState(null);
   const [over, setOver] = useState(null);
+  /* Congelado al montar: alejarse desde Página se anima una vez, sin repetir. */
+  const [zoomEntry] = useState(enter);
   const auto = useRef({ dir: 0, speed: 0, raf: null, x: 0, y: 0 });
   const drag = useRef({ x: 0, y: 0, active: false });
   const centered = useRef(-1);
@@ -88,7 +90,10 @@ export default function PostRail({
   };
 
   return (
-    <div className={s.rail} ref={railRef}>
+    <div
+      className={[s.rail, zoomEntry && s.zoomout].filter(Boolean).join(' ')}
+      ref={railRef}
+    >
       {post.slides.map((sl, i) => (
         <div
           key={sl.id}

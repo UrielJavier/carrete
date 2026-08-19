@@ -18,7 +18,7 @@ import s from './Cell.module.css';
  * pagina nunca selecciona por accidente.
  */
 export default function Cell({
-  cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef,
+  cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -35,7 +35,11 @@ export default function Cell({
 
   if (!image) {
     return (
-      <div className={`${s.cell} ${s.empty}`} data-cell={cell.cellIndex} style={pos}>
+      <div
+        className={[s.cell, s.empty, faded && s.faded].filter(Boolean).join(' ')}
+        data-cell={cell.cellIndex}
+        style={pos}
+      >
         <div className={s.placeholder}>
           <span className={s.sign}>+</span>
           <span className={s.lbl}>añadir</span>
@@ -65,6 +69,11 @@ export default function Cell({
     isLifting && s.lifting,
     moving && s.movable,
     framing && s.framing,
+    /* En Página (sin encuadre ni mover) la celda deja pasar el paneo horizontal,
+       para poder desplazar la tira aunque el gesto empiece sobre una foto. */
+    !framing && !moving && s.scrollable,
+    /* En Foto solo se ve la celda que editas: el resto del layout se desvanece. */
+    faded && s.faded,
   ].filter(Boolean).join(' ');
 
   const chrome = (

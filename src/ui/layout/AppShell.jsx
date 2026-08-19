@@ -14,7 +14,7 @@ export const Busy = ({ label }) => (label ? <div className={s.busy}>{label}</div
  * aparece cuando hay uno abierto.
  */
 export default function AppShell({
-  version, onHome, onVersion, versionActive,
+  version, onHome,
   fullscreen, onFullscreen,
   docBar, meta, notices, children,
 }) {
@@ -22,20 +22,16 @@ export default function AppShell({
     <>
       <header className={s.header}>
         <div className={s.bar}>
-          <button type="button" className={s.home} title="Inicio" onClick={onHome}>
-            <h1 className={s.brand}>Carrete</h1>
-          </button>
+          <div className={s.brandwrap}>
+            <button type="button" className={s.home} title="Inicio" onClick={onHome}>
+              <h1 className={s.brand}>Carrete</h1>
+            </button>
+            <span className={s.ver}>v{version}</span>
+          </div>
           <span className={s.grow} />
           <Button variant="icon" title="Pantalla completa" onClick={onFullscreen}>
             {fullscreen ? <Icon.shrink /> : <Icon.expand />}
           </Button>
-          <button
-            type="button"
-            className={[s.version, versionActive && s.on].filter(Boolean).join(' ')}
-            onClick={onVersion}
-          >
-            v{version}
-          </button>
         </div>
         {docBar && <div className={s.docbar}>{docBar}</div>}
       </header>

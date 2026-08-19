@@ -17,12 +17,19 @@
 
 import { LAYOUTS, RATIOS, TRANSPARENT, clamp } from './layouts.js';
 
-/** Tamaño de la foto en multiplos del tamaño de su celda. Sin pixeles. */
+/**
+ * Tamaño de la foto en multiplos del tamaño de su celda. Sin pixeles.
+ *
+ * A scale 1 la foto ENCAJA entera dentro de la celda (contain): el eje que
+ * limita toca los bordes y el otro deja hueco, que se rellena con el color de
+ * fondo. El zoom (scale > 1) la agranda desde ahi, y a partir de cierto punto
+ * cubre y recorta. Asi la foto nunca se deforma y llenar la celda es opcional.
+ */
 export function imageUnits(scale, cellAspect, imgAspect) {
   const wider = imgAspect > cellAspect;
   return {
-    dwU: (wider ? imgAspect / cellAspect : 1) * scale,
-    dhU: (wider ? 1 : cellAspect / imgAspect) * scale,
+    dwU: (wider ? 1 : imgAspect / cellAspect) * scale,
+    dhU: (wider ? cellAspect / imgAspect : 1) * scale,
   };
 }
 

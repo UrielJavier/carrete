@@ -6,6 +6,13 @@
   position: absolute;
   overflow: hidden;
   outline-offset: -1px;
+  transition: opacity var(--dur) var(--ease);
+}
+
+/* Hiper-foco en Foto: solo se ve la celda que editas; las demás se desvanecen. */
+.faded {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .empty {
@@ -16,6 +23,12 @@
 .filled {
   outline: 1px solid rgba(255, 255, 255, 0.18);
   touch-action: none;
+}
+
+/* En Página la foto no captura el gesto: el arrastre horizontal desplaza la tira y
+   el toque sigue seleccionando. Va después de .filled para ganarle el touch-action. */
+.scrollable {
+  touch-action: pan-x;
 }
 
 .framing {
@@ -128,7 +141,9 @@
   border-top: 0;
 }
 
-.lifting {
+/* Al levantar una celda para moverla se atenua la FOTO, no la celda entera: asi
+   las esquinas azules de seleccion siguen a plena intensidad sobre la que mueves. */
+.lifting img {
   opacity: 0.42;
 }
 

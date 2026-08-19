@@ -30,6 +30,13 @@
   color: var(--c-text-dim);
   font: var(--fs-micro) / 1 var(--font-mono);
   cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.box:active {
+  transform: scale(0.96);
 }
 
 .box > span {

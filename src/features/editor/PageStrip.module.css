@@ -1,0 +1,141 @@
+/* Nivel Página: tira horizontal con TODAS las páginas montadas. Se ven unas tres
+   a la vez (la centrada entera y un tercio de cada vecina) y se desplaza a
+   cualquiera. El relleno lateral deja centrar también la primera y la última. */
+
+/* Contenedor del área: la tira dentro, y el aviso de recorte flotando fuera de las
+   páginas (en la banda vacía). */
+.holder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.strip {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* En modo mover no se desplaza: el gesto reordena las fotos de la página activa. */
+.strip.locked {
+  overflow-x: hidden;
+  scroll-snap-type: none;
+}
+
+/* En Foto la tira se desvanece: el foco se lleva el lienzo de la celda seleccionada. */
+.strip.dim {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Acercarse desde Post: un "divein" suave — la tira entra un poco más pequeña
+   (como si te acercaras) y crece hasta su sitio. Sutil, no un morph literal. */
+.strip.zoomin {
+  animation: stripZoomIn var(--dur) var(--ease);
+  transform-origin: center;
+}
+
+@keyframes stripZoomIn {
+  from { transform: scale(0.74); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip.zoomin { animation: none; }
+}
+
+.page {
+  flex: none;
+  position: relative;
+  overflow: hidden;
+  scroll-snap-align: center;
+  outline: 1px solid var(--c-line);
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+/* Las vecinas quedan atenuadas y sin interacción hasta que el scroll las centra. */
+.page.inactive {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Lienzo de la foto en foco: centrado en el área, a la FORMA de la celda. Entra con
+   un pequeño zoom para que el paso a Foto no sea un corte. */
+.focus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  outline: 1px solid var(--c-line);
+  animation: focusIn var(--dur) var(--ease);
+}
+
+@keyframes focusIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus { animation: none; }
+}
+
+/* Tile de añadir, al final de la tira y del tamaño de una página. */
+.add {
+  flex: none;
+  scroll-snap-align: center;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--c-line-strong);
+  background: none;
+  color: var(--c-text-dim);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.add:active:not(.addoff) {
+  transform: scale(0.98);
+}
+
+.add.addoff {
+  opacity: 0.3;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page { transition: none; }
+}
+
+/* Fantasma del recorte 3:4 que Instagram aplica en la cuadrícula del perfil. */
+.cropline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-left: 1px dashed rgba(255, 255, 255, 0.45);
+  border-right: 1px dashed rgba(255, 255, 255, 0.45);
+}
+
+/* El rótulo del recorte va FUERA de las páginas: en la banda inferior vacía del
+   área (las páginas quedan centradas y son más bajas que el área). */
+.cropnote {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: var(--fs-micro) / 1 var(--font-mono);
+  color: var(--c-text-faint);
+  pointer-events: none;
+}

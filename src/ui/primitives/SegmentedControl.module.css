@@ -20,6 +20,8 @@
   padding: var(--s-3) 7px;
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
 }
 
 .item.on {

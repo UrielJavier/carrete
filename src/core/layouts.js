@@ -61,8 +61,10 @@ export const TRANSPARENT = 'transparent';
 
 export const BGS = ['#ffffff', '#000000', TRANSPARENT];
 
-/** Los asomos muestran una fraccion de la pagina vecina a cada lado. */
-export const PEEK_FRAC = 0.2;
+/** Los asomos muestran un tercio de la pagina vecina a cada lado. Como la pagina
+ *  activa ocupa 1 / (1 + 2·frac) del ancho, con 1/3 se ven ~1,67 paginas: mucho
+ *  menos que las ~4,3 de Post, asi que la activa siempre queda mas ampliada. */
+export const PEEK_FRAC = 1 / 3;
 export const PEEK_GAP = 3;
 
 /** En Foto los asomos se cierran y la pagina se acerca. */

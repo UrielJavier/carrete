@@ -9,6 +9,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Aire en los extremos: la bolita activa escala ×2,1 y sin esto la primera y la
+     última se salen del borde y el overflow del panel las recorta. */
+  padding-inline: var(--s-3);
   touch-action: none;
   cursor: pointer;
   outline: none;

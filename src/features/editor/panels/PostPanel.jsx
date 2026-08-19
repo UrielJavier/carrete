@@ -4,16 +4,18 @@ import {
   SegmentedControl, ToolBox, ToolRow, Swatch, Field, Hint,
   NotchSlider, ColorSwatches,
 } from '../../../ui/primitives/index.js';
-import { Icon, RatioGlyph, GapGlyph, FmtGlyph } from '../../../ui/icons.jsx';
+import { Icon, RatioGlyph, GapGlyph } from '../../../ui/icons.jsx';
 import { HAPTIC, haptic } from '../../../hooks/useHaptics.js';
 import s from '../LevelPanel.module.css';
 
-/** Cabecera de subnivel, compartida por los tres paneles. */
-export function Back({ label, onBack }) {
+/** Cabecera de subnivel: título (la acción, que vuelve al tocarlo) y un subtítulo
+ *  con una explicación muy breve. Compartida por los tres paneles. */
+export function Back({ label, sub, onBack }) {
   return (
     <button type="button" className={s.back} onClick={onBack}>
       <Icon.left />
-      <span>{label}</span>
+      <span className={s.title}>{label}</span>
+      {sub && <span className={s.sub}>{sub}</span>}
     </button>
   );
 }
@@ -31,7 +33,7 @@ export default function PostPanel({
   if (tool === 'move') {
     return (
       <>
-        <Back label="mover" onBack={onBack} />
+        <Back label="mover" sub="reordena las páginas" onBack={onBack} />
         <ToolRow>
           <ToolBox
             icon={<Icon.left />} label="izq" disabled={current === 0}
@@ -42,7 +44,7 @@ export default function PostPanel({
             onClick={() => onMove(current, current + 1)}
           />
         </ToolRow>
-        <Hint>arrastra una página a su nueva posición, o usa izq/der</Hint>
+        <Hint>o arrastra una página directamente a su sitio.</Hint>
       </>
     );
   }
@@ -50,20 +52,24 @@ export default function PostPanel({
   if (tool === 'ratio') {
     return (
       <>
-        <Back label="proporción" onBack={onBack} />
-        <Field label="proporción">
-          <SegmentedControl
-            stacked
-            value={post.ratio}
-            onChange={(v) => onSetting({ ratio: v })}
-            options={Object.keys(RATIOS).map((k) => ({
-              value: k,
-              title: k,
-              label: RATIOS[k].label,
-              icon: <RatioGlyph ratio={k} />,
-            }))}
-          />
+        <Back label="proporción" sub="la forma de cada página" onBack={onBack} />
+        <Field>
+          <div className={s.ratiogrid}>
+            {Object.keys(RATIOS).map((k) => (
+              <button
+                key={k}
+                type="button"
+                title={k}
+                className={post.ratio === k ? s.on : undefined}
+                onClick={() => onSetting({ ratio: k })}
+              >
+                <RatioGlyph ratio={k} />
+                <span>{RATIOS[k].label}{k === '3:4' ? ' *' : ''}</span>
+              </button>
+            ))}
+          </div>
         </Field>
+        <Hint>* 3:4 es la más alargada.</Hint>
       </>
     );
   }
@@ -72,8 +78,8 @@ export default function PostPanel({
     const index = Math.max(0, GAPS.indexOf(post.gap));
     return (
       <>
-        <Back label="gap" onBack={onBack} />
-        <Field label="gap" right={<span className={s.gapval}>{post.gap}px</span>}>
+        <Back label="gap" sub="el espacio entre fotos" onBack={onBack} />
+        <Field right={<span className={s.gapval}>{post.gap}px</span>}>
           <NotchSlider
             steps={GAPS}
             index={index}
@@ -85,7 +91,6 @@ export default function PostPanel({
             }}
           />
         </Field>
-        <Hint>el valor es la separación real: la misma entre fotos y en el borde</Hint>
       </>
     );
   }
@@ -93,8 +98,8 @@ export default function PostPanel({
   if (tool === 'bg') {
     return (
       <>
-        <Back label="color" onBack={onBack} />
-        <Field label="color">
+        <Back label="color" sub="el fondo del post" onBack={onBack} />
+        <Field>
           <ColorSwatches
             value={post.bg}
             presets={BGS}
@@ -117,8 +122,8 @@ export default function PostPanel({
   if (tool === 'fmt') {
     return (
       <>
-        <Back label="formato" onBack={onBack} />
-        <Field label="formato">
+        <Back label="formato" sub="el tipo de archivo al exportar" onBack={onBack} />
+        <Field>
           <SegmentedControl
             value={post.bg === TRANSPARENT ? 'png' : (post.fmt || 'png')}
             onChange={(v) => onSetting({ fmt: v })}
@@ -132,25 +137,23 @@ export default function PostPanel({
             ]}
           />
         </Field>
-        <Hint>
-          {post.bg === TRANSPARENT
-            ? 'con fondo transparente el formato es PNG: JPEG no tiene canal alfa y pintaría los huecos de negro.'
-            : post.fmt === 'png'
-              ? 'PNG no recomprime: no añade pérdida al montar, pero cada página pesa unos 4 MB.'
-              : 'JPG al 95%. Suficiente en casi todo, y unos 800 kB por página.'}
-        </Hint>
+        {post.bg === TRANSPARENT && (
+          <Hint>con fondo transparente es PNG: JPEG pintaría los huecos de negro.</Hint>
+        )}
       </>
     );
   }
 
+  const fmt = post.bg === TRANSPARENT ? 'png' : (post.fmt || 'png');
+  const ext = fmt === 'jpeg' ? '.jpg' : '.png';
   return (
     <>
       <ToolRow>
         <ToolBox icon={<Icon.move />} label="mover" onClick={() => onTool('move')} />
-        <ToolBox icon={<RatioGlyph ratio={post.ratio} />} label="ratio" onClick={() => onTool('ratio')} />
+        <ToolBox icon={<span className={s.toolval}>{RATIOS[post.ratio].label}</span>} label="ratio" onClick={() => onTool('ratio')} />
         <ToolBox icon={<GapGlyph gap={post.gap} />} label="gap" onClick={() => onTool('gap')} />
         <ToolBox icon={<Swatch color={post.bg} />} label="color" onClick={() => onTool('bg')} />
-        <ToolBox icon={<FmtGlyph fmt={post.fmt} />} label="formato" onClick={() => onTool('fmt')} />
+        <ToolBox icon={<span className={s.toolval}>{ext}</span>} label="formato" onClick={() => onTool('fmt')} />
       </ToolRow>
       <Hint>arrastra una página, o muévela con izq/der · tócala para abrirla</Hint>
     </>

@@ -45,20 +45,19 @@
   color: var(--c-text);
 }
 
-.version {
-  font: var(--fs-nano) / 1 var(--font-mono);
-  color: var(--c-text-faint);
-  letter-spacing: 0.04em;
-  background: none;
-  border: 1px solid var(--c-line);
-  padding: 3px var(--s-3);
-  cursor: pointer;
+/* Marca + versión juntas; solo "Carrete" es pulsable (lleva a Proyectos). */
+.brandwrap {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
 }
 
-.version.on {
-  color: var(--c-ink-on-light);
-  background: var(--c-text);
-  border-color: var(--c-text);
+/* La versión es una etiqueta, no un control: pequeña, tenue y sin eventos. */
+.ver {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  color: var(--c-text-faint);
+  pointer-events: none;
 }
 
 .projmeta {

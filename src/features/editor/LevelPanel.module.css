@@ -25,27 +25,49 @@
   display: none;
 }
 
-/* Cabecera de subnivel: volver, con el nombre de la herramienta. */
+/* Cabecera de subnivel: flecha a la izquierda y, a su derecha, título (la acción)
+   sobre un subtítulo con la explicación. Título y subtítulo comparten borde
+   izquierdo, así que quedan alineados sin ajustes a mano. */
 .back {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--s-3);
+  row-gap: var(--s-1);
   align-items: center;
-  gap: var(--s-3);
-  width: 100%;
+  align-self: flex-start;
   background: none;
   border: 0;
-  padding: 0 0 var(--s-1);
+  padding: 0;
   cursor: pointer;
   color: var(--c-text);
-  font: var(--fs-sm) / 1 var(--font-mono);
-  letter-spacing: 0.06em;
+  text-align: left;
 }
 
+/* Flecha en la fila del título (no flotando entre las dos líneas). */
 .back :global(svg) {
+  grid-column: 1;
+  grid-row: 1;
   width: 15px;
   height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
+}
+
+.title {
+  grid-column: 2;
+  grid-row: 1;
+  font: var(--fs-sm) / 1.2 var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+/* Explicación breve y tenue, en la misma columna que el título (alineada bajo él). */
+.sub {
+  grid-column: 2;
+  grid-row: 2;
+  font: var(--fs-xs) / 1.2 var(--font-mono);
+  letter-spacing: 0.06em;
+  color: var(--c-text-faint);
 }
 
 /* Selector de rejillas: zona tocable de 44px, que es lo que reclamaba el
@@ -75,6 +97,14 @@
   display: grid;
   place-items: center;
   color: var(--c-glyph);
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.glyph:active {
+  transform: scale(0.96);
 }
 
 .glyph.on {
@@ -103,6 +133,14 @@
   cursor: pointer;
   text-align: center;
   overflow: hidden;
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.rotgrid button:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .rotgrid button.on {
@@ -131,9 +169,87 @@
   opacity: 1 !important;
 }
 
+/* Fila horizontal de dirección para el ajuste fino de la foto. */
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+}
+
+.dpad button {
+  height: var(--hit);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-line);
+  background: none;
+  color: var(--c-text-dim);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.dpad button:active {
+  transform: scale(0.92);
+  border-color: var(--c-text);
+  color: var(--c-text);
+}
+
+.dpad :global(svg) {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
 .gapval {
   font: var(--fs-xs) / 1 var(--font-mono);
   color: var(--c-text-dim);
   width: 36px;
   text-align: right;
+}
+
+/* Valor mostrado como texto dentro de la caja, en vez de un glifo: el propio
+   texto ES el estado (el ratio elegido, la extension de export). */
+.toolval {
+  font: var(--fs-sm) / 1.4 var(--font-mono);
+  color: inherit;
+}
+
+/* Selector de proporcion: mismas columnas iguales que el ajuste de angulo, con el
+   glifo del ratio sobre su etiqueta. Cada opcion es su propia caja. */
+.ratiogrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-3);
+}
+
+.ratiogrid button {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  padding: var(--s-2);
+  background: none;
+  border: 1px solid var(--c-line);
+  color: var(--c-text-dim);
+  font: var(--fs-micro) / 1 var(--font-mono);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.ratiogrid button:active {
+  transform: scale(0.96);
+}
+
+.ratiogrid button.on {
+  background: var(--c-text);
+  border-color: var(--c-text);
+  color: var(--c-ink-on-light);
 }

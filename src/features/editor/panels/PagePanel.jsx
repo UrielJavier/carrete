@@ -8,12 +8,12 @@ import s from '../LevelPanel.module.css';
 /** Nivel Página: la rejilla y el orden de las fotos dentro de ella. */
 export default function PagePanel({
   slide, current, totalPages, photoCount, tool, ratio,
-  onTool, onBack, onLayout, onNeedTwo,
+  onTool, onBack, onLayout, onNeedTwo, onDelete,
 }) {
   if (tool === 'layout') {
     return (
       <>
-        <Back label="layout" onBack={onBack} />
+        <Back label="layout" sub="cómo se reparten las fotos" onBack={onBack} />
         <div className={s.layouts}>
           {Object.keys(LAYOUTS).map((k) => (
             <button
@@ -27,7 +27,6 @@ export default function PagePanel({
             </button>
           ))}
         </div>
-        <Hint>la rejilla de la página {current + 1}</Hint>
       </>
     );
   }
@@ -35,8 +34,7 @@ export default function PagePanel({
   if (tool === 'move') {
     return (
       <>
-        <Back label="mover" onBack={onBack} />
-        <Hint>arrastra una foto sobre otra para intercambiarlas</Hint>
+        <Back label="mover" sub="arrastra una foto sobre otra" onBack={onBack} />
       </>
     );
   }
@@ -48,6 +46,7 @@ export default function PagePanel({
           onClick={() => onTool('layout')} />
         <ToolBox icon={<Icon.move />} label="mover" disabled={photoCount < 2}
           disabledReason={onNeedTwo} onClick={() => onTool('move')} />
+        <ToolBox icon={<Icon.trash />} label="borrar" danger onClick={onDelete} />
       </ToolRow>
       <Hint>
         {totalPages > 1

@@ -12,6 +12,15 @@
   cursor: pointer;
   font: var(--fs-sm) / 1 var(--font-mono);
   color: var(--c-text-dim);
+  transition: transform var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+/* Pequeño hundido al pulsar: feedback táctil, nada más. */
+.base:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .base:disabled {

@@ -20,6 +20,23 @@
   display: none;
 }
 
+/* Alejarse desde Página: un "pullback" suave — el carrusel entra un pelín más
+   grande (como si vinieras de cerca) y se asienta. Sutil a propósito, no un morph
+   literal del tamaño de la página. */
+.rail.zoomout {
+  animation: railZoomOut var(--dur) var(--ease);
+  transform-origin: center;
+}
+
+@keyframes railZoomOut {
+  from { transform: scale(1.32); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail.zoomout { animation: none; }
+}
+
 .tile {
   position: relative;
   flex: none;
@@ -69,7 +86,7 @@
 .acts {
   position: absolute;
   bottom: calc(100% + var(--s-3));
-  right: 0;
+  left: 0;
   display: flex;
   gap: 5px;
   z-index: 7;
@@ -85,6 +102,11 @@
   color: var(--c-text-dim);
   border: 1px solid var(--c-line-strong);
   cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.acts button:active {
+  transform: scale(0.9);
 }
 
 .acts button.danger { color: var(--c-danger); }
@@ -106,6 +128,11 @@
   background: none;
   color: var(--c-text-dim);
   cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.add:active:not(.off) {
+  transform: scale(0.97);
 }
 
 .add.off {

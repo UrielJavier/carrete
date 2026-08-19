@@ -9,13 +9,13 @@
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
 import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM } from './core/layouts.js';
-import { postCells, stageMetrics, newT } from './core/geometry.js';
+import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
 import { CS_LABEL, OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
 import { newPost, duplicates, layoutChangeImpact } from './core/post.js';
 import { reducer, initialState } from './state/store.js';
 
-import { useElementWidth, useViewportHeight } from './hooks/useElementWidth.js';
+import { useElementWidth, useElementHeight, useViewportHeight } from './hooks/useElementWidth.js';
 import { useFullscreen } from './hooks/useFullscreen.js';
 import { useToast, TOAST_MS } from './hooks/useToast.js';
 import { useTapGuard } from './hooks/useTapGuard.js';
@@ -29,7 +29,8 @@ import AppShell, { Section, Busy } from './ui/layout/AppShell.jsx';
 import { Button, SegmentedControl, Notice, Toast, Dialog } from './ui/primitives/index.js';
 import { Icon } from './ui/icons.jsx';
 
-import Stage, { StageWrap } from './features/editor/Stage.jsx';
+import { StageWrap } from './features/editor/Stage.jsx';
+import PageStrip from './features/editor/PageStrip.jsx';
 import PostRail from './features/editor/PostRail.jsx';
 import PageBar from './features/editor/PageBar.jsx';
 import LevelPanel, { PostPanel, PagePanel, PhotoPanel } from './features/editor/LevelPanel.jsx';
@@ -39,13 +40,11 @@ import ProjectsView from './features/projects/ProjectsView.jsx';
 import ExportSheet from './features/export/ExportSheet.jsx';
 import { exportPost } from './features/export/exportPost.js';
 import { zipShots, safeName } from './features/export/zipShots.js';
-import ChangelogView from './features/changelog/ChangelogView.jsx';
 
 import './styles/tokens.css';
 import './styles/base.css';
 
 export const VERSION = '4.0.0';
-export const BUILD = '18 ago 2026';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -71,8 +70,12 @@ export default function App() {
   const swapFrom = useRef(null);
   const dropRef = useRef(null);
   const lastDrop = useRef(null);
+  /* Nivel del render anterior: da la DIRECCIÓN de la transición post↔página, para
+     que la vista que entra sepa si acercarse (desde Post) o alejarse (desde Página). */
+  const prevLevel = useRef(level);
 
   const wrapW = useElementWidth(wrapRef);
+  const workH = useElementHeight(wrapRef);
   const viewH = useViewportHeight();
   const { toast, say, clear } = useToast();
   const { guardRef, arm } = useTapGuard();
@@ -102,11 +105,14 @@ export default function App() {
   }, []);
 
   /* ── derivados ── */
+  /* Siempre a tamaño de Página: el acercamiento del nivel Foto lo hace un transform
+     sobre la página activa, no el layout, así el centrado por scroll no se descuadra.
+     areaH es idéntica en los tres niveles, así que fijar 'page' no cambia el alto. */
   const metrics = useMemo(
-    () => stageMetrics(wrapW, viewH, post.ratio, level, {
+    () => stageMetrics(wrapW, viewH, post.ratio, 'page', {
       peekFrac: PEEK_FRAC, peekGap: PEEK_GAP, fotoZoom: FOTO_ZOOM, reserved: RESERVED,
     }),
-    [wrapW, viewH, post.ratio, level]
+    [wrapW, viewH, post.ratio]
   );
   const cells = useMemo(() => postCells(post), [post]);
   const localCells = useMemo(
@@ -133,6 +139,10 @@ export default function App() {
   useEffect(() => {
     if (level === 'photo' && !selImage) dispatch({ type: 'level', level: 'page' });
   }, [level, selImage]);
+
+  /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
+     aún conserva el nivel del que se viene. */
+  useEffect(() => { prevLevel.current = level; }, [level]);
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
      el registro de la foto y no en el post. */
@@ -260,12 +270,19 @@ export default function App() {
   const docLevel = mode === 'edit' || mode === 'feed' || mode === 'grid';
   const projectName = projects.projects.find((p) => p.id === projects.projectId)?.name;
 
+  const dupInfo = (image) => {
+    const g = dup.groups.find((x) => x.key === image.key);
+    const pages = g?.pages || [];
+    const donde = pages.length === 1
+      ? `dos veces en la página ${pages[0]}`
+      : `en las páginas ${pages.slice(0, -1).join(', ')} y ${pages[pages.length - 1]}`;
+    say(`La misma foto está ${donde}.`, 'dup');
+  };
+
   return (
     <AppShell
       version={VERSION}
-      versionActive={mode === 'log'}
       onHome={() => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } })}
-      onVersion={() => dispatch({ type: 'set', patch: { mode: mode === 'log' ? 'edit' : 'log' } })}
       fullscreen={fullscreen.active}
       onFullscreen={fullscreen.toggle}
       meta={docLevel && (!projects.projectId
@@ -316,11 +333,12 @@ export default function App() {
     >
       {mode === 'edit' && (
         <main>
-          <StageWrap innerRef={wrapRef} areaH={metrics.areaH}>
+          <StageWrap innerRef={wrapRef}>
             {level === 'post' ? (
               <PostRail
                 post={post} cells={cells} current={current} tool={tool}
                 areaH={metrics.areaH} getSource={getSource}
+                enter={prevLevel.current === 'page'}
                 onSelect={(i) => dispatch({ type: 'goPage', i })}
                 onOpen={(i) => {
                   arm();
@@ -338,12 +356,11 @@ export default function App() {
                 onLimit={() => say(`Instagram admite ${MAX_SLIDES} páginas como máximo en un carrusel.`, 'warn')}
               />
             ) : (
-              <Stage
-                post={post} cells={cells} localCells={localCells} current={current}
-                level={level} tool={tool} images={images} sel={sel}
+              <PageStrip
+                post={post} cells={cells} current={current} level={level} tool={tool}
+                images={images} sel={sel} enter={prevLevel.current === 'post'}
                 dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys}
-                showThirds={showThirds} metrics={metrics} guardRef={guardRef}
-                getSource={getSource} swipe={swipe}
+                showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } })}
                 onOpen={(cellIndex) => dispatch({
                   type: 'set',
@@ -353,16 +370,15 @@ export default function App() {
                 onTransform={(cellIndex, t, withHistory) => dispatch({
                   type: 'patchCell', slideIndex: current, cellIndex, patch: { t }, history: withHistory,
                 })}
-                onDupInfo={(image) => {
-                  const g = dup.groups.find((x) => x.key === image.key);
-                  const pages = g?.pages || [];
-                  const donde = pages.length === 1
-                    ? `dos veces en la página ${pages[0]}`
-                    : `en las páginas ${pages.slice(0, -1).join(', ')} y ${pages[pages.length - 1]}`;
-                  say(`La misma foto está ${donde}.`, 'dup');
+                onDupInfo={dupInfo}
+                onCenter={(i) => dispatch({ type: 'goPage', i })}
+                onAdd={() => dispatch({ type: 'addSlide' })}
+                onLimit={() => say(`Instagram admite ${MAX_SLIDES} páginas como máximo en un carrusel.`, 'warn')}
+                onSwapStart={(i) => {
+                  swapFrom.current = i;
+                  setLiftIdx(i);
+                  dispatch({ type: 'select', sel: { slideIndex: current, cellIndex: i } });
                 }}
-                onGoPage={(i) => dispatch({ type: 'goPage', i })}
-                onSwapStart={(i) => { swapFrom.current = i; setLiftIdx(i); }}
                 onSwapOver={onSwapOver}
                 onSwapEnd={onSwapEnd}
               />
@@ -378,9 +394,19 @@ export default function App() {
 
           <LevelPanel
             level={level}
-            onLevel={(v) => dispatch({ type: 'level', level: v })}
-            photoAvailable={!!selImage}
-            onNeedPhoto={() => say('Toca una foto de la página para poder editarla.', 'warn')}
+            onLevel={(v) => {
+              /* Ir a Foto sin selección no es un callejón: se elige la primera foto
+                 de la página actual y se baja a editarla. */
+              if (v === 'photo' && !selImage) {
+                const ci = slide.cells.findIndex((c) => c.imgId);
+                if (ci < 0) return;
+                dispatch({ type: 'set', patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex: ci } } });
+                return;
+              }
+              dispatch({ type: 'level', level: v });
+            }}
+            photoAvailable={!!selImage || slide.cells.some((c) => c.imgId)}
+            onNeedPhoto={() => say('Añade una foto a esta página para poder editarla.', 'warn')}
           >
             {level === 'post' && (
               <PostPanel
@@ -404,6 +430,12 @@ export default function App() {
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}
+                onDelete={() => setAsk({
+                  title: `¿Borrar la página ${current + 1}?`,
+                  body: 'Se quitará del post. Puedes deshacerlo después.',
+                  ok: 'Borrar',
+                  onOk: () => dispatch({ type: 'removeSlide', i: current }),
+                })}
               />
             )}
             {level === 'photo' && selImage && (
@@ -423,6 +455,18 @@ export default function App() {
                   type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
                   patch: { imgId: null, t: newT() }, history: true,
                 })}
+                onNudge={(dx, dy) => {
+                  if (!selCell || !selImage) return;
+                  const t = selCell.t;
+                  const next = clampT(
+                    { scale: t.scale, fx: t.fx + dx, fy: t.fy + dy },
+                    selCell.cellAspect, selImage.w / selImage.h,
+                  );
+                  dispatch({
+                    type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
+                    patch: { t: next }, history: true,
+                  });
+                }}
               />
             )}
           </LevelPanel>
@@ -471,10 +515,6 @@ export default function App() {
             })}
           />
         </Section>
-      )}
-
-      {mode === 'log' && (
-        <Section><ChangelogView version={VERSION} build={BUILD} /></Section>
       )}
 
       {shots && (

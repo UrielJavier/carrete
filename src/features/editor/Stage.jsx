@@ -106,8 +106,8 @@ export default function Stage({
   );
 }
 
-export const StageWrap = ({ children, innerRef, areaH }) => (
+export const StageWrap = ({ children, innerRef }) => (
   <div className={s.wrap} ref={innerRef}>
-    <div className={s.area} style={{ height: areaH }}>{children}</div>
+    <div className={s.area}>{children}</div>
   </div>
 );
