@@ -46,7 +46,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.11.0';
+export const VERSION = '4.12.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -426,20 +426,7 @@ export default function App() {
                 onJpgBlocked={() => say('Con fondo transparente hace falta PNG: JPG no guarda transparencia.', 'warn')}
               />
             )}
-            {level === 'page' && selText && (
-              <TextPanel
-                text={selText}
-                onPatch={(patch, withHistory) => dispatch({
-                  type: 'patchText', slideIndex: textSel.slideIndex, id: textSel.id, patch, history: withHistory,
-                })}
-                onReorder={(dir) => dispatch({
-                  type: 'reorderText', slideIndex: textSel.slideIndex, id: textSel.id, dir,
-                })}
-                onRemove={() => dispatch({ type: 'removeText', slideIndex: textSel.slideIndex, id: textSel.id })}
-                onBack={() => dispatch({ type: 'selectText', id: null })}
-              />
-            )}
-            {level === 'page' && !selText && (
+            {level === 'page' && (
               <PagePanel
                 slide={slide} current={current} totalPages={post.slides.length}
                 photoCount={slide.cells.filter((c) => c.imgId).length}
@@ -455,6 +442,20 @@ export default function App() {
                   ok: 'Borrar',
                   onOk: () => dispatch({ type: 'removeSlide', i: current }),
                 })}
+              />
+            )}
+            {level === 'text' && selText && (
+              <TextPanel
+                text={selText}
+                tool={tool}
+                onTool={(t) => dispatch({ type: 'tool', tool: t })}
+                onPatch={(patch, withHistory) => dispatch({
+                  type: 'patchText', slideIndex: textSel.slideIndex, id: textSel.id, patch, history: withHistory,
+                })}
+                onReorder={(dir) => dispatch({
+                  type: 'reorderText', slideIndex: textSel.slideIndex, id: textSel.id, dir,
+                })}
+                onRemove={() => dispatch({ type: 'removeText', slideIndex: textSel.slideIndex, id: textSel.id })}
               />
             )}
             {level === 'photo' && selImage && (

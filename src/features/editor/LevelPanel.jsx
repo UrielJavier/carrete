@@ -14,8 +14,9 @@ import s from './LevelPanel.module.css';
  */
 function Breadcrumb({ level, current, onGo }) {
   const segs = [{ label: 'Carrusel', to: 'post' }];
-  if (level === 'page' || level === 'photo') segs.push({ label: `Página ${current + 1}`, to: 'page' });
+  if (level === 'page' || level === 'photo' || level === 'text') segs.push({ label: `Página ${current + 1}`, to: 'page' });
   if (level === 'photo') segs.push({ label: 'Foto', to: 'photo' });
+  if (level === 'text') segs.push({ label: 'Texto', to: 'text' });
 
   return (
     <nav className={s.crumbs} aria-label="Navegación">

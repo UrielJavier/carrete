@@ -10,6 +10,18 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.12.0 — 21 ago 2026 · texto como nivel propio
+
+- **Texto es ahora un nivel** en el breadcrumb: `Carrusel › Página › Texto`, igual que
+  Foto. Al añadir o tocar un texto se entra en ese nivel; se sube tocando **Página**.
+- El panel deja de amontonar todos los ajustes (que obligaba a hacer scroll en el
+  móvil): ahora es una **fila de herramientas** y cada una abre su mini-panel —
+  **escribir** (contenido + alineación), **fuente**, **tamaño**, **color**, **giro** y
+  **orden**. Cada glifo muestra el valor actual (la "Aa" en su tipografía, el color, el
+  ángulo…).
+- El **orden (capa) entre textos** es su propia herramienta: adelante/atrás de uno en
+  uno, siempre por encima de las fotos.
+
 ## 4.11.0 — 21 ago 2026 · textos, fase 1
 
 - Nueva herramienta **texto** en el nivel Página: añade textos que van **siempre por
@@ -20,8 +32,8 @@ HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 - Se ve igual en el editor, el feed, la miniatura del perfil y el **export** (imagen y
   vídeo): misma fuente de verdad. Las fuentes van **empaquetadas en local** (sin CDN),
   solo el subconjunto latino.
-- Falta para más adelante: texto en el nivel **Foto**, **imanes** (snapping a los
-  centros) y la herramienta de **margen/área segura**.
+- Falta para más adelante: **imanes** (snapping a los centros) y la herramienta de
+  **margen/área segura**. (Texto en el nivel Foto queda descartado a propósito.)
 
 ## 4.10.2 — 20 ago 2026
 

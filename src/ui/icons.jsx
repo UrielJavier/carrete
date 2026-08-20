@@ -55,6 +55,8 @@ export const Icon = {
     </S>
   ),
   text: () => <S><path d="M5 6V4h14v2M12 4v16M9 20h6" /></S>,
+  size: () => <S><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4" /></S>,
+  align: () => <S><path d="M4 6h16M7 12h10M5 18h14" /></S>,
   front: () => <S><path d="M4 8l8-4 8 4-8 4-8-4z" /><path d="M4 14l8 4 8-4" /></S>,
   back: () => <S><path d="M4 16l8 4 8-4-8-4-8 4z" /><path d="M4 10l8-4 8 4" /></S>,
   mute: () => (

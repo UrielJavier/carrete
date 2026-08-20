@@ -73,8 +73,14 @@ export function reducer(state, action) {
       return { ...state, current: action.i, sel: null, textSel: null };
 
     case 'select':
-      /* Seleccionar una celda quita la selección de texto (y viceversa). */
-      return { ...state, sel: action.sel, textSel: action.sel ? null : state.textSel };
+      /* Seleccionar una celda sale de la edición de texto (vuelve a Página) y quita
+         la selección de texto. */
+      return {
+        ...state,
+        sel: action.sel,
+        textSel: action.sel ? null : state.textSel,
+        level: state.level === 'text' && action.sel ? 'page' : state.level,
+      };
 
     case 'layout':
       return withHistory(state, {
@@ -156,6 +162,8 @@ export function reducer(state, action) {
         post: replaceTexts(state.post, action.slideIndex, texts),
         textSel: { slideIndex: action.slideIndex, id: action.text.id },
         sel: null,
+        level: 'text',
+        tool: null,
       });
     }
 
@@ -175,6 +183,8 @@ export function reducer(state, action) {
         ...state,
         post: replaceTexts(state.post, action.slideIndex, texts),
         textSel: null,
+        level: 'page',
+        tool: null,
       });
     }
 
@@ -198,6 +208,8 @@ export function reducer(state, action) {
         ...state,
         textSel: action.id ? { slideIndex: action.slideIndex, id: action.id } : null,
         sel: null,
+        level: action.id ? 'text' : 'page',
+        tool: null,
       };
 
     case 'putImages': {

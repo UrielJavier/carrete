@@ -13,16 +13,26 @@
   border-color: var(--c-accent);
 }
 
-.fonts,
-.aligns {
+/* Botonera en cuadrícula de anchos iguales (fuentes, alineación, orden). */
+.fonts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-4);
+}
+
+.seg {
   display: flex;
   gap: var(--s-4);
 }
 
 .fontbtn,
-.alignbtn {
+.segbtn {
   flex: 1;
-  padding: var(--s-6) var(--s-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-4);
+  padding: var(--s-8) var(--s-4);
   background: var(--c-surface);
   border: 1px solid var(--c-line);
   color: var(--c-text);
@@ -30,19 +40,27 @@
   font-size: var(--fs-md);
 }
 
-.alignbtn {
-  font-size: var(--fs-lg);
-  line-height: 1;
+.fontbtn.on,
+.segbtn.on {
+  border-color: var(--c-text);
+  color: var(--c-text);
 }
 
-.fontbtn.on,
-.alignbtn.on {
-  border-color: var(--c-accent);
-  background: var(--c-accent-soft, var(--c-surface));
-  color: var(--c-accent);
+.segbtn :global(svg) {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
 }
 
 .range {
   width: 100%;
   accent-color: var(--c-accent);
+}
+
+/* Glifo "Aa" de la herramienta de fuente. */
+.aa {
+  font-size: 17px;
+  line-height: 1;
 }

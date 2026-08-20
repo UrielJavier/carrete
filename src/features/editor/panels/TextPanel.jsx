@@ -1,39 +1,66 @@
 import React from 'react';
-import { FONTS } from '../../../core/text.js';
-import { ToolBox, ToolRow, Field, Hint, ColorSwatches } from '../../../ui/primitives/index.js';
-import { Icon } from '../../../ui/icons.jsx';
+import { FONTS, fontCss } from '../../../core/text.js';
+import { ToolBox, ToolRow, Field, Hint, ColorSwatches, Swatch } from '../../../ui/primitives/index.js';
+import { Icon, RotGlyph } from '../../../ui/icons.jsx';
 import { Back } from './PostPanel.jsx';
 import s from './TextPanel.module.css';
 
 const COLORS = ['#ffffff', '#000000', '#e11d48', '#2563eb', '#f59e0b'];
 const ALIGNS = [
-  { key: 'left', label: '⯇' },
-  { key: 'center', label: '≡' },
-  { key: 'right', label: '⯈' },
+  { key: 'left', label: 'izq.' },
+  { key: 'center', label: 'centro' },
+  { key: 'right', label: 'der.' },
 ];
 
+/** "Aa" pintado con la fuente elegida: el glifo ES el valor de la herramienta. */
+const AaGlyph = ({ font }) => (
+  <span className={s.aa} style={{ fontFamily: fontCss(font) }}>Aa</span>
+);
+
 /**
- * Panel de un texto seleccionado. Cada texto elige su fuente, color, tamaño y giro
- * por separado. El orden entre textos se mueve de uno en uno (adelante/atrás), no
- * de golpe al extremo. Mover por la página se hace arrastrando la caja.
+ * Nivel Texto: mismas mecánicas que Foto. Una fila de herramientas y cada una abre
+ * su propio mini-panel, así no hay que hacer scroll vertical en una caja pequeña.
+ * Subir a Página se hace por el breadcrumb; el orden (z-index) entre textos es una
+ * herramienta más, de uno en uno.
  */
-export default function TextPanel({ text, onPatch, onReorder, onRemove, onBack }) {
-  return (
-    <>
-      <Back label="texto" sub="fuente, color, tamaño y giro" onBack={onBack} />
+export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRemove }) {
+  if (tool === 'write') {
+    return (
+      <>
+        <Back label="escribir" sub="contenido y alineación" onBack={() => onTool(null)} />
+        <Field label="texto">
+          <textarea
+            className={s.area}
+            rows={2}
+            autoFocus
+            value={text.content}
+            placeholder="Escribe aquí…"
+            onChange={(e) => onPatch({ content: e.target.value }, false)}
+            onBlur={() => onPatch({}, true)}
+          />
+        </Field>
+        <Field label="alineación">
+          <div className={s.seg}>
+            {ALIGNS.map((a) => (
+              <button
+                key={a.key}
+                type="button"
+                className={[s.segbtn, (text.align || 'center') === a.key && s.on].filter(Boolean).join(' ')}
+                onClick={() => onPatch({ align: a.key }, true)}
+              >
+                {a.label}
+              </button>
+            ))}
+          </div>
+        </Field>
+      </>
+    );
+  }
 
-      <Field label="texto">
-        <textarea
-          className={s.area}
-          rows={2}
-          value={text.content}
-          placeholder="Escribe aquí…"
-          onChange={(e) => onPatch({ content: e.target.value }, false)}
-          onBlur={() => onPatch({}, true)}
-        />
-      </Field>
-
-      <Field label="fuente">
+  if (tool === 'font') {
+    return (
+      <>
+        <Back label="fuente" sub="tipografía del texto" onBack={() => onTool(null)} />
         <div className={s.fonts}>
           {FONTS.map((f) => (
             <button
@@ -47,19 +74,14 @@ export default function TextPanel({ text, onPatch, onReorder, onRemove, onBack }
             </button>
           ))}
         </div>
-      </Field>
+      </>
+    );
+  }
 
-      <Field label="color">
-        <ColorSwatches
-          value={text.color}
-          presets={COLORS}
-          custom={COLORS.includes(text.color) ? '#111111' : text.color}
-          onPick={(c) => onPatch({ color: c }, true)}
-          onCustom={(c) => onPatch({ color: c }, false)}
-        />
-      </Field>
-
-      <Field label="tamaño">
+  if (tool === 'size') {
+    return (
+      <>
+        <Back label="tamaño" sub="alto de la letra" onBack={() => onTool(null)} />
         <input
           className={s.range}
           type="range"
@@ -70,9 +92,14 @@ export default function TextPanel({ text, onPatch, onReorder, onRemove, onBack }
           onChange={(e) => onPatch({ size: Number(e.target.value) }, false)}
           onPointerUp={() => onPatch({}, true)}
         />
-      </Field>
+      </>
+    );
+  }
 
-      <Field label="giro">
+  if (tool === 'rot') {
+    return (
+      <>
+        <Back label="giro" sub="inclina el texto" onBack={() => onTool(null)} />
         <input
           className={s.range}
           type="range"
@@ -83,29 +110,55 @@ export default function TextPanel({ text, onPatch, onReorder, onRemove, onBack }
           onChange={(e) => onPatch({ rot: Number(e.target.value) }, false)}
           onPointerUp={() => onPatch({}, true)}
         />
-      </Field>
+        <Hint>{`${text.rot || 0}°`}</Hint>
+      </>
+    );
+  }
 
-      <Field label="alineación">
-        <div className={s.aligns}>
-          {ALIGNS.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              className={[s.alignbtn, (text.align || 'center') === a.key && s.on].filter(Boolean).join(' ')}
-              onClick={() => onPatch({ align: a.key }, true)}
-            >
-              {a.label}
-            </button>
-          ))}
+  if (tool === 'color') {
+    return (
+      <>
+        <Back label="color" sub="color del texto" onBack={() => onTool(null)} />
+        <ColorSwatches
+          value={text.color}
+          presets={COLORS}
+          custom={COLORS.includes(text.color) ? '#111111' : text.color}
+          onPick={(c) => onPatch({ color: c }, true)}
+          onCustom={(c) => onPatch({ color: c }, false)}
+        />
+      </>
+    );
+  }
+
+  if (tool === 'order') {
+    return (
+      <>
+        <Back label="orden" sub="capa entre textos" onBack={() => onTool(null)} />
+        <div className={s.seg}>
+          <button type="button" className={s.segbtn} onClick={() => onReorder(1)}>
+            <Icon.front /> adelante
+          </button>
+          <button type="button" className={s.segbtn} onClick={() => onReorder(-1)}>
+            <Icon.back /> atrás
+          </button>
         </div>
-      </Field>
+        <Hint>los textos se apilan en orden; adelante/atrás lo mueve un peldaño (siempre encima de las fotos).</Hint>
+      </>
+    );
+  }
 
+  return (
+    <>
       <ToolRow>
-        <ToolBox icon={<Icon.front />} label="adelante" onClick={() => onReorder(1)} />
-        <ToolBox icon={<Icon.back />} label="atrás" onClick={() => onReorder(-1)} />
+        <ToolBox icon={<Icon.text />} label="escribir" onClick={() => onTool('write')} />
+        <ToolBox icon={<AaGlyph font={text.font} />} label="fuente" onClick={() => onTool('font')} />
+        <ToolBox icon={<Icon.size />} label="tamaño" onClick={() => onTool('size')} />
+        <ToolBox icon={<Swatch color={text.color} />} label="color" onClick={() => onTool('color')} />
+        <ToolBox icon={<RotGlyph deg={text.rot || 0} />} label="giro" onClick={() => onTool('rot')} />
+        <ToolBox icon={<Icon.front />} label="orden" onClick={() => onTool('order')} />
         <ToolBox icon={<Icon.trash />} label="quitar" danger onClick={onRemove} />
       </ToolRow>
-      <Hint>arrastra el texto sobre la página para colocarlo · va siempre encima de las fotos</Hint>
+      <Hint>arrastra el texto sobre la página para colocarlo · toca una herramienta para editarlo</Hint>
     </>
   );
 }
