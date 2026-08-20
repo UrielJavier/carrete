@@ -167,7 +167,11 @@
   max-width: 100%;
 }
 
-.dupflag {
+/* El aviso de "sin audio" comparte forma y color con el de foto repetida: mismos
+   22px, mismo fondo, misma esquina. El de duplicado además es un botón (toca para
+   ver dónde); el de audio solo informa. */
+.dupflag,
+.mutedflag {
   flex: none;
   width: 22px;
   height: 22px;
@@ -176,33 +180,18 @@
   padding: 0;
   background: var(--c-dup);
   border: 0;
+}
+
+.dupflag {
   cursor: pointer;
 }
 
-.dupflag :global(svg) {
-  width: 13px;
-  height: 13px;
-  fill: none;
-  stroke: var(--c-ink-invert);
-  stroke-width: 1.9;
-}
-
-/* Aviso de "sin audio" en vídeos: mismo tamaño que el de foto repetida, pero
-   neutro (no es un problema, solo informa de que el export va mudo). */
-.mutedflag {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  background: rgba(10, 10, 10, 0.72);
-}
-
+.dupflag :global(svg),
 .mutedflag :global(svg) {
   width: 13px;
   height: 13px;
   fill: none;
-  stroke: rgba(255, 255, 255, 0.82);
+  stroke: var(--c-ink-invert);
   stroke-width: 1.9;
 }
 

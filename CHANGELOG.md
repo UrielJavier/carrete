@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.10.1 — 20 ago 2026
+
+- El badge de "sin audio" ahora es **igual que el de foto repetida** (mismo tamaño,
+  color y esquina) en vez del fondo neutro anterior. El aviso de duplicado se queda
+  en su sitio y el de audio va al lado.
+
 ## 4.10.0 — 20 ago 2026
 
 - Los vídeos muestran un **iconito de "sin audio"** en la celda (como el aviso de foto
