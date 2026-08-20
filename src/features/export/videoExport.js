@@ -1,4 +1,5 @@
 import { drawRegion } from '../../core/geometry.js';
+import { drawTexts } from '../../core/text.js';
 
 /**
  * Export de una PÁGINA que tiene un vídeo, a MP4. Se decodifica el vídeo de origen
@@ -10,7 +11,7 @@ import { drawRegion } from '../../core/geometry.js';
  */
 const CLIP_MAX = 30;
 
-export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidCell, staticSrc, onProgress }) {
+export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidCell, staticSrc, texts, onProgress }) {
   const {
     Output, Mp4OutputFormat, BufferTarget, CanvasSource, QUALITY_VERY_HIGH,
     Input, BlobSource, ALL_FORMATS, VideoSampleSink,
@@ -66,6 +67,8 @@ export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidC
     const frame = hasFrame ? { el: frameCv, w: vid.w, h: vid.h } : null;
     const getSrc = (id) => (id === vidCell.imgId ? frame : posterFor(id));
     drawRegion(ctx, cells, pageIndex, W, H, bg, getSrc);
+    /* Textos encima, repintados en cada fotograma (son estáticos, es barato). */
+    drawTexts(ctx, texts, W, H);
   };
 
   /* Denominador solo para la barra; la cuenta real de fotogramas la marca el vídeo. */

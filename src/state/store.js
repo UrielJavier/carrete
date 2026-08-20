@@ -22,6 +22,7 @@ export function initialState() {
     history: [],         // [{ post, orient }]
     current: 0,
     sel: null,           // { slideIndex, cellIndex }
+    textSel: null,       // { slideIndex, id } del texto seleccionado
     level: 'page',       // post | page | photo
     tool: null,          // subnivel abierto
     mode: 'edit',        // edit | feed | grid | projects | log
@@ -52,23 +53,28 @@ const replaceSlide = (post, i, slide) => ({
   slides: post.slides.map((s, k) => (k === i ? slide : s)),
 });
 
+/** Reemplaza el array de textos de una página, tolerando páginas antiguas sin él. */
+const replaceTexts = (post, i, texts) =>
+  replaceSlide(post, i, { ...post.slides[i], texts });
+
 export function reducer(state, action) {
   switch (action.type) {
     case 'set':
       return { ...state, ...action.patch };
 
     case 'level':
-      return { ...state, level: action.level, tool: null };
+      return { ...state, level: action.level, tool: null, textSel: null };
 
     case 'tool':
       return { ...state, tool: action.tool };
 
     case 'goPage':
       if (action.i < 0 || action.i >= state.post.slides.length) return state;
-      return { ...state, current: action.i, sel: null };
+      return { ...state, current: action.i, sel: null, textSel: null };
 
     case 'select':
-      return { ...state, sel: action.sel };
+      /* Seleccionar una celda quita la selección de texto (y viceversa). */
+      return { ...state, sel: action.sel, textSel: action.sel ? null : state.textSel };
 
     case 'layout':
       return withHistory(state, {
@@ -141,6 +147,59 @@ export function reducer(state, action) {
       return action.history ? withHistory(state, next) : next;
     }
 
+    case 'addText': {
+      const slide = state.post.slides[action.slideIndex];
+      if (!slide) return state;
+      const texts = (slide.texts || []).concat([action.text]);
+      return withHistory(state, {
+        ...state,
+        post: replaceTexts(state.post, action.slideIndex, texts),
+        textSel: { slideIndex: action.slideIndex, id: action.text.id },
+        sel: null,
+      });
+    }
+
+    case 'patchText': {
+      const slide = state.post.slides[action.slideIndex];
+      if (!slide) return state;
+      const texts = (slide.texts || []).map((t) => (t.id === action.id ? { ...t, ...action.patch } : t));
+      const next = { ...state, post: replaceTexts(state.post, action.slideIndex, texts) };
+      return action.history ? withHistory(state, next) : next;
+    }
+
+    case 'removeText': {
+      const slide = state.post.slides[action.slideIndex];
+      if (!slide) return state;
+      const texts = (slide.texts || []).filter((t) => t.id !== action.id);
+      return withHistory(state, {
+        ...state,
+        post: replaceTexts(state.post, action.slideIndex, texts),
+        textSel: null,
+      });
+    }
+
+    case 'reorderText': {
+      /* Un peldaño: intercambia el texto con su vecino. dir +1 = adelante (arriba). */
+      const slide = state.post.slides[action.slideIndex];
+      if (!slide) return state;
+      const texts = (slide.texts || []).slice();
+      const i = texts.findIndex((t) => t.id === action.id);
+      const j = i + action.dir;
+      if (i < 0 || j < 0 || j >= texts.length) return state;
+      [texts[i], texts[j]] = [texts[j], texts[i]];
+      return withHistory(state, {
+        ...state,
+        post: replaceTexts(state.post, action.slideIndex, texts),
+      });
+    }
+
+    case 'selectText':
+      return {
+        ...state,
+        textSel: action.id ? { slideIndex: action.slideIndex, id: action.id } : null,
+        sel: null,
+      };
+
     case 'putImages': {
       /* Coloca las fotos importadas en la celda indicada y las siguientes vacias. */
       const images = { ...state.images };
@@ -202,6 +261,7 @@ export function reducer(state, action) {
         history: [],
         current: clamp(action.current || 0, 0, action.post.slides.length - 1),
         sel: null,
+        textSel: null,
         tool: null,
       };
 
@@ -215,6 +275,7 @@ export function reducer(state, action) {
         history,
         current: clamp(state.current, 0, entry.post.slides.length - 1),
         sel: null,
+        textSel: null,
         pendingOrient: entry.orient,   // lo aplica App con un efecto asincrono
       };
     }

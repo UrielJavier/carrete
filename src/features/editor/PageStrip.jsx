@@ -1,6 +1,7 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RATIOS, TRANSPARENT, PEEK_GAP, MAX_SLIDES } from '../../core/layouts.js';
 import Cell from './Cell.jsx';
+import TextLayer from './TextLayer.jsx';
 import s from './PageStrip.module.css';
 
 /**
@@ -20,9 +21,9 @@ import s from './PageStrip.module.css';
  */
 export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
-  showThirds, metrics, guardRef, enter, areaW, workH,
+  showThirds, metrics, guardRef, enter, areaW, workH, textSel,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
-  onSwapStart, onSwapOver, onSwapEnd,
+  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText,
 }) {
   const scrollRef = useRef(null);
   const centered = useRef(-1);
@@ -160,6 +161,17 @@ export default function PageStrip({
               <div className={s.cropline}
                 style={{ left: `${((1 - cropPct) / 2) * 100}%`, width: `${cropPct * 100}%` }} />
             )}
+
+            {/* Textos por encima de las fotos. Solo se editan en la página activa y
+                en el nivel Página (en Foto se ve solo la celda enfocada). */}
+            <TextLayer
+              texts={sl.texts}
+              selId={textSel && textSel.slideIndex === i ? textSel.id : null}
+              active={active && !photo}
+              stageH={stageH}
+              onSelect={(id) => onSelectText(i, id)}
+              onMove={(id, x, y, commit) => onMoveText(i, id, x, y, commit)}
+            />
           </div>
         );
       })}

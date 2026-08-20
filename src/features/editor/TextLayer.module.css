@@ -1,0 +1,33 @@
+/* La capa cubre la página pero no roba eventos: los toques pasan a las celdas. */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.box {
+  position: absolute;
+  /* Por defecto no captura: solo la página activa lo activa (.on). Sin esto, los
+     textos de las páginas vecinas robarían los toques. */
+  pointer-events: none;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  user-select: none;
+  -webkit-user-select: none;
+  /* El ancla es el centro de la caja; el translate lo coloca por su centro. */
+  transform-origin: center;
+}
+
+/* Solo la página activa deja tocar/arrastrar los textos. */
+.on {
+  pointer-events: auto;
+  cursor: move;
+  touch-action: none;
+}
+
+.sel {
+  outline: 1px solid var(--c-accent);
+  outline-offset: 3px;
+}

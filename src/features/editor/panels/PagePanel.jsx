@@ -8,7 +8,7 @@ import s from '../LevelPanel.module.css';
 /** Nivel Página: la rejilla y el orden de las fotos dentro de ella. */
 export default function PagePanel({
   slide, current, totalPages, photoCount, tool, ratio,
-  onTool, onBack, onLayout, onNeedTwo, onDelete,
+  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText,
 }) {
   if (tool === 'layout') {
     return (
@@ -46,6 +46,7 @@ export default function PagePanel({
           onClick={() => onTool('layout')} />
         <ToolBox icon={<Icon.move />} label="mover" disabled={photoCount < 2}
           disabledReason={onNeedTwo} onClick={() => onTool('move')} />
+        <ToolBox icon={<Icon.text />} label="texto" onClick={onAddText} />
         <ToolBox icon={<Icon.trash />} label="borrar" danger onClick={onDelete} />
       </ToolRow>
       <Hint>

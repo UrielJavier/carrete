@@ -13,6 +13,7 @@ import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
 import { CS_LABEL, OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
 import { newPost, duplicates, layoutChangeImpact, exportSize } from './core/post.js';
+import { newText } from './core/text.js';
 import { reducer, initialState } from './state/store.js';
 
 import { useElementWidth, useElementHeight, useViewportHeight } from './hooks/useElementWidth.js';
@@ -34,6 +35,7 @@ import PageStrip from './features/editor/PageStrip.jsx';
 import PostRail from './features/editor/PostRail.jsx';
 import PageBar from './features/editor/PageBar.jsx';
 import LevelPanel, { PostPanel, PagePanel, PhotoPanel } from './features/editor/LevelPanel.jsx';
+import TextPanel from './features/editor/panels/TextPanel.jsx';
 import FeedView from './features/feed/FeedView.jsx';
 import ProfileGrid from './features/profile/ProfileGrid.jsx';
 import ProjectsView from './features/projects/ProjectsView.jsx';
@@ -44,7 +46,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.10.2';
+export const VERSION = '4.11.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -53,7 +55,7 @@ const RESERVED = 366;
 
 export default function App() {
   const [st, dispatch] = useReducer(reducer, undefined, initialState);
-  const { post, images, history, current, sel, level, tool, mode } = st;
+  const { post, images, history, current, sel, textSel, level, tool, mode } = st;
 
   const [busy, setBusy] = useState(null);
   const [err, setErr] = useState(null);
@@ -134,6 +136,9 @@ export default function App() {
     ? localCells.find((c) => c.slideIndex === sel.slideIndex && c.cellIndex === sel.cellIndex)
     : null;
   const selImage = selCell?.imgId ? images[selCell.imgId] : null;
+  const selText = textSel
+    ? post.slides[textSel.slideIndex]?.texts?.find((t) => t.id === textSel.id)
+    : null;
   const R = RATIOS[post.ratio];
   /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
   const exSize = exportSize(post.ratio);
@@ -365,7 +370,7 @@ export default function App() {
             ) : (
               <PageStrip
                 post={post} cells={cells} current={current} level={level} tool={tool}
-                images={images} sel={sel} enter={prevLevel.current === 'post'}
+                images={images} sel={sel} textSel={textSel} enter={prevLevel.current === 'post'}
                 dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys}
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } })}
@@ -388,6 +393,10 @@ export default function App() {
                 }}
                 onSwapOver={onSwapOver}
                 onSwapEnd={onSwapEnd}
+                onSelectText={(slideIndex, id) => dispatch({ type: 'selectText', slideIndex, id })}
+                onMoveText={(slideIndex, id, x, y, commit) => dispatch({
+                  type: 'patchText', slideIndex, id, patch: { x, y }, history: commit,
+                })}
               />
             )}
           </StageWrap>
@@ -417,13 +426,27 @@ export default function App() {
                 onJpgBlocked={() => say('Con fondo transparente hace falta PNG: JPG no guarda transparencia.', 'warn')}
               />
             )}
-            {level === 'page' && (
+            {level === 'page' && selText && (
+              <TextPanel
+                text={selText}
+                onPatch={(patch, withHistory) => dispatch({
+                  type: 'patchText', slideIndex: textSel.slideIndex, id: textSel.id, patch, history: withHistory,
+                })}
+                onReorder={(dir) => dispatch({
+                  type: 'reorderText', slideIndex: textSel.slideIndex, id: textSel.id, dir,
+                })}
+                onRemove={() => dispatch({ type: 'removeText', slideIndex: textSel.slideIndex, id: textSel.id })}
+                onBack={() => dispatch({ type: 'selectText', id: null })}
+              />
+            )}
+            {level === 'page' && !selText && (
               <PagePanel
                 slide={slide} current={current} totalPages={post.slides.length}
                 photoCount={slide.cells.filter((c) => c.imgId).length}
                 tool={tool} ratio={post.ratio}
                 onTool={(t) => dispatch({ type: 'tool', tool: t })}
                 onBack={() => dispatch({ type: 'tool', tool: null })}
+                onAddText={() => dispatch({ type: 'addText', slideIndex: current, text: newText() })}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}
                 onDelete={() => setAsk({

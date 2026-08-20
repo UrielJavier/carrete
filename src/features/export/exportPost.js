@@ -3,6 +3,7 @@ import { drawRegion, drawnWidth } from '../../core/geometry.js';
 import { exportSize } from '../../core/post.js';
 import { rotateOnto } from '../../core/image.js';
 import { convertToSRGB } from '../../core/color.js';
+import { drawTexts, ensureFonts } from '../../core/text.js';
 import { encodePageVideo, videoCellOf } from './videoExport.js';
 
 /**
@@ -18,6 +19,9 @@ export async function exportPost({ post, cells, images, onProgress }) {
   const { w: EXW, h: EXH } = exportSize(post.ratio);
   const out = [];
   const cache = new Map();
+
+  /* Las fuentes de los textos deben estar cargadas antes de pintar en canvas. */
+  await ensureFonts();
 
   const decodeFor = async (im, needW) => {
     const key = `${im.id}:${Math.ceil(needW / 256)}`;
@@ -77,6 +81,7 @@ export async function exportPost({ post, cells, images, onProgress }) {
         bg: post.bg,
         vidCell,
         staticSrc: local,
+        texts: post.slides[i].texts,
         onProgress: (f, tot) => onProgress?.(i + 1, post.slides.length, { frame: f, frames: tot }),
       });
       out.push({
@@ -89,7 +94,10 @@ export async function exportPost({ post, cells, images, onProgress }) {
       continue;
     }
 
-    drawRegion(cv.getContext('2d'), cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null);
+    const ctx = cv.getContext('2d');
+    drawRegion(ctx, cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null);
+    /* Textos SIEMPRE encima de las fotos. */
+    drawTexts(ctx, post.slides[i].texts, EXW, EXH);
 
     /* Con fondo transparente el formato es PNG por narices: JPEG no tiene canal
        alfa y pintaria los huecos de negro. */

@@ -10,6 +10,7 @@ export const newSlide = (layoutId = 'full') => ({
   id: uid(),
   layoutId,
   cells: LAYOUTS[layoutId].cells.map(() => ({ imgId: null, t: newT() })),
+  texts: [],
 });
 
 export const newPost = () => ({

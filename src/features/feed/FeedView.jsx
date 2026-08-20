@@ -75,7 +75,7 @@ export default function FeedView({ post, cells, getSource }) {
           >
             {post.slides.map((sl, i) => (
               <div key={sl.id} className={post.bg === TRANSPARENT ? 'checker' : undefined}>
-                <RegionCanvas cells={cells} index={i} ratio={post.ratio} bg={post.bg} getSource={getSource} />
+                <RegionCanvas cells={cells} index={i} ratio={post.ratio} bg={post.bg} getSource={getSource} texts={sl.texts} />
               </div>
             ))}
           </div>

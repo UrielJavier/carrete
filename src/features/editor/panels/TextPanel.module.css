@@ -1,0 +1,48 @@
+.area {
+  width: 100%;
+  resize: none;
+  padding: var(--s-6);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  color: var(--c-text);
+  font: var(--fs-md) / 1.4 var(--font-sans);
+}
+
+.area:focus {
+  outline: none;
+  border-color: var(--c-accent);
+}
+
+.fonts,
+.aligns {
+  display: flex;
+  gap: var(--s-4);
+}
+
+.fontbtn,
+.alignbtn {
+  flex: 1;
+  padding: var(--s-6) var(--s-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  color: var(--c-text);
+  cursor: pointer;
+  font-size: var(--fs-md);
+}
+
+.alignbtn {
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+.fontbtn.on,
+.alignbtn.on {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft, var(--c-surface));
+  color: var(--c-accent);
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--c-accent);
+}

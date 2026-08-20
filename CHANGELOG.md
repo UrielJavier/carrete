@@ -10,6 +10,19 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.11.0 — 21 ago 2026 · textos, fase 1
+
+- Nueva herramienta **texto** en el nivel Página: añade textos que van **siempre por
+  encima** de las fotos. Cada texto elige por separado **fuente** (Sans/Serif/Escrita/
+  Mono), **color**, **tamaño**, **giro** y **alineación**.
+- Se **arrastra** sobre la página para colocarlo; su panel permite editar el contenido
+  y ordenar los textos entre sí **de uno en uno** (adelante/atrás), no de golpe.
+- Se ve igual en el editor, el feed, la miniatura del perfil y el **export** (imagen y
+  vídeo): misma fuente de verdad. Las fuentes van **empaquetadas en local** (sin CDN),
+  solo el subconjunto latino.
+- Falta para más adelante: texto en el nivel **Foto**, **imanes** (snapping a los
+  centros) y la herramienta de **margen/área segura**.
+
 ## 4.10.2 — 20 ago 2026
 
 - Los avisos (foto repetida, sin audio) se mueven a la esquina **superior derecha**,

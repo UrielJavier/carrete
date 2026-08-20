@@ -54,6 +54,9 @@ export const Icon = {
       <path d="M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3" />
     </S>
   ),
+  text: () => <S><path d="M5 6V4h14v2M12 4v16M9 20h6" /></S>,
+  front: () => <S><path d="M4 8l8-4 8 4-8 4-8-4z" /><path d="M4 14l8 4 8-4" /></S>,
+  back: () => <S><path d="M4 16l8 4 8-4-8-4-8 4z" /><path d="M4 10l8-4 8 4" /></S>,
   mute: () => (
     <S>
       <path d="M4 9v6h4l5 4V5L8 9H4z" />
