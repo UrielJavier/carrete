@@ -111,6 +111,11 @@ export default function Cell({
   const chrome = (
     <>
       <div className={s.badges}>
+        {image.type === 'video' && (
+          <span className={s.mutedflag} title="Esta versión exporta el vídeo sin audio">
+            <Icon.mute />
+          </span>
+        )}
         {dupCount > 1 && (
           <button
             type="button"

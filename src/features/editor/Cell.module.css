@@ -187,6 +187,25 @@
   stroke-width: 1.9;
 }
 
+/* Aviso de "sin audio" en vídeos: mismo tamaño que el de foto repetida, pero
+   neutro (no es un problema, solo informa de que el export va mudo). */
+.mutedflag {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 10, 10, 0.72);
+}
+
+.mutedflag :global(svg) {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.82);
+  stroke-width: 1.9;
+}
+
 .sizetag {
   overflow: hidden;
   white-space: nowrap;

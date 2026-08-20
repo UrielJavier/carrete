@@ -11,7 +11,7 @@ import s from '../LevelPanel.module.css';
  *  la foto se ve entera mientras la encuadras. */
 export default function PhotoPanel({
   image, tool, showThirds, trim,
-  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove, onNudge, onTrim,
+  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove, onNudge, onTrim, onAudio,
 }) {
   const isVideo = image.type === 'video';
 
@@ -56,7 +56,10 @@ export default function PhotoPanel({
     <>
       <ToolRow>
         {isVideo ? (
-          <ToolBox icon={<Icon.trim />} label="recortar" onClick={() => onTool('trim')} />
+          <>
+            <ToolBox icon={<Icon.trim />} label="recortar" onClick={() => onTool('trim')} />
+            <ToolBox icon={<Icon.mute />} label="audio" onClick={onAudio} />
+          </>
         ) : (
           <>
             <ToolBox icon={<RotGlyph deg={image.rot || 0} />} label="girar" onClick={() => onTool('rotate')} />

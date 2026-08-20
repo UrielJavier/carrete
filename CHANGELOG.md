@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.10.0 — 20 ago 2026
+
+- Los vídeos muestran un **iconito de "sin audio"** en la celda (como el aviso de foto
+  repetida), para recordar que el export va mudo en esta versión.
+- Nueva herramienta **audio** en el nivel Foto (solo vídeos): de momento al pulsarla
+  sale un aviso de que esta versión todavía no admite audio. Deja el hueco listo para
+  cuando se pueda quitar/poner sonido.
+
 ## 4.9.0 — 20 ago 2026
 
 - Export de vídeo con **FPS originales**: antes se remuestreaba todo a 30 fps
