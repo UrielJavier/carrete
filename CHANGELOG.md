@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.4.0 — 20 ago 2026
+
+- **Fuera las pestañas Post/Página/Foto**; en su lugar un **breadcrumb**
+  `Carrusel › Página N › Foto`. Se baja tocando contenido (una página, una foto) y
+  se sube tocando un tramo del camino. Quita el nivel de navegación abstracto: la
+  selección y el camino lo cuentan. Siempre hay forma de volver a Carrusel.
+
 ## 4.3.1 — 20 ago 2026
 
 - Ajuste del feedback de selección: la atenuación de las demás fotos es más suave

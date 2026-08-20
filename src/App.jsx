@@ -44,7 +44,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.3.1';
+export const VERSION = '4.4.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -396,19 +396,8 @@ export default function App() {
 
           <LevelPanel
             level={level}
-            onLevel={(v) => {
-              /* Ir a Foto sin selección no es un callejón: se elige la primera foto
-                 de la página actual y se baja a editarla. */
-              if (v === 'photo' && !selImage) {
-                const ci = slide.cells.findIndex((c) => c.imgId);
-                if (ci < 0) return;
-                dispatch({ type: 'set', patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex: ci } } });
-                return;
-              }
-              dispatch({ type: 'level', level: v });
-            }}
-            photoAvailable={!!selImage || slide.cells.some((c) => c.imgId)}
-            onNeedPhoto={() => say('Añade una foto a esta página para poder editarla.', 'warn')}
+            current={current}
+            onGo={(v) => dispatch({ type: 'level', level: v })}
           >
             {level === 'post' && (
               <PostPanel
