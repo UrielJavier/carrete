@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.2.1 — 20 ago 2026
+
+- La hoja de export **explica el flujo de compartir**: toca Compartir → Instagram →
+  Feed y se suben como carrusel en orden. El truco no era evidente; ahora hay un
+  texto claro sobre el botón. El ZIP queda como alternativa secundaria.
+
 ## 4.2.0 — 20 ago 2026
 
 - **Botón "Compartir"** en la hoja de export (móvil): abre la hoja de compartir

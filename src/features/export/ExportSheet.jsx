@@ -49,10 +49,17 @@ export default function ExportSheet({
 
       <div className={s.zone}>
         {canShare && (
-          <Button variant="primary" className={s.zipbtn} onClick={doShare}>
-            <Icon.share />
-            {`Compartir las ${shots.length}`}
-          </Button>
+          <>
+            <p className={s.lead}>
+              Para subirlas a Instagram sin descargar nada: toca <strong>Compartir</strong>,
+              elige <strong>Instagram</strong> y dentro <strong>Feed</strong>. Se publican
+              las {shots.length} como un <strong>carrusel</strong>, en el orden que montaste.
+            </p>
+            <Button variant="primary" className={s.zipbtn} onClick={doShare}>
+              <Icon.share />
+              {`Compartir las ${shots.length}`}
+            </Button>
+          </>
         )}
         {zip ? (
           <a className={s.zip} href={zip.url} download={zip.name}>
@@ -66,12 +73,14 @@ export default function ExportSheet({
             disabled={!!zipping}
             onClick={onZip}
           >
-            {zipping ? `Empaquetando… ${zipping}%` : `Descargar las ${shots.length} en un ZIP`}
+            {zipping
+              ? `Empaquetando… ${zipping}%`
+              : (canShare ? 'o descárgalas en un ZIP' : `Descargar las ${shots.length} en un ZIP`)}
           </Button>
         )}
         <Hint>
           {canShare
-            ? 'Compartir → Instagram → Feed las sube como un carrusel, en este orden.'
+            ? 'Instagram te preguntará Reels / Stories / Feed al compartir: elige Feed.'
             : 'o guárdalas de una en una y súbelas en ese orden'}
         </Hint>
       </div>

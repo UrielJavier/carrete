@@ -75,6 +75,19 @@
   align-items: flex-start;
 }
 
+/* Explicación del flujo de compartir: el usuario no adivina que hay que elegir
+   Instagram → Feed para que salga el carrusel. */
+.lead {
+  margin: 0;
+  font: var(--fs-sm) / 1.55 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.lead strong {
+  color: var(--c-text);
+  font-weight: 400;
+}
+
 .zipbtn {
   width: 100%;
   justify-content: center;
