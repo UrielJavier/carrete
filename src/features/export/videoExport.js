@@ -10,9 +10,9 @@ import { drawRegion } from '../../core/geometry.js';
  */
 const CLIP_MAX = 30;
 
-export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidCell, staticSrc, fps = 30, onProgress }) {
+export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidCell, staticSrc, onProgress }) {
   const {
-    Output, Mp4OutputFormat, BufferTarget, CanvasSource, QUALITY_HIGH,
+    Output, Mp4OutputFormat, BufferTarget, CanvasSource, QUALITY_VERY_HIGH,
     Input, BlobSource, ALL_FORMATS, VideoSampleSink,
   } = await import('mediabunny');
 
@@ -25,6 +25,16 @@ export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidC
   const track = await input.getPrimaryVideoTrack();
   if (!track) throw new Error('el vídeo no tiene pista de vídeo');
   const sink = new VideoSampleSink(track);
+
+  /* FPS del propio vídeo (para la barra de progreso y como pista al muxer). Se
+     estima muestreando unos paquetes; si falla, 30. Los fotogramas de verdad se
+     añaden con su timestamp/duración reales, así que se respeta la cadencia
+     original (incluida VFR) sin remuestrear a una rejilla fija. */
+  let srcFps = 30;
+  try {
+    const stats = await track.computePacketStats(60);
+    if (stats?.averagePacketRate) srcFps = stats.averagePacketRate;
+  } catch (e) { /* estimación no disponible */ }
 
   /* Lienzo persistente con el fotograma actual del vídeo, a las dimensiones del
      vídeo: así drawRegion lo encuadra igual que una foto, y se puede reutilizar si un
@@ -41,8 +51,8 @@ export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidC
   const ctx = canvas.getContext('2d');
 
   const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
-  const cvSource = new CanvasSource(canvas, { codec: 'avc', quality: QUALITY_HIGH, keyFrameInterval: 2 });
-  output.addVideoTrack(cvSource, { frameRate: fps });
+  const cvSource = new CanvasSource(canvas, { codec: 'avc', quality: QUALITY_VERY_HIGH, keyFrameInterval: 2 });
+  output.addVideoTrack(cvSource, { frameRate: Math.max(1, Math.round(srcFps)) });
   await output.start();
 
   /* Las demás celdas (fotos estáticas) se componen con el mismo decode a resolución
@@ -52,31 +62,40 @@ export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidC
     return images[id]?.el ? { el: images[id].el, w: images[id].w, h: images[id].h } : null;
   };
 
-  const total = Math.max(1, Math.round(clip * fps));
-  const timestamps = [];
-  for (let k = 0; k < total; k++) timestamps.push(start + k / fps);
-
-  const dur = 1 / fps;
-  let k = 0;
-  for await (const sample of sink.samplesAtTimestamps(timestamps)) {
-    if (sample) {
-      /* draw() aplica la rotación de los metadatos (los móviles graban en
-         horizontal + marca "rota 90°"); toCanvasImageSource() da el fotograma crudo
-         sin rotar, y como frameCv está a dimensiones ya rotadas (vid.w/vid.h, de
-         <video>.videoWidth/Height) el vídeo salía girado y estirado. */
-      sample.draw(fctx, 0, 0, vid.w, vid.h);
-      sample.close();
-      hasFrame = true;
-    } else if (!hasFrame && vid.el) {
-      fctx.drawImage(vid.el, 0, 0, vid.w, vid.h);
-      hasFrame = true;
-    }
+  const composite = () => {
     const frame = hasFrame ? { el: frameCv, w: vid.w, h: vid.h } : null;
     const getSrc = (id) => (id === vidCell.imgId ? frame : posterFor(id));
     drawRegion(ctx, cells, pageIndex, W, H, bg, getSrc);
-    await cvSource.add(k / fps, dur); // eslint-disable-line no-await-in-loop
+  };
+
+  /* Denominador solo para la barra; la cuenta real de fotogramas la marca el vídeo. */
+  const est = Math.max(1, Math.round(clip * srcFps));
+  let t0 = null;
+  let k = 0;
+  for await (const sample of sink.samples(start, end)) {
+    /* draw() aplica la rotación de los metadatos (los móviles graban en horizontal +
+       marca "rota 90°"); toCanvasImageSource() da el fotograma crudo sin rotar, y como
+       frameCv está a dimensiones ya rotadas (vid.w/vid.h) el vídeo salía girado. */
+    sample.draw(fctx, 0, 0, vid.w, vid.h);
+    hasFrame = true;
+    composite();
+    /* Cada fotograma entra con su timestamp/duración reales (reajustados para que el
+       primero sea 0): así el MP4 conserva la cadencia original del vídeo. */
+    if (t0 == null) t0 = sample.timestamp;
+    const ts = Math.max(0, sample.timestamp - t0);
+    const d = sample.duration || 1 / srcFps;
+    sample.close();
+    await cvSource.add(ts, d); // eslint-disable-line no-await-in-loop
     k += 1;
-    onProgress?.(k, total);
+    onProgress?.(Math.min(k, est), est);
+  }
+
+  /* Sin ningún fotograma (raro), al menos el póster para no dejar el MP4 vacío. */
+  if (k === 0 && vid.el) {
+    fctx.drawImage(vid.el, 0, 0, vid.w, vid.h);
+    hasFrame = true;
+    composite();
+    await cvSource.add(0, clip);
   }
 
   await output.finalize();

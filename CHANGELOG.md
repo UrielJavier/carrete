@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.9.0 — 20 ago 2026
+
+- Export de vídeo con **FPS originales**: antes se remuestreaba todo a 30 fps
+  (duplicando o tirando fotogramas). Ahora se recorren los fotogramas reales del
+  vídeo y cada uno entra con su timestamp/duración propios, así que se conserva la
+  cadencia original (60 fps siguen siendo 60; también VFR).
+- **Más calidad**: el codificador sube a `QUALITY_VERY_HIGH` para reducir la pérdida
+  del re-encode (ficheros algo más grandes; Instagram recomprime igual, pero parte
+  de una fuente más limpia).
+
 ## 4.8.1 — 20 ago 2026
 
 - Arreglado: los vídeos **verticales de móvil** se exportaban **girados 90° y
