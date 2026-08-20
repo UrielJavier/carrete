@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.8.1 — 20 ago 2026
+
+- Arreglado: los vídeos **verticales de móvil** se exportaban **girados 90° y
+  estirados**. Los móviles graban el fotograma en horizontal + una marca "rota 90°
+  al mostrar"; ahora el export aplica esa rotación al componer (usa `VideoSample.draw`
+  en vez del fotograma crudo), así que el clip sale con la orientación y proporción
+  correctas.
+
 ## 4.8.0 — 20 ago 2026 · vídeo, fase 3 (export a MP4)
 
 - **Export mixto foto + vídeo**: al exportar, cada página se codifica según lo que

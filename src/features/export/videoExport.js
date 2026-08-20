@@ -60,7 +60,11 @@ export async function encodePageVideo({ pageIndex, cells, images, W, H, bg, vidC
   let k = 0;
   for await (const sample of sink.samplesAtTimestamps(timestamps)) {
     if (sample) {
-      fctx.drawImage(sample.toCanvasImageSource(), 0, 0, vid.w, vid.h);
+      /* draw() aplica la rotación de los metadatos (los móviles graban en
+         horizontal + marca "rota 90°"); toCanvasImageSource() da el fotograma crudo
+         sin rotar, y como frameCv está a dimensiones ya rotadas (vid.w/vid.h, de
+         <video>.videoWidth/Height) el vídeo salía girado y estirado. */
+      sample.draw(fctx, 0, 0, vid.w, vid.h);
       sample.close();
       hasFrame = true;
     } else if (!hasFrame && vid.el) {
