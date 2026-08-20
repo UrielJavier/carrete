@@ -155,8 +155,7 @@
   opacity: 0.42;
 }
 
-/* Distintivos informativos, juntos y pegados a la esquina inferior izquierda,
-   para dejar libres las esquinas que marcan estado. */
+/* Metadatos (dimensiones/peso) en la esquina inferior izquierda. */
 .badges {
   position: absolute;
   bottom: 0;
@@ -167,9 +166,20 @@
   max-width: 100%;
 }
 
+/* Avisos (foto repetida, sin audio) en la esquina SUPERIOR DERECHA: así no se
+   pisan con los metadatos de abajo. */
+.flags {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+}
+
 /* El aviso de "sin audio" comparte forma y color con el de foto repetida: mismos
-   22px, mismo fondo, misma esquina. El de duplicado además es un botón (toca para
-   ver dónde); el de audio solo informa. */
+   22px y mismo fondo. El de duplicado además es un botón (toca para ver dónde); el
+   de audio solo informa. */
 .dupflag,
 .mutedflag {
   flex: none;

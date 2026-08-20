@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.10.2 — 20 ago 2026
+
+- Los avisos (foto repetida, sin audio) se mueven a la esquina **superior derecha**,
+  separados de los **metadatos** (dimensiones/peso), que se quedan abajo-izquierda.
+  Así dejan de pisarse.
+
 ## 4.10.1 — 20 ago 2026
 
 - El badge de "sin audio" ahora es **igual que el de foto repetida** (mismo tamaño,

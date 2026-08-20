@@ -110,7 +110,9 @@ export default function Cell({
 
   const chrome = (
     <>
-      <div className={s.badges}>
+      {/* Avisos arriba-derecha, lejos de los metadatos (abajo-izquierda) para que no
+          se pisen. */}
+      <div className={s.flags}>
         {dupCount > 1 && (
           <button
             type="button"
@@ -128,6 +130,8 @@ export default function Cell({
             <Icon.mute />
           </span>
         )}
+      </div>
+      <div className={s.badges}>
         <div className={s.sizetag}>
           {image.w}×{image.h}
           {image.file?.size ? ` · ${weight(image.file.size)}` : ''}
