@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.7.1 — 20 ago 2026
+
+- Recorte: fuera la previsualización propia de la timeline — **el área de trabajo es
+  el preview** y ahora reproduce en bucle solo el trozo elegido (inicio/fin). Y la
+  barra se separa de los bordes de la pantalla, para no chocar con el gesto de
+  "atrás" de Android.
+
 ## 4.7.0 — 20 ago 2026 · vídeo, fase 2 (recortar)
 
 - Herramienta **recortar** para celdas de vídeo (nivel Foto): una línea de tiempo

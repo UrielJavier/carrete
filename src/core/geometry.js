@@ -86,6 +86,7 @@ export function postCells(post) {
         cellAspect: (rect.w * R.w) / (rect.h * R.h),
         imgId: s.cells[ci].imgId,
         t: s.cells[ci].t,
+        trim: s.cells[ci].trim,
       });
     });
   });

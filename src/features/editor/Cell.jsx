@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { clamp } from '../../core/layouts.js';
 import { imageUnits, clampT, newT } from '../../core/geometry.js';
 import { weight } from '../../core/format.js';
@@ -25,6 +25,28 @@ export default function Cell({
   const ptrs = useRef(new Map());
   const gesture = useRef(null);
   const before = useRef(null);
+  const vidRef = useRef(null);
+
+  /* Si el medio es un vídeo recortado, la reproducción se ciñe al trozo [start, end]:
+     así el área de trabajo previsualiza justo lo que se exportará. */
+  const trimStart = cell.trim?.start ?? 0;
+  const trimEnd = cell.trim?.end;
+  useEffect(() => {
+    const v = vidRef.current;
+    if (!v || image?.type !== 'video') return undefined;
+    const keepInRange = () => {
+      if (trimEnd != null && (v.currentTime >= trimEnd || v.currentTime < trimStart - 0.05)) {
+        try { v.currentTime = trimStart; } catch (e) { /* seek no disponible aún */ }
+      }
+    };
+    try {
+      if (v.currentTime < trimStart || (trimEnd != null && v.currentTime > trimEnd)) {
+        v.currentTime = trimStart;
+      }
+    } catch (e) { /* seek */ }
+    v.addEventListener('timeupdate', keepInRange);
+    return () => v.removeEventListener('timeupdate', keepInRange);
+  }, [image, trimStart, trimEnd]);
 
   const pos = {
     left: `${cell.rect.xLocal * 100}%`,
@@ -63,7 +85,7 @@ export default function Cell({
   /* La celda pinta un <video> si el medio es vídeo, y una <img> si es foto; el
      encuadre (posición/escala) es idéntico. */
   const media = image.type === 'video' ? (
-    <video src={image.url} style={imgStyle} muted loop playsInline autoPlay preload="auto" />
+    <video ref={vidRef} src={image.url} style={imgStyle} muted loop playsInline autoPlay preload="auto" />
   ) : (
     <img src={image.url} alt="" draggable={false} style={imgStyle} />
   );

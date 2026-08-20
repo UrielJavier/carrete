@@ -7,11 +7,10 @@ const fmt = (t) => `${(t || 0).toFixed(1)}s`;
 
 /**
  * Recorte de un vídeo: dos manijas (inicio/fin) sobre una línea de tiempo, con el
- * clip resultante limitado a MAX segundos. Al arrastrar, un <video> busca ese
- * fotograma para ver dónde empieza/acaba. No exporta nada; solo fija start/end.
+ * clip limitado a MAX segundos. No hay previsualización propia: el vídeo del área de
+ * trabajo reproduce el trozo elegido, así que ese es el preview. Solo fija start/end.
  */
-export default function Timeline({ url, duration, value, onChange }) {
-  const vref = useRef(null);
+export default function Timeline({ duration, value, onChange }) {
   const trackRef = useRef(null);
   const drag = useRef(null); // 'start' | 'end'
 
@@ -38,9 +37,6 @@ export default function Timeline({ url, duration, value, onChange }) {
       ne = clamp(t, start + 0.1, dur);
       if (ne - start > MAX) ne = start + MAX;
     }
-    if (vref.current) {
-      try { vref.current.currentTime = drag.current === 'start' ? ns : ne; } catch (err) { /* seek */ }
-    }
     onChange({ start: ns, end: ne });
   };
 
@@ -52,9 +48,6 @@ export default function Timeline({ url, duration, value, onChange }) {
 
   return (
     <div className={s.wrap}>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video ref={vref} className={s.preview} src={url} muted playsInline preload="auto" />
-
       <div
         ref={trackRef}
         className={s.track}

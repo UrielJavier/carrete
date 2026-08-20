@@ -19,7 +19,7 @@ export default function PhotoPanel({
     return (
       <>
         <Back label="recortar" sub="elige el trozo del vídeo" onBack={onBack} />
-        <Timeline url={image.url} duration={image.duration} value={trim} onChange={onTrim} />
+        <Timeline duration={image.duration} value={trim} onChange={onTrim} />
         <Hint>arrastra las manijas para elegir inicio y fin · máximo 30 s.</Hint>
       </>
     );

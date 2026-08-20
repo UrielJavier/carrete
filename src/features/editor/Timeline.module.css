@@ -3,14 +3,9 @@
   flex-direction: column;
   gap: var(--s-4);
   width: 100%;
-}
-
-.preview {
-  width: 100%;
-  max-height: 180px;
-  object-fit: contain;
-  background: #000;
-  display: block;
+  /* Separado de los bordes de la pantalla: pegado al canto, arrastrar las manijas
+     choca con el gesto de "atrás" de Android. */
+  padding-inline: var(--s-8);
 }
 
 /* Línea de tiempo: pista con la zona elegida resaltada y dos manijas. */
