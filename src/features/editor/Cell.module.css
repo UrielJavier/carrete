@@ -15,6 +15,12 @@
   pointer-events: none;
 }
 
+/* En Página, al seleccionar una foto las demás se atenúan (estilo Figma). Siguen
+   tocables: tocar otra la selecciona. */
+.dimmed {
+  opacity: 0.4;
+}
+
 .empty {
   outline: 1px dashed rgba(255, 255, 255, 0.3);
   background: rgba(0, 0, 0, 0.35);

@@ -40,6 +40,9 @@ export default function PageStrip({
   const photo = level === 'photo';
   const locked = photo || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
+  /* En Página, si hay una foto seleccionada en la página activa, las demás se
+     atenúan (estilo Figma): la selección habla sin necesidad de más navegación. */
+  const selHere = !photo && tool !== 'move' && !!sel && sel.slideIndex === current;
 
   /* Las celdas de cada página en espacio local: x relativa al inicio de su página. */
   const byPage = useMemo(() => {
@@ -139,6 +142,7 @@ export default function PageStrip({
                   tool={tool}
                   showThirds={showThirds}
                   guardRef={guardRef}
+                  dimmed={active && selHere && c.cellIndex !== sel.cellIndex}
                   onSelect={() => onSelect(c.cellIndex)}
                   onOpen={() => onOpen(c.cellIndex)}
                   onFiles={(files) => onFiles(files, c.cellIndex)}

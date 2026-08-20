@@ -25,7 +25,9 @@ export default function LevelPanel({ level, onLevel, photoAvailable, onNeedPhoto
           { value: 'photo', label: 'Foto', disabledReason: photoAvailable ? undefined : onNeedPhoto },
         ]}
       />
-      <div className={s.body}>{children}</div>
+      {/* key por nivel: al cambiar de nivel el cuerpo se remonta y reproduce la
+          animación de entrada, para que se note que las herramientas han cambiado. */}
+      <div className={s.body} key={level}>{children}</div>
     </div>
   );
 }

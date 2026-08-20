@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.3.0 — 20 ago 2026
+
+- Más feedback de selección (estilo Figma), primer paso hacia menos dependencia de
+  las pestañas: al seleccionar una foto en Página, **las demás se atenúan** (siguen
+  tocables), y el **panel de herramientas entra con una pequeña animación** al
+  cambiar de nivel, para que se note que ha cambiado.
+
 ## 4.2.1 — 20 ago 2026
 
 - La hoja de export **explica el flujo de compartir**: toca Compartir → Instagram →

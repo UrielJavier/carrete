@@ -18,7 +18,7 @@ import s from './Cell.module.css';
  * pagina nunca selecciona por accidente.
  */
 export default function Cell({
-  cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded,
+  cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -36,7 +36,7 @@ export default function Cell({
   if (!image) {
     return (
       <div
-        className={[s.cell, s.empty, faded && s.faded].filter(Boolean).join(' ')}
+        className={[s.cell, s.empty, faded && s.faded, dimmed && s.dimmed].filter(Boolean).join(' ')}
         data-cell={cell.cellIndex}
         style={pos}
       >
@@ -74,6 +74,8 @@ export default function Cell({
     !framing && !moving && s.scrollable,
     /* En Foto solo se ve la celda que editas: el resto del layout se desvanece. */
     faded && s.faded,
+    /* En Página, al seleccionar una, las demás se atenúan (siguen tocables). */
+    dimmed && s.dimmed,
   ].filter(Boolean).join(' ');
 
   const chrome = (

@@ -19,10 +19,21 @@
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  animation: panelIn var(--dur) var(--ease);
 }
 
 .body::-webkit-scrollbar {
   display: none;
+}
+
+/* Entrada del panel al cambiar de nivel: sube un poco y aparece. */
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body { animation: none; }
 }
 
 /* Cabecera de subnivel: flecha a la izquierda y, a su derecha, título (la acción)
