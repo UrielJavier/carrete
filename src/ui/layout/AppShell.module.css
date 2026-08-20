@@ -45,7 +45,7 @@
   color: var(--c-text);
 }
 
-/* Marca + versión juntas; solo "Carrete" es pulsable (lleva a Proyectos). */
+/* Marca + versión juntas; solo "Maqueta" es pulsable (lleva a Proyectos). */
 .brandwrap {
   display: flex;
   align-items: baseline;

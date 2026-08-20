@@ -1,5 +1,6 @@
-import { RATIOS, TRANSPARENT, clamp } from '../../core/layouts.js';
+import { TRANSPARENT, clamp } from '../../core/layouts.js';
 import { drawRegion, drawnWidth } from '../../core/geometry.js';
+import { exportSize } from '../../core/post.js';
 import { rotateOnto } from '../../core/image.js';
 import { convertToSRGB } from '../../core/color.js';
 
@@ -12,7 +13,8 @@ import { convertToSRGB } from '../../core/color.js';
  * supermuestreo y el resultado sale mejor que rotando al tamaño final.
  */
 export async function exportPost({ post, cells, images, onProgress }) {
-  const R = RATIOS[post.ratio];
+  /* La proporcion sale del ratio; el ancho es fijo (1080, el de IG). */
+  const { w: EXW, h: EXH } = exportSize(post.ratio);
   const out = [];
   const cache = new Map();
 
@@ -48,18 +50,18 @@ export async function exportPost({ post, cells, images, onProgress }) {
   for (let i = 0; i < post.slides.length; i++) {
     onProgress?.(i + 1, post.slides.length);
     const cv = document.createElement('canvas');
-    cv.width = R.w;
-    cv.height = R.h;
+    cv.width = EXW;
+    cv.height = EXH;
 
     const local = new Map();
     for (const cell of cells) {
       if (cell.rect.x + cell.rect.w <= i + 1e-4 || cell.rect.x >= i + 1 - 1e-4) continue;
       const im = cell.imgId ? images[cell.imgId] : null;
       if (!im) continue;
-      local.set(cell.imgId, await decodeFor(im, drawnWidth(cell, im.w / im.h, R.w)));
+      local.set(cell.imgId, await decodeFor(im, drawnWidth(cell, im.w / im.h, EXW)));
     }
 
-    drawRegion(cv.getContext('2d'), cells, i, R.w, R.h, post.bg, (id) => local.get(id) || null);
+    drawRegion(cv.getContext('2d'), cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null);
 
     /* Con fondo transparente el formato es PNG por narices: JPEG no tiene canal
        alfa y pintaria los huecos de negro. */

@@ -23,6 +23,26 @@ export const newPost = () => ({
   slides: [newSlide('full')],
 });
 
+/**
+ * Ancho del fichero exportado. Fijo a 1080: es el ancho real con el que Instagram
+ * sirve el feed organico, asi que subir mas (p.ej. 1440) solo fuerza que IG lo
+ * vuelva a reducir a 1080, con una pasada extra de remuestreo. A 1080 se le da a IG
+ * justo lo que va a mostrar y las fotos se amplian mucho menos.
+ */
+export const EXPORT_WIDTH = 1080;
+
+/**
+ * Tamaño en pixeles del fichero exportado. La PROPORCION sale de RATIOS; el ancho
+ * solo decide cuantos pixeles tiene el fichero. Cambiar el ancho NO altera ningun
+ * encuadre: todo el dibujo es relativo, asi que a cualquier ancho sale el mismo
+ * recorte, solo con mas o menos resolucion.
+ */
+export function exportSize(ratio, width = EXPORT_WIDTH) {
+  const R = RATIOS[ratio];
+  const w = Math.max(1, Math.round(width || EXPORT_WIDTH));
+  return { w, h: Math.round((w * R.h) / R.w) };
+}
+
 export const clonePost = (post) => JSON.parse(JSON.stringify(post));
 
 /**

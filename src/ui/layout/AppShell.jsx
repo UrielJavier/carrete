@@ -24,7 +24,7 @@ export default function AppShell({
         <div className={s.bar}>
           <div className={s.brandwrap}>
             <button type="button" className={s.home} title="Inicio" onClick={onHome}>
-              <h1 className={s.brand}>Carrete</h1>
+              <h1 className={s.brand}>Maqueta</h1>
             </button>
             <span className={s.ver}>v{version}</span>
           </div>

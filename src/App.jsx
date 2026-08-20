@@ -1,5 +1,5 @@
 /**
- * CARRETE — composicion de la aplicacion.
+ * MAQUETA — composicion de la aplicacion.
  *
  * Este fichero no calcula nada: reune el estado, los hooks y las vistas. Toda la
  * geometria, el color y el modelo del post viven en src/core, cubiertos por tests;
@@ -12,7 +12,7 @@ import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM } from './core/layou
 import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
 import { CS_LABEL, OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
-import { newPost, duplicates, layoutChangeImpact } from './core/post.js';
+import { newPost, duplicates, layoutChangeImpact, exportSize } from './core/post.js';
 import { reducer, initialState } from './state/store.js';
 
 import { useElementWidth, useElementHeight, useViewportHeight } from './hooks/useElementWidth.js';
@@ -44,7 +44,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.0.0';
+export const VERSION = '4.1.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -133,6 +133,8 @@ export default function App() {
     : null;
   const selImage = selCell?.imgId ? images[selCell.imgId] : null;
   const R = RATIOS[post.ratio];
+  /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
+  const exSize = exportSize(post.ratio);
 
   /* El nivel Foto no puede existir sin foto: es el unico ajuste automatico que
      queda. Lo demas lo decide el usuario con las pestañas. */
@@ -289,7 +291,7 @@ export default function App() {
         ? 'ningún proyecto abierto'
         : `${projectName ? `${projectName} · ` : ''}${post.slides.length}`
           + `${post.slides.length >= MAX_SLIDES - 4 ? `/${MAX_SLIDES}` : ''} `
-          + `${post.slides.length === 1 ? 'página' : 'páginas'} · ${R.w}×${R.h}`)}
+          + `${post.slides.length === 1 ? 'página' : 'páginas'} · ${exSize.w}×${exSize.h}`)}
       docBar={docLevel && (
         <>
           <SegmentedControl

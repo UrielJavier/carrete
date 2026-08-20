@@ -1,11 +1,14 @@
-# Carrete
+# Maqueta
 
 Editor de carruseles para Instagram. Páginas con rejilla, encuadre con máscara,
-y export sin degradar más de lo inevitable.
+y export al tamaño nativo de Instagram (1080 px de ancho).
 
-Nació como un solo fichero HTML iterado sobre el móvil. Esa versión, funcional y
-probada, está en `reference/carrete-3.13.2.html` y sigue abriéndose con doble clic
-sin servidor ni instalación. Este repo es el paso siguiente.
+Nació como **Carrete**, un solo fichero HTML iterado sobre el móvil. Esa versión,
+funcional y probada, está en `reference/carrete-3.13.2.html` y sigue abriéndose con
+doble clic sin servidor ni instalación. Este repo es el paso siguiente, ya como
+Maqueta.
+
+En marcha: <https://urieljavier.github.io/carrete/>
 
 ## Empezar
 
@@ -44,7 +47,7 @@ al original** y no puede serlo:
 
 | pérdida | ¿evitable? |
 |---|---|
-| reescalado a 1440 px | no, Instagram hace lo mismo |
+| reescalado a 1080 px | no, pero es el ancho que sirve Instagram, así que no hay pasada extra |
 | recompresión JPEG | sí, y **PNG es el formato por defecto** |
 | remuestreo al girar | no, pero se hace a 1,6× y eso lo mitiga |
 | ampliar con la pinza | no |
@@ -53,12 +56,16 @@ al original** y no puede serlo:
 una generación de recompresión encima de la que ya trae el fichero de origen. Cada
 página pesa unos 4 MB en lugar de 800 kB, y por eso existe el ZIP.
 
-**Pendiente, y es la deuda de calidad más real:** si la foto tiene menos
-resolución de la que la celda necesita, se amplía. Una foto de 1776×1184 a sangre
-en una página 4:5 se amplía un 52%, porque cubrir por el alto exige 2700 px de
-ancho. Sería mejor exportar a la resolución en la que ninguna celda amplía y
-dejar que suba Instagram. `upscaleReport()` en `src/core/post.js` ya calcula el
-dato; falta usarlo.
+**Ancho de exportación fijo a 1080 px** — es el ancho con el que Instagram sirve el
+feed orgánico. Antes se exportaba a 1440 y era un overshoot: IG lo reducía a 1080
+igualmente, con una pasada extra de remuestreo. A 1080 se le da a IG justo lo que va
+a mostrar. La proporción sigue saliendo de `RATIOS`; el ancho solo decide los
+píxeles, vía `exportSize(ratio)` en `src/core/post.js` (con tests).
+
+**Nota de calidad:** con el modelo *contain*, una foto entra entera y rara vez se
+amplía; solo lo hace si haces zoom para llenar más allá de su resolución.
+`upscaleReport()` en `src/core/post.js` calcula ese dato (pendiente: sigue con la
+fórmula del modelo *cover* antiguo, hay que actualizarlo a *contain*).
 
 ## Estructura
 

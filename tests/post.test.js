@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   newPost, newSlide, clonePost, layoutChangeImpact, applyLayout,
   moveSlideTo, swapCells, duplicates, unusedImageIds, upscaleReport, projectBytes,
+  exportSize, EXPORT_WIDTH,
 } from '../src/core/post.js';
 
 const withPhotos = (layoutId, ids) => {
@@ -162,5 +163,31 @@ describe('projectBytes: espacio que ocupa un proyecto', () => {
   it('ignora fotos sin tamaño conocido', () => {
     const post = { ...newPost(), slides: [withPhotos('v2', ['i1', 'i9'])] };
     expect(projectBytes(post, { i1: 500 }).photos).toBe(500);
+  });
+});
+
+describe('exportSize: el ancho decide los pixeles, la proporcion sale del ratio', () => {
+  it('por defecto exporta a 1080, con la altura del ratio', () => {
+    expect(exportSize('4:5')).toEqual({ w: 1080, h: 1350 });
+    expect(exportSize('3:4')).toEqual({ w: 1080, h: 1440 });
+    expect(exportSize('1:1')).toEqual({ w: 1080, h: 1080 });
+    expect(EXPORT_WIDTH).toBe(1080);
+  });
+
+  it('coincide con los tamaños nativos de Instagram', () => {
+    // IG feed 2026: 4:5 = 1080x1350, 3:4 = 1080x1440.
+    expect(exportSize('4:5')).toEqual({ w: 1080, h: 1350 });
+    expect(exportSize('3:4')).toEqual({ w: 1080, h: 1440 });
+  });
+
+  it('cambiar el ancho NO altera la proporcion (mismo encuadre, mas pixeles)', () => {
+    for (const ratio of ['4:5', '3:4', '1:1', '1.91:1']) {
+      const a = exportSize(ratio, 1080);
+      const b = exportSize(ratio, 1440);
+      expect(b.w).toBe(1440);
+      expect(a.w).toBe(1080);
+      /* La proporción ancho/alto es la misma a cualquier ancho (salvo redondeo). */
+      expect(a.w / a.h).toBeCloseTo(b.w / b.h, 2);
+    }
   });
 });

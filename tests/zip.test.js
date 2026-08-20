@@ -12,8 +12,8 @@ describe('safeName: nombre de fichero a partir del proyecto', () => {
   });
 
   it('tiene respaldo si no queda nada', () => {
-    expect(safeName('')).toBe('carrete');
-    expect(safeName('///')).toBe('carrete');
-    expect(safeName(null)).toBe('carrete');
+    expect(safeName('')).toBe('maqueta');
+    expect(safeName('///')).toBe('maqueta');
+    expect(safeName(null)).toBe('maqueta');
   });
 });

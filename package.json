@@ -1,9 +1,9 @@
 {
-  "name": "carrete",
+  "name": "maqueta",
   "private": true,
-  "version": "4.0.0",
+  "version": "4.1.0",
   "type": "module",
-  "description": "Editor de carruseles para Instagram: paginas con rejilla, encuadre con mascara y export a resolucion nativa.",
+  "description": "Maqueta: editor de carruseles para Instagram — paginas con rejilla, encuadre con mascara y export al tamaño nativo de IG.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
