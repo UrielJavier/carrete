@@ -1,0 +1,58 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  width: 100%;
+}
+
+.preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+
+/* Línea de tiempo: pista con la zona elegida resaltada y dos manijas. */
+.track {
+  position: relative;
+  height: 34px;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--c-accent);
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.handle {
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: calc(100% + 6px);
+  transform: translateX(-50%);
+  background: var(--c-text);
+  border: 1px solid var(--c-bg);
+  border-radius: 2px;
+  padding: 0;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.times {
+  display: flex;
+  justify-content: space-between;
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.len {
+  color: var(--c-text);
+}

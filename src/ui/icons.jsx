@@ -24,6 +24,7 @@ export const Icon = {
   right: () => <S><path d="M9 18l6-6-6-6" /></S>,
   up: () => <S><path d="M18 15l-6-6-6 6" /></S>,
   down: () => <S><path d="M6 9l6 6 6-6" /></S>,
+  trim: () => <S><path d="M7 3v18M17 3v18M7 8h10M7 16h10" /></S>,
   plus: () => <S><path d="M12 5v14M5 12h14" /></S>,
   copy: () => <S><path d="M9 9h11v11H9z" /><path d="M15 5H4v11" /></S>,
   trash: () => <S><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></S>,

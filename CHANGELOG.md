@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.7.0 — 20 ago 2026 · vídeo, fase 2 (recortar)
+
+- Herramienta **recortar** para celdas de vídeo (nivel Foto): una línea de tiempo
+  con dos manijas para elegir **inicio y fin**, con el clip limitado a **30 s**. Al
+  arrastrar, la previsualización busca ese fotograma. En vídeos, girar/espejo se
+  ocultan (son para píxeles de foto). El recorte se aplicará en el export (fase 3).
+
 ## 4.6.0 — 20 ago 2026 · vídeo, fase 1 (importar + previsualizar)
 
 - Las celdas ya **aceptan vídeos** (además de fotos): el `+` y "cambiar" abren

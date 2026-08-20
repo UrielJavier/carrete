@@ -3,15 +3,28 @@ import { splitRotation } from '../../../core/post.js';
 import { newT } from '../../../core/geometry.js';
 import { ToolBox, ToolRow, Hint, Field, FileInput } from '../../../ui/primitives/index.js';
 import { Icon, RotGlyph } from '../../../ui/icons.jsx';
+import Timeline from '../Timeline.jsx';
 import { Back } from './PostPanel.jsx';
 import s from '../LevelPanel.module.css';
 
 /** Nivel Foto: lo que antes eran botones encima de la imagen. Fuera del lienzo,
  *  la foto se ve entera mientras la encuadras. */
 export default function PhotoPanel({
-  image, tool, showThirds,
-  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove, onNudge,
+  image, tool, showThirds, trim,
+  onTool, onBack, onRotate, onMirror, onThirds, onCenter, onReplace, onRemove, onNudge, onTrim,
 }) {
+  const isVideo = image.type === 'video';
+
+  if (tool === 'trim') {
+    return (
+      <>
+        <Back label="recortar" sub="elige el trozo del vídeo" onBack={onBack} />
+        <Timeline url={image.url} duration={image.duration} value={trim} onChange={onTrim} />
+        <Hint>arrastra las manijas para elegir inicio y fin · máximo 30 s.</Hint>
+      </>
+    );
+  }
+
   if (tool === 'rotate') {
     return (
       <>
@@ -42,8 +55,14 @@ export default function PhotoPanel({
   return (
     <>
       <ToolRow>
-        <ToolBox icon={<RotGlyph deg={image.rot || 0} />} label="girar" onClick={() => onTool('rotate')} />
-        <ToolBox icon={<Icon.mirror />} label="espejo" on={!!image.flip} onClick={onMirror} />
+        {isVideo ? (
+          <ToolBox icon={<Icon.trim />} label="recortar" onClick={() => onTool('trim')} />
+        ) : (
+          <>
+            <ToolBox icon={<RotGlyph deg={image.rot || 0} />} label="girar" onClick={() => onTool('rotate')} />
+            <ToolBox icon={<Icon.mirror />} label="espejo" on={!!image.flip} onClick={onMirror} />
+          </>
+        )}
         <ToolBox icon={<Icon.grid />} label="tercios" on={showThirds} onClick={onThirds} />
         <ToolBox icon={<Icon.center />} label="centrar" onClick={() => onCenter(newT())} />
         <ToolBox icon={<Icon.move />} label="mover" onClick={() => onTool('move')} />
@@ -54,8 +73,9 @@ export default function PhotoPanel({
       </ToolRow>
       <Hint>
         {image.name} · {image.w}×{image.h}
+        {isVideo && image.duration ? ` · ${image.duration.toFixed(1)}s` : ''}
         {image.rot ? ` · ${image.rot}°` : ''}{image.flip ? ' · espejo' : ''}
-        {'  —  arrastra para encuadrar, pinza para ampliar'}
+        {isVideo ? '  —  arrastra para encuadrar · recorta para elegir el trozo' : '  —  arrastra para encuadrar, pinza para ampliar'}
       </Hint>
     </>
   );

@@ -44,7 +44,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.6.0';
+export const VERSION = '4.7.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -434,8 +434,13 @@ export default function App() {
             {level === 'photo' && selImage && (
               <PhotoPanel
                 image={selImage} tool={tool} showThirds={showThirds}
+                trim={post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.trim}
                 onTool={(t) => dispatch({ type: 'tool', tool: t })}
                 onBack={() => dispatch({ type: 'tool', tool: null })}
+                onTrim={(trim) => dispatch({
+                  type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
+                  patch: { trim }, history: false,
+                })}
                 onRotate={(deg) => library.reorient(selImage.id, ((deg % 360) + 360) % 360, !!selImage.flip)}
                 onMirror={() => library.reorient(selImage.id, selImage.rot || 0, !selImage.flip)}
                 onThirds={() => setShowThirds((v) => !v)}
