@@ -2,7 +2,6 @@ import React from 'react';
 import { weight } from '../../core/format.js';
 import { Button, Hint } from '../../ui/primitives/index.js';
 import { Icon } from '../../ui/icons.jsx';
-import VideoSpike from './VideoSpike.jsx';
 import s from './ExportSheet.module.css';
 
 /**
@@ -14,13 +13,18 @@ export default function ExportSheet({
   shots, zip, zipping, width, height, format, onZip, onClose,
 }) {
   const total = shots.reduce((a, sh) => a + (sh.bytes || 0), 0);
+  const nVideo = shots.filter((sh) => sh.video).length;
+  /* El carrusel mezcla fotos y vídeos: la etiqueta se adapta a lo que hay. */
+  const kind = nVideo === 0 ? (shots.length === 1 ? 'imagen' : 'imágenes')
+    : nVideo === shots.length ? (shots.length === 1 ? 'vídeo' : 'vídeos')
+      : 'archivos';
 
   /* Ficheros para la hoja de compartir nativa (Web Share API). En móvil, elegir
-     Instagram → Feed sube las varias imágenes como un carrusel. */
+     Instagram → Feed sube las varias imágenes/vídeos como un carrusel. */
   const shareFiles = React.useMemo(
     () => shots
       .filter((sh) => sh.blob)
-      .map((sh) => new File([sh.blob], sh.name, { type: sh.blob.type || 'image/png' })),
+      .map((sh) => new File([sh.blob], sh.name, { type: sh.blob.type || (sh.video ? 'video/mp4' : 'image/png') })),
     [shots],
   );
   const canShare = React.useMemo(() => {
@@ -41,8 +45,8 @@ export default function ExportSheet({
       <div className={s.bar}>
         <Icon.check />
         <span>
-          {shots.length} {shots.length === 1 ? 'imagen' : 'imágenes'} · {width}×{height}
-          {' · '}{format === 'jpeg' ? 'JPG' : 'PNG'} · {weight(total)}
+          {shots.length} {kind} · {width}×{height}
+          {nVideo === 0 ? ` · ${format === 'jpeg' ? 'JPG' : 'PNG'}` : nVideo === shots.length ? ' · MP4' : ' · foto+vídeo'} · {weight(total)}
         </span>
         <span className={s.grow} />
         <Button variant="ghost" onClick={onClose}><Icon.close /></Button>
@@ -54,7 +58,8 @@ export default function ExportSheet({
             <p className={s.lead}>
               Para subirlas a Instagram sin descargar nada: toca <strong>Compartir</strong>,
               elige <strong>Instagram</strong> y dentro <strong>Feed</strong>. Se publican
-              las {shots.length} como un <strong>carrusel</strong>, en el orden que montaste.
+              las {shots.length} como un <strong>carrusel</strong>, en el orden que montaste
+              {nVideo > 0 && <> (las páginas con vídeo van como clip)</>}.
             </p>
             <Button variant="primary" className={s.zipbtn} onClick={doShare}>
               <Icon.share />
@@ -89,7 +94,9 @@ export default function ExportSheet({
       <div className={s.shots}>
         {shots.map((sh) => (
           <a key={sh.name} href={sh.url} download={sh.name}>
-            <img src={sh.url} alt="" />
+            {sh.video
+              ? <video src={sh.url} muted loop playsInline autoPlay preload="metadata" />
+              : <img src={sh.url} alt="" />}
             <span>{sh.name} · {weight(sh.bytes)} ↓</span>
           </a>
         ))}
@@ -99,10 +106,6 @@ export default function ExportSheet({
         En Android puedes mantener pulsada cada imagen para guardarla en la galería.
         El ZIP va a Descargas y hay que abrirlo desde ahí.
       </p>
-
-      {typeof VideoEncoder !== 'undefined' && (
-        <VideoSpike shots={shots} width={width} height={height} />
-      )}
     </div>
   );
 }

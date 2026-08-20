@@ -10,6 +10,21 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.8.0 — 20 ago 2026 · vídeo, fase 3 (export a MP4)
+
+- **Export mixto foto + vídeo**: al exportar, cada página se codifica según lo que
+  tenga. Una página **con vídeo** sale como **MP4** (H.264, 1080 px, sin audio en
+  esta v1); una página **solo de fotos** sigue saliendo como imagen (PNG/JPG). Así
+  un carrusel puede mezclar clips y fotos, en el orden que montaste.
+- El vídeo se decodifica fotograma a fotograma con Mediabunny, **recortado a
+  \[inicio, fin]**, y se compone con las demás celdas usando la misma fuente de
+  verdad que el preview (`drawRegion`) — las fotos de esa página van a resolución de
+  export, no la miniatura.
+- La hoja de export ya distingue **imágenes/vídeos/archivos**, reproduce los clips
+  en las miniaturas, y **Compartir** manda los ficheros mixtos a Instagram → Feed.
+  El progreso muestra el **% del fotograma** mientras codifica cada vídeo.
+- Fuera el **spike (beta)** de export a vídeo: ya existe la función real.
+
 ## 4.7.1 — 20 ago 2026
 
 - Recorte: fuera la previsualización propia de la timeline — **el área de trabajo es

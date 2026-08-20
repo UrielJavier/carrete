@@ -44,7 +44,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.7.1';
+export const VERSION = '4.8.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -237,7 +237,10 @@ export default function App() {
       setBusy('Exportando…');
       const out = await exportPost({
         post, cells, images,
-        onProgress: (i, n) => setBusy(`Exportando ${i}/${n}…`),
+        onProgress: (i, n, v) => setBusy(
+          v ? `Exportando vídeo ${i}/${n} · ${Math.round((v.frame / v.frames) * 100)}%`
+            : `Exportando ${i}/${n}…`,
+        ),
       });
       setZip(null);
       setShots(out);
@@ -520,8 +523,8 @@ export default function App() {
           shots={shots}
           zip={zip}
           zipping={zipping}
-          width={R.w}
-          height={R.h}
+          width={exSize.w}
+          height={exSize.h}
           format={post.bg === 'transparent' ? 'png' : post.fmt}
           onZip={runZip}
           onClose={closeExport}

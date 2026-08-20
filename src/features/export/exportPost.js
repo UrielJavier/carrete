@@ -3,6 +3,7 @@ import { drawRegion, drawnWidth } from '../../core/geometry.js';
 import { exportSize } from '../../core/post.js';
 import { rotateOnto } from '../../core/image.js';
 import { convertToSRGB } from '../../core/color.js';
+import { encodePageVideo, videoCellOf } from './videoExport.js';
 
 /**
  * EXPORT. El principio: el File original nunca se toca, y aqui se vuelve a
@@ -53,12 +54,39 @@ export async function exportPost({ post, cells, images, onProgress }) {
     cv.width = EXW;
     cv.height = EXH;
 
+    /* Las fotos de la página se decodifican a resolución de export una sola vez;
+       sirven tanto para el export de imagen como para componer una página con vídeo. */
     const local = new Map();
     for (const cell of cells) {
       if (cell.rect.x + cell.rect.w <= i + 1e-4 || cell.rect.x >= i + 1 - 1e-4) continue;
       const im = cell.imgId ? images[cell.imgId] : null;
-      if (!im) continue;
+      if (!im || im.type === 'video') continue;
       local.set(cell.imgId, await decodeFor(im, drawnWidth(cell, im.w / im.h, EXW)));
+    }
+
+    /* Si la página tiene un vídeo, se exporta como MP4 (fotograma a fotograma); si
+       no, como imagen. Así un carrusel mezcla páginas-foto y páginas-vídeo. */
+    const vidCell = videoCellOf(cells, i, images);
+    if (vidCell) {
+      const blob = await encodePageVideo({
+        pageIndex: i,
+        cells,
+        images,
+        W: EXW,
+        H: EXH,
+        bg: post.bg,
+        vidCell,
+        staticSrc: local,
+        onProgress: (f, tot) => onProgress?.(i + 1, post.slides.length, { frame: f, frames: tot }),
+      });
+      out.push({
+        blob,
+        url: blob ? URL.createObjectURL(blob) : '',
+        name: String(i + 1).padStart(2, '0') + '.mp4',
+        bytes: blob ? blob.size : 0,
+        video: true,
+      });
+      continue;
     }
 
     drawRegion(cv.getContext('2d'), cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null);

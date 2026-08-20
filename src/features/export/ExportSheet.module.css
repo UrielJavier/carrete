@@ -43,7 +43,8 @@
   text-decoration: none;
 }
 
-.shots img {
+.shots img,
+.shots video {
   display: block;
   width: 100%;
 }
