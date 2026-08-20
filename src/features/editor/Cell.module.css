@@ -16,9 +16,9 @@
 }
 
 /* En Página, al seleccionar una foto las demás se atenúan (estilo Figma). Siguen
-   tocables: tocar otra la selecciona. */
+   tocables: tocar otra la selecciona. Atenuación suave, solo para dar jerarquía. */
 .dimmed {
-  opacity: 0.4;
+  opacity: 0.65;
 }
 
 .empty {

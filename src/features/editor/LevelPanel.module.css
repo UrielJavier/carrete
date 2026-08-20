@@ -26,9 +26,10 @@
   display: none;
 }
 
-/* Entrada del panel al cambiar de nivel: sube un poco y aparece. */
+/* Entrada del panel al cambiar de nivel: sube y aparece, lo bastante para que se
+   note el cambio de herramientas. */
 @keyframes panelIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

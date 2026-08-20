@@ -10,6 +10,11 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.3.1 — 20 ago 2026
+
+- Ajuste del feedback de selección: la atenuación de las demás fotos es más suave
+  (menos agresiva) y la animación del panel al cambiar de nivel, más marcada.
+
 ## 4.3.0 — 20 ago 2026
 
 - Más feedback de selección (estilo Figma), primer paso hacia menos dependencia de
