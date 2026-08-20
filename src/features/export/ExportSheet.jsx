@@ -2,6 +2,7 @@ import React from 'react';
 import { weight } from '../../core/format.js';
 import { Button, Hint } from '../../ui/primitives/index.js';
 import { Icon } from '../../ui/icons.jsx';
+import VideoSpike from './VideoSpike.jsx';
 import s from './ExportSheet.module.css';
 
 /**
@@ -98,6 +99,10 @@ export default function ExportSheet({
         En Android puedes mantener pulsada cada imagen para guardarla en la galería.
         El ZIP va a Descargas y hay que abrirlo desde ahí.
       </p>
+
+      {typeof VideoEncoder !== 'undefined' && (
+        <VideoSpike shots={shots} width={width} height={height} />
+      )}
     </div>
   );
 }

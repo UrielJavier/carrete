@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.5.0 — 20 ago 2026
+
+- **Spike (beta) de export a vídeo**: en la hoja de export, un botón que codifica las
+  páginas como un MP4 (H.264) en el propio dispositivo, con WebCodecs + Mediabunny.
+  Sirve para MEDIR si el móvil aguanta antes de construir la función real
+  (foto + vídeo en un layout). Mediabunny se carga bajo demanda (chunk aparte), así
+  que no pesa en el arranque. Solo aparece si el navegador puede codificar (iOS 16.4+
+  / Chrome 94+). Sin audio todavía. Nada sale del dispositivo.
+
 ## 4.4.0 — 20 ago 2026
 
 - **Fuera las pestañas Post/Página/Foto**; en su lugar un **breadcrumb**
