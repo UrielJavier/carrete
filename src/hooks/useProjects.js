@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { uid } from '../core/layouts.js';
 import { newPost, clonePost, projectBytes } from '../core/post.js';
-import { buildPreview } from '../core/image.js';
+import { buildPreview, buildVideoPreview } from '../core/image.js';
 import * as db from '../core/db.js';
 
 const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
@@ -38,7 +38,9 @@ export function useProjects({ post, images, current, ui, onLoad, onError, setBus
       try {
         const rec = await db.loadFile(id);
         if (!rec?.file) continue;
-        const pv = await buildPreview(rec.file, rec.cs, rec.converted, rec.rot || 0, !!rec.flip);
+        const pv = rec.type === 'video'
+          ? await buildVideoPreview(rec.file)
+          : await buildPreview(rec.file, rec.cs, rec.converted, rec.rot || 0, !!rec.flip);
         loaded[id] = { id, saved: true, ...rec, ...pv };
       } catch (e) {
         /* foto ilegible: la celda quedara vacia */
@@ -82,7 +84,7 @@ export function useProjects({ post, images, current, ui, onLoad, onError, setBus
         const im = images[id];
         if (im.saved) continue;
         await db.saveFile(id, {
-          name: im.name, cs: im.cs, key: im.key,
+          name: im.name, cs: im.cs, key: im.key, type: im.type,
           converted: im.converted, rot: im.rot || 0, flip: !!im.flip, file: im.file,
         });
         im.saved = true;

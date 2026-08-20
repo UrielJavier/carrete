@@ -44,7 +44,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.5.0';
+export const VERSION = '4.6.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -123,7 +123,9 @@ export default function App() {
   );
   const dup = useMemo(() => duplicates(post, images), [post, images]);
   const getSource = useCallback(
-    (id) => (images[id] ? { el: images[id].el, w: images[id].w, h: images[id].h } : null),
+    /* Sin `el` (p.ej. un vídeo cuyo póster no se pudo capturar) no hay nada que
+       dibujar en canvas: se trata como celda vacía en miniaturas/feed/export. */
+    (id) => (images[id]?.el ? { el: images[id].el, w: images[id].w, h: images[id].h } : null),
     [images]
   );
 

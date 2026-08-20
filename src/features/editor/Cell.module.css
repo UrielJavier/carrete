@@ -45,11 +45,13 @@
   cursor: grab;
 }
 
-.cell img {
+.cell img,
+.cell video {
   position: absolute;
   pointer-events: none;
   user-select: none;
   display: block;
+  object-fit: fill;
 }
 
 .placeholder {

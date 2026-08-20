@@ -70,6 +70,56 @@ export async function buildPreview(file, cs, convert, rot, flip) {
 }
 
 /**
+ * Preview de un VÍDEO. Devuelve la URL para el <video>, las dimensiones, la duración
+ * y un PÓSTER (primer fotograma) como imagen, que usan las miniaturas / feed / perfil
+ * (que dibujan en canvas) y el export estático provisional hasta que el export a
+ * vídeo esté montado. El File original nunca se toca.
+ */
+export async function buildVideoPreview(file) {
+  const url = URL.createObjectURL(file);
+  const video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = 'auto';
+  video.src = url;
+
+  await new Promise((res, rej) => {
+    if (video.readyState >= 1) return res();
+    video.onloadedmetadata = () => res();
+    video.onerror = () => rej(new Error('no se pudo leer el vídeo'));
+  });
+
+  const w = video.videoWidth || 1080;
+  const h = video.videoHeight || 1080;
+  const duration = Number.isFinite(video.duration) ? video.duration : 0;
+
+  /* Póster: un fotograma temprano. Con timeout por si el seek no dispara en el
+     navegador, para no colgar la importación. */
+  let el = null;
+  try {
+    await new Promise((res) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; res(); } };
+      video.onseeked = finish;
+      setTimeout(finish, 1500);
+      try { video.currentTime = Math.min(0.1, duration ? duration / 2 : 0.1); } catch (e) { finish(); }
+    });
+    const cv = document.createElement('canvas');
+    cv.width = w;
+    cv.height = h;
+    cv.getContext('2d').drawImage(video, 0, 0, w, h);
+    const poster = new Image();
+    poster.src = cv.toDataURL('image/jpeg', 0.6);
+    await new Promise((res) => { poster.onload = res; poster.onerror = res; });
+    el = poster;
+  } catch (e) {
+    el = null;
+  }
+
+  return { type: 'video', url, el, w, h, srcW: w, srcH: h, duration };
+}
+
+/**
  * Identidad por CONTENIDO, no por id: cada importacion crea un id nuevo, asi que
  * la misma foto metida dos veces son dos entradas distintas. Sin esto, el aviso
  * de fotos repetidas no detectaria el caso que de verdad importa.

@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.6.0 — 20 ago 2026 · vídeo, fase 1 (importar + previsualizar)
+
+- Las celdas ya **aceptan vídeos** (además de fotos): el `+` y "cambiar" abren
+  fotos o vídeos. El vídeo se **previsualiza reproduciéndose** en la celda, con el
+  mismo encuadre (contain/zoom) que una foto, y se guarda/recarga con el proyecto.
+- Miniaturas, feed y perfil muestran un **póster** (primer fotograma) del vídeo.
+- Todavía **no** hay recortar (in/out) ni export a vídeo: una página con vídeo se
+  exporta de momento como el póster estático. Eso llega en las fases 2 y 3.
+
 ## 4.5.0 — 20 ago 2026
 
 - **Spike (beta) de export a vídeo**: en la hoja de export, un botón que codifica las

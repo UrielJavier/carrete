@@ -10,7 +10,7 @@ export default function FileInput({ onFiles, multiple = false, guardRef }) {
   return (
     <input
       type="file"
-      accept="image/*"
+      accept="image/*,video/*"
       multiple={multiple}
       className={s.input}
       onClick={(e) => {

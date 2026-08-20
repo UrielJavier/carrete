@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { uid } from '../core/layouts.js';
 import { rotSize, turnFocal, mirrorFocal, clampT, postCells } from '../core/geometry.js';
 import { detectColorSpace } from '../core/color.js';
-import { buildPreview, fingerprint } from '../core/image.js';
+import { buildPreview, buildVideoPreview, fingerprint } from '../core/image.js';
 
 /**
  * BIBLIOTECA DE FOTOS.
@@ -15,9 +15,17 @@ import { buildPreview, fingerprint } from '../core/image.js';
 export function useImageLibrary({ post, images, dispatch, setBusy, onError }) {
   const ingest = useCallback(async (files, slideIndex, cellIndex) => {
     try {
-      setBusy(files.length > 1 ? `Leyendo ${files.length} fotos…` : 'Leyendo foto…');
+      setBusy(files.length > 1 ? `Leyendo ${files.length} archivos…` : 'Leyendo archivo…');
       const added = [];
       for (const file of files) {
+        if (file.type.startsWith('video/')) {
+          /* El vídeo no se hashea entero (podrían ser decenas de MB): basta su huella
+             de metadatos para detectar repetidos. */
+          const key = `${file.name}|${file.size}|${file.lastModified || 0}`;
+          const pv = await buildVideoPreview(file);
+          added.push({ id: uid(), name: file.name, file, key, rot: 0, flip: false, ...pv });
+          continue;
+        }
         const cs = await detectColorSpace(file);
         /* Identidad por CONTENIDO: cada importacion crea un id nuevo, asi que la
            misma foto metida dos veces son dos entradas distintas y sin el hash el

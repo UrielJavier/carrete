@@ -60,6 +60,14 @@ export default function Cell({
     height: `${u.dhU * 100}%`,
   };
 
+  /* La celda pinta un <video> si el medio es vídeo, y una <img> si es foto; el
+     encuadre (posición/escala) es idéntico. */
+  const media = image.type === 'video' ? (
+    <video src={image.url} style={imgStyle} muted loop playsInline autoPlay preload="auto" />
+  ) : (
+    <img src={image.url} alt="" draggable={false} style={imgStyle} />
+  );
+
   const moving = level === 'page' && tool === 'move';
   const framing = level === 'photo';
   const cls = [
@@ -127,7 +135,7 @@ export default function Cell({
         onPointerUp={onSwapEnd}
         onPointerCancel={onSwapEnd}
       >
-        <img src={image.url} alt="" draggable={false} style={imgStyle} />
+        {media}
         {chrome}
       </div>
     );
@@ -142,7 +150,7 @@ export default function Cell({
         style={pos}
         onClick={() => (selected ? onOpen() : onSelect())}
       >
-        <img src={image.url} alt="" draggable={false} style={imgStyle} />
+        {media}
         {chrome}
       </div>
     );
@@ -207,7 +215,7 @@ export default function Cell({
       }}
       onDoubleClick={() => onTransform(newT(), true)}
     >
-      <img src={image.url} alt="" draggable={false} style={imgStyle} />
+      {media}
       {chrome}
     </div>
   );
