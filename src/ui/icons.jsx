@@ -33,6 +33,13 @@ export const Icon = {
   close: () => <S><path d="M18 6L6 18M6 6l12 12" /></S>,
   check: () => <S><path d="M4 12.5l5 5L20 6.5" /></S>,
   download: () => <S><path d="M12 3v12" /><path d="M7 11l5 5 5-5" /><path d="M4 20h16" /></S>,
+  share: () => (
+    <S>
+      <path d="M12 3v13" />
+      <path d="M8 7l4-4 4 4" />
+      <path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7" />
+    </S>
+  ),
   mirror: () => (
     <S>
       <path d="M12 3v18" strokeDasharray="2 2.5" />

@@ -14,6 +14,27 @@ export default function ExportSheet({
 }) {
   const total = shots.reduce((a, sh) => a + (sh.bytes || 0), 0);
 
+  /* Ficheros para la hoja de compartir nativa (Web Share API). En móvil, elegir
+     Instagram → Feed sube las varias imágenes como un carrusel. */
+  const shareFiles = React.useMemo(
+    () => shots
+      .filter((sh) => sh.blob)
+      .map((sh) => new File([sh.blob], sh.name, { type: sh.blob.type || 'image/png' })),
+    [shots],
+  );
+  const canShare = React.useMemo(() => {
+    if (typeof navigator === 'undefined' || !navigator.canShare || !shareFiles.length) return false;
+    try { return navigator.canShare({ files: shareFiles }); } catch (e) { return false; }
+  }, [shareFiles]);
+
+  const doShare = async () => {
+    try {
+      await navigator.share({ files: shareFiles, title: 'Maqueta' });
+    } catch (e) {
+      /* El usuario cancela, o el navegador no lo permite: no hacemos nada. */
+    }
+  };
+
   return (
     <div className={s.sheet}>
       <div className={s.bar}>
@@ -27,18 +48,31 @@ export default function ExportSheet({
       </div>
 
       <div className={s.zone}>
+        {canShare && (
+          <Button variant="primary" className={s.zipbtn} onClick={doShare}>
+            <Icon.share />
+            {`Compartir las ${shots.length}`}
+          </Button>
+        )}
         {zip ? (
           <a className={s.zip} href={zip.url} download={zip.name}>
             <Icon.download />
             <span>{zip.name} · {weight(zip.bytes)}</span>
           </a>
         ) : (
-          <Button variant="primary" className={s.zipbtn} disabled={!!zipping} onClick={onZip}>
+          <Button
+            variant={canShare ? 'outline' : 'primary'}
+            className={s.zipbtn}
+            disabled={!!zipping}
+            onClick={onZip}
+          >
             {zipping ? `Empaquetando… ${zipping}%` : `Descargar las ${shots.length} en un ZIP`}
           </Button>
         )}
         <Hint>
-          o guárdalas de una en una y súbelas en ese orden
+          {canShare
+            ? 'Compartir → Instagram → Feed las sube como un carrusel, en este orden.'
+            : 'o guárdalas de una en una y súbelas en ese orden'}
         </Hint>
       </div>
 

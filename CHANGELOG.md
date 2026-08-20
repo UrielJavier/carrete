@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.2.0 — 20 ago 2026
+
+- **Botón "Compartir"** en la hoja de export (móvil): abre la hoja de compartir
+  nativa con todas las páginas. Al elegir Instagram → Feed, las sube como un
+  **carrusel** en orden. Usa la Web Share API; solo aparece si el navegador
+  soporta compartir ficheros. El ZIP y las descargas siguen como alternativa.
+
 ## 4.1.0 — 20 ago 2026
 
 - **Renombrado de Carrete a Maqueta**: nombre de producto, título, marca de la
