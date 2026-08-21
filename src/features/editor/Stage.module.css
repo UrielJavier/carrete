@@ -15,6 +15,7 @@
    la proporción de la página). El contenido se centra dentro; en Foto la celda usa
    ese alto real para hacerse lo más grande posible. */
 .area {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;

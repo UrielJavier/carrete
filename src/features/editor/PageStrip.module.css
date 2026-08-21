@@ -4,10 +4,12 @@
 
 /* Contenedor del área: la tira dentro, y el aviso de recorte flotando fuera de las
    páginas (en la banda vacía). */
+/* Anclado al área (position:absolute sobre .area relativa) para ocupar TODA su altura
+   de forma fiable: con height:100% sobre un hijo flex, el % a veces no se resolvía y
+   la franja negra de arriba/abajo quedaba fuera del holder (y del backdrop del foco). */
 .holder {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 /* Backdrop del foco: cubre toda el área para que tocar cualquier negro salga a

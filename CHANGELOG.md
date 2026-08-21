@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.21.2 — 21 ago 2026
+
+- "Tocar fuera para salir" ahora también funciona en el **eje vertical** (franja negra
+  de arriba/abajo). El área de trabajo no ocupaba de forma fiable todo el alto (la
+  altura en % de un hijo flex no siempre se resolvía), así que ese negro quedaba fuera
+  del backdrop. Ahora el área se ancla a todo el alto y el toque sale desde cualquier
+  parte.
+
 ## 4.21.1 — 21 ago 2026
 
 - "Tocar fuera para salir" en modo foco ahora cubre **todo el negro** del área (antes
