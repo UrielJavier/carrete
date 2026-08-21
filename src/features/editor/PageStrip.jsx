@@ -166,6 +166,7 @@ export default function PageStrip({
                 en el nivel Página (en Foto se ve solo la celda enfocada). */}
             <TextLayer
               texts={sl.texts}
+              cells={byPage[i]}
               selId={textSel && textSel.slideIndex === i ? textSel.id : null}
               active={active && !photo}
               stageH={stageH}

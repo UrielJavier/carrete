@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.14.0 — 21 ago 2026 · imanes (snapping) del texto
+
+- Al **arrastrar** un texto, su centro se **imanta** a los centros vertical/horizontal
+  de la **página** y de **cada foto**. Pasas cerca y se pega, sigues y se suelta;
+  mientras está pegado aparece una **línea guía** y un toque háptico al enganchar.
+- Cada eje es independiente (puedes quedar centrado en X pero libre en Y).
+
 ## 4.13.0 — 21 ago 2026
 
 - Nueva herramienta **estilo**: **negrita** y **cursiva** por texto (toggles). Inter y
@@ -48,8 +55,8 @@ HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 - Se ve igual en el editor, el feed, la miniatura del perfil y el **export** (imagen y
   vídeo): misma fuente de verdad. Las fuentes van **empaquetadas en local** (sin CDN),
   solo el subconjunto latino.
-- Falta para más adelante: **imanes** (snapping a los centros) y la herramienta de
-  **margen/área segura**. (Texto en el nivel Foto queda descartado a propósito.)
+- Falta para más adelante: la herramienta de **margen/área segura**. (Texto en el
+  nivel Foto queda descartado a propósito.)
 
 ## 4.10.2 — 20 ago 2026
 

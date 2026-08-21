@@ -31,3 +31,26 @@
   outline: 1px solid var(--c-accent);
   outline-offset: 3px;
 }
+
+/* Líneas guía del imán: finas, del color de acento, mientras se arrastra pegado. */
+.guideV,
+.guideH {
+  position: absolute;
+  background: var(--c-accent);
+  pointer-events: none;
+  z-index: 7;
+}
+
+.guideV {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-0.5px);
+}
+
+.guideH {
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: translateY(-0.5px);
+}
