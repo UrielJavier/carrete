@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.21.0 — 21 ago 2026
+
+- En modo foco (**Texto** y **Foto**), tocar el **fondo negro** (fuera de la página/celda)
+  sube un nivel: vuelve a **Página**. Patrón "toca fuera para cerrar", además del
+  breadcrumb.
+
 ## 4.20.2 — 21 ago 2026
 
 - El modo foco de texto ya **no recorta arriba/abajo**: en vez de escalar la página

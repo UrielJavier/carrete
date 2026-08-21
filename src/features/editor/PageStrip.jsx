@@ -25,7 +25,7 @@ export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
   showThirds, metrics, guardRef, enter, areaW, workH, textSel,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
-  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText,
+  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus,
 }) {
   const scrollRef = useRef(null);
   const centered = useRef(-1);
@@ -126,7 +126,13 @@ export default function PageStrip({
   }, [current, step, post.slides.length, onCenter]);
 
   return (
-    <div className={s.holder}>
+    <div
+      className={s.holder}
+      /* En foco (Texto o Foto), tocar el negro (el propio contenedor, no la página ni
+         la celda) sube un nivel: vuelve a Página. La tira está difuminada y sin
+         captura, así que el toque llega aquí. */
+      onClick={(e) => { if ((photo || textFocus) && e.target === e.currentTarget) onExitFocus?.(); }}
+    >
       <div
         ref={scrollRef}
         className={[s.strip, locked && s.locked, (photo || textFocus) && s.dim, zoomEntry && s.zoomin]

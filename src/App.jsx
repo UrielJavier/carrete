@@ -48,7 +48,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.20.2';
+export const VERSION = '4.21.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -412,6 +412,7 @@ export default function App() {
                 onMoveText={(slideIndex, id, x, y, commit) => dispatch({
                   type: 'patchText', slideIndex, id, patch: { x, y }, history: commit,
                 })}
+                onExitFocus={() => dispatch({ type: 'level', level: 'page' })}
               />
             )}
           </StageWrap>
