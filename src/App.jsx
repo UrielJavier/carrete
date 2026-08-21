@@ -47,7 +47,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.16.0';
+export const VERSION = '4.16.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -283,8 +283,10 @@ export default function App() {
     setZip(null);
   };
 
-  /* Feedback por mailto: abre TU app de correo con la versión ya puesta. Sin
-     servidor, nada sale del dispositivo salvo lo que tú escribas y envíes. */
+  /* Feedback por mailto SIN destinatario fijo: abre el correo con asunto y cuerpo
+     rellenos y tú eliges a quién enviarlo. Así no hay ninguna dirección escrita en el
+     código (el repo es público). Sin servidor, nada sale del dispositivo salvo lo que
+     tú escribas y envíes. */
   const sendFeedback = () => {
     const subject = encodeURIComponent(`Maqueta v${VERSION} — comentario`);
     const body = encodeURIComponent(`\n\n———\nMaqueta v${VERSION}`);
