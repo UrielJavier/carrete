@@ -40,8 +40,11 @@ export default function PageStrip({
   const step = stageW + PEEK_GAP;
   const cropPct = Math.min(1, (R.h * 3) / 4 / R.w);
   const photo = level === 'photo';
+  /* En Texto se enfoca la PÁGINA entera: las vecinas se desvanecen y la activa se
+     agranda un poco, como el foco de Foto pero a escala de página. */
+  const textFocus = level === 'text';
   const safe = safeRect(post.safe, post.ratio);
-  const locked = photo || tool === 'move';
+  const locked = photo || textFocus || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
   /* En Página, si hay una foto seleccionada en la página activa, las demás se
      atenúan (estilo Figma): la selección habla sin necesidad de más navegación. */
@@ -111,7 +114,7 @@ export default function PageStrip({
     <div className={s.holder}>
       <div
         ref={scrollRef}
-        className={[s.strip, locked && s.locked, photo && s.dim, zoomEntry && s.zoomin]
+        className={[s.strip, locked && s.locked, photo && s.dim, textFocus && s.textfocus, zoomEntry && s.zoomin]
           .filter(Boolean).join(' ')}
         style={{ gap: PEEK_GAP, paddingInline: `calc((100% - ${stageW}px) / 2)` }}
         onScroll={onScroll}
@@ -122,7 +125,7 @@ export default function PageStrip({
           <div
             key={sl.id}
             data-page={i}
-            className={[s.page, !active && s.inactive, post.bg === TRANSPARENT && 'checker']
+            className={[s.page, active && s.active, !active && s.inactive, post.bg === TRANSPARENT && 'checker']
               .filter(Boolean).join(' ')}
             style={{
               width: stageW,
@@ -159,7 +162,7 @@ export default function PageStrip({
 
             {/* Líneas del recorte 3:4 sobre la 1ª página; el rótulo va fuera del
                 layout (abajo). Solo en Página. */}
-            {i === 0 && cropPct < 1 && !photo && (
+            {i === 0 && cropPct < 1 && !photo && !textFocus && (
               <div className={s.cropline}
                 style={{ left: `${((1 - cropPct) / 2) * 100}%`, width: `${cropPct * 100}%` }} />
             )}
@@ -196,7 +199,7 @@ export default function PageStrip({
 
       {/* Al final de la tira, del tamaño de una página: se llega deslizando hasta
           el final y añade una página nueva al carrusel. Solo en el nivel Página. */}
-      {!photo && (
+      {!photo && !textFocus && (
         <button
           type="button"
           className={[s.add, full && s.addoff].filter(Boolean).join(' ')}
@@ -242,7 +245,7 @@ export default function PageStrip({
 
       {/* Aviso del recorte 3:4: FUERA del layout, en la banda inferior vacía del
           área (las páginas son más bajas), cuando estás en la 1ª página. */}
-      {!photo && current === 0 && cropPct < 1 && (
+      {!photo && !textFocus && current === 0 && cropPct < 1 && (
         <span className={s.cropnote}>recorte 3:4 · cuadrícula</span>
       )}
     </div>

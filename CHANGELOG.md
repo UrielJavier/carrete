@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.20.0 — 21 ago 2026
+
+- Al editar un texto se entra en **modo foco** (como con las fotos), pero enfocando la
+  **página entera**: las páginas vecinas se desvanecen, la activa se agranda un poco y
+  la tira se bloquea, para colocar y ajustar el texto sin distracción.
+
 ## 4.19.0 — 21 ago 2026 · miniaturas y visor en la Biblioteca
 
 - Cada archivo de la Biblioteca muestra ahora una **miniatura** (en vídeos, el fotograma
