@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.17.1 — 21 ago 2026
+
+- Arreglado el **parpadeo** de la Biblioteca: el autoguardado renovaba el array de
+  proyectos y la lista se recargaba en bucle. Ahora carga una sola vez (y a mano tras
+  borrar), sin parpadear.
+
 ## 4.17.0 — 21 ago 2026 · Biblioteca
 
 - Nueva sección **Biblioteca** (en el menú): todos los archivos del dispositivo —fotos

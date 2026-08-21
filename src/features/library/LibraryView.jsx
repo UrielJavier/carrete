@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { weight } from '../../core/format.js';
 import * as db from '../../core/db.js';
 import { Button, SegmentedControl, Caption, Hint } from '../../ui/primitives/index.js';
@@ -20,16 +20,15 @@ const stamp = (t) => {
 export default function LibraryView({ projects, estimate, onAsk, say }) {
   const [data, setData] = useState(null);
   const [sort, setSort] = useState('size');
-  const [loading, setLoading] = useState(true);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    try {
-      setData(await loadLibrary(projects));
-    } finally {
-      setLoading(false);
-    }
-  }, [projects]);
+  /* El autoguardado renueva la identidad del array `projects` cada pocos cientos de
+     ms; si el reload dependiera de él, la lista parpadearía. Se lee por ref y se carga
+     una sola vez (y a mano tras borrar): mientras estás en la Biblioteca el conjunto
+     de proyectos no cambia. */
+  const projectsRef = useRef(projects);
+  projectsRef.current = projects;
+
+  const reload = useCallback(() => loadLibrary(projectsRef.current).then(setData), []);
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -57,7 +56,7 @@ export default function LibraryView({ projects, estimate, onAsk, say }) {
       body: 'Se quitan del dispositivo los que no usa ningún proyecto. Puedes volver a añadirlos importándolos otra vez.',
       ok: 'Borrar no usados',
       onOk: async () => {
-        const gone = await db.sweepFiles(projects);
+        const gone = await db.sweepFiles(projectsRef.current);
         say(`${gone.length} ${gone.length === 1 ? 'archivo borrado' : 'archivos borrados'}`, 'dup');
         reload();
       },
@@ -108,8 +107,8 @@ export default function LibraryView({ projects, estimate, onAsk, say }) {
       )}
 
       <div className={s.list}>
-        {loading && <p className={s.lead}>Cargando…</p>}
-        {!loading && (!t || !t.count) && (
+        {!data && <p className={s.lead}>Cargando…</p>}
+        {data && !t.count && (
           <p className={s.lead}>No hay archivos todavía. Al montar un carrusel aparecerán aquí.</p>
         )}
         {files.map((f) => (
