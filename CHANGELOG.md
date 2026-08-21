@@ -10,6 +10,18 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.17.0 — 21 ago 2026 · Biblioteca
+
+- Nueva sección **Biblioteca** (en el menú): todos los archivos del dispositivo —fotos
+  y vídeos— con su **peso**, en cuántos proyectos se usan y cuándo se usaron por última
+  vez.
+- **Barra de espacio ocupado** que reparte el total entre **fotos** y **vídeos**, con la
+  reserva del navegador si está disponible.
+- **Ordenar** por **peso**, por **uso** o por **recientes**, para localizar rápido lo que
+  más ocupa o lo que ya no usas.
+- Borrar un archivo suelto (avisa si está en uso) o **borrar de golpe los no usados**.
+  Todo local; nada sale del dispositivo.
+
 ## 4.16.3 — 21 ago 2026
 
 - El botón **nuevo proyecto** ahora es **grande y fijo abajo (centrado)**, siempre a

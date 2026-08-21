@@ -1,0 +1,148 @@
+.summary {
+  max-width: var(--stage-cap);
+  margin: var(--s-4) auto var(--s-6);
+}
+
+/* Barra de espacio ocupado: fotos + vídeos, a lo ancho del total. */
+.bar {
+  display: flex;
+  height: 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  overflow: hidden;
+}
+
+.segPhoto {
+  background: var(--c-accent);
+}
+
+.segVideo {
+  background: var(--c-line-strong);
+}
+
+.legend {
+  display: flex;
+  gap: var(--s-8);
+  margin-top: var(--s-4);
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.dotPhoto,
+.dotVideo {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.dotPhoto {
+  background: var(--c-accent);
+}
+
+.dotVideo {
+  background: var(--c-line-strong);
+}
+
+.total {
+  margin: var(--s-5) 0 0;
+  font: var(--fs-xs) / 1.6 var(--font-mono);
+  color: var(--c-text-faint);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  max-width: var(--stage-cap);
+  margin: 0 auto var(--s-4);
+}
+
+.sweep {
+  flex: none;
+}
+
+.list {
+  max-width: var(--stage-cap);
+  margin: 0 auto;
+}
+
+.lead {
+  font: var(--fs-xs) / 1.6 var(--font-mono);
+  color: var(--c-text-faint);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  padding: var(--s-5) 0;
+  border-top: 1px solid var(--c-line);
+}
+
+.row:first-child {
+  border-top: 0;
+}
+
+/* Los huérfanos (sin usar) se marcan: son los candidatos a borrar. */
+.orphan {
+  opacity: 0.72;
+}
+
+.badge {
+  flex: none;
+  padding: 2px var(--s-3);
+  font: var(--fs-micro) / 1.4 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--c-line);
+}
+
+.pho {
+  color: var(--c-accent);
+  border-color: var(--c-accent);
+}
+
+.vid {
+  color: var(--c-text);
+  border-color: var(--c-line-strong);
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 var(--fs-md) / 1.2 var(--font-sans);
+  color: var(--c-text);
+}
+
+.meta {
+  font: var(--fs-xs) / 1.2 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.del {
+  flex: none;
+}
+
+.spacer {
+  height: var(--s-8);
+}
+
+.foot {
+  max-width: var(--stage-cap);
+}

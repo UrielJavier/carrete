@@ -40,6 +40,7 @@ import TextPanel from './features/editor/panels/TextPanel.jsx';
 import FeedView from './features/feed/FeedView.jsx';
 import ProfileGrid from './features/profile/ProfileGrid.jsx';
 import ProjectsView from './features/projects/ProjectsView.jsx';
+import LibraryView from './features/library/LibraryView.jsx';
 import ExportSheet from './features/export/ExportSheet.jsx';
 import { exportPost } from './features/export/exportPost.js';
 import { zipShots, safeName } from './features/export/zipShots.js';
@@ -47,7 +48,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.16.3';
+export const VERSION = '4.17.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -557,6 +558,17 @@ export default function App() {
         </Section>
       )}
 
+      {mode === 'library' && (
+        <Section>
+          <LibraryView
+            projects={projects.projects}
+            estimate={estimate}
+            onAsk={setAsk}
+            say={say}
+          />
+        </Section>
+      )}
+
       {shots && (
         <ExportSheet
           shots={shots}
@@ -583,6 +595,14 @@ export default function App() {
             sub: 'abrir o crear',
             active: mode === 'projects',
             onClick: () => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } }),
+          },
+          {
+            key: 'library',
+            icon: <Icon.library />,
+            label: 'Biblioteca',
+            sub: 'archivos y espacio',
+            active: mode === 'library',
+            onClick: () => dispatch({ type: 'set', patch: { mode: 'library', sel: null } }),
           },
           { type: 'caption', key: 'c-help', label: 'Ayuda' },
           {
