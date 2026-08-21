@@ -3,6 +3,7 @@ import { RATIOS, TRANSPARENT, PEEK_GAP, MAX_SLIDES } from '../../core/layouts.js
 import { safeRect } from '../../core/text.js';
 import Cell from './Cell.jsx';
 import TextLayer from './TextLayer.jsx';
+import RegionCanvas from './RegionCanvas.jsx';
 import s from './PageStrip.module.css';
 
 /**
@@ -40,19 +41,29 @@ export default function PageStrip({
   const step = stageW + PEEK_GAP;
   const cropPct = Math.min(1, (R.h * 3) / 4 / R.w);
   const photo = level === 'photo';
-  /* En Texto se enfoca la PÁGINA entera: las vecinas se desvanecen y la activa se
-     AGRANDA hasta llenar el área (limitada por ancho y alto, como el foco de Foto),
-     así ocupa todo el espacio y no se recorta en formatos altos ni anchos. */
+  /* En Texto se enfoca la PÁGINA entera en un lienzo PROPIO (fuera de la tira, que
+     recorta), dimensionado para llenar el área a su proporción: la misma técnica que
+     el foco de Foto. Así ocupa el máximo sin recortarse arriba/abajo. */
   const textFocus = level === 'text';
-  const focusScale = (textFocus && areaW && workH && stageW && stageH)
-    ? Math.min(areaW / stageW, workH / stageH)
-    : 1;
+  let pageFocusW = 0;
+  let pageFocusH = 0;
+  if (textFocus && areaW && workH) {
+    const pa = R.w / R.h; // proporción de la página (ancho/alto)
+    pageFocusH = Math.min(workH, areaW / pa);
+    pageFocusW = pageFocusH * pa;
+  }
   const safe = safeRect(post.safe, post.ratio);
   const locked = photo || textFocus || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
   /* En Página, si hay una foto seleccionada en la página activa, las demás se
      atenúan (estilo Figma): la selección habla sin necesidad de más navegación. */
   const selHere = !photo && tool !== 'move' && !!sel && sel.slideIndex === current;
+
+  /* Fuente de imagen para el lienzo del foco de texto: el preview ya decodificado. */
+  const focusSrc = useCallback(
+    (id) => (images[id]?.el ? { el: images[id].el, w: images[id].w, h: images[id].h } : null),
+    [images],
+  );
 
   /* Las celdas de cada página en espacio local: x relativa al inicio de su página. */
   const byPage = useMemo(() => {
@@ -118,7 +129,7 @@ export default function PageStrip({
     <div className={s.holder}>
       <div
         ref={scrollRef}
-        className={[s.strip, locked && s.locked, photo && s.dim, textFocus && s.textfocus, zoomEntry && s.zoomin]
+        className={[s.strip, locked && s.locked, (photo || textFocus) && s.dim, zoomEntry && s.zoomin]
           .filter(Boolean).join(' ')}
         style={{ gap: PEEK_GAP, paddingInline: `calc((100% - ${stageW}px) / 2)` }}
         onScroll={onScroll}
@@ -129,14 +140,12 @@ export default function PageStrip({
           <div
             key={sl.id}
             data-page={i}
-            className={[s.page, active && s.active, !active && s.inactive, post.bg === TRANSPARENT && 'checker']
+            className={[s.page, !active && s.inactive, post.bg === TRANSPARENT && 'checker']
               .filter(Boolean).join(' ')}
             style={{
               width: stageW,
               height: stageH,
               background: post.bg === TRANSPARENT ? undefined : post.bg,
-              transform: active && textFocus ? `scale(${focusScale})` : undefined,
-              zIndex: active && textFocus ? 2 : undefined,
             }}
           >
             {byPage[i].map((c) => {
@@ -175,7 +184,7 @@ export default function PageStrip({
 
             {/* Área segura: guía de edición (no se exporta), sobre la que el texto
                 se imanta. Se ve mientras editas (niveles Página/Texto). */}
-            {!photo && safe && (
+            {!photo && !textFocus && safe && (
               <div
                 className={s.safe}
                 style={{
@@ -194,7 +203,7 @@ export default function PageStrip({
               cells={byPage[i]}
               safe={safe}
               selId={textSel && textSel.slideIndex === i ? textSel.id : null}
-              active={active && !photo}
+              active={active && !photo && !textFocus}
               stageH={stageH}
               onSelect={(id) => onSelectText(i, id)}
               onMove={(id, x, y, commit) => onMoveText(i, id, x, y, commit)}
@@ -245,6 +254,50 @@ export default function PageStrip({
             onOpen={() => {}}
             onTransform={(t, history) => onTransform(focusCell.cellIndex, t, history)}
             onDupInfo={() => onDupInfo(focusImage)}
+          />
+        </div>
+      )}
+
+      {/* Texto: la PÁGINA entera en un lienzo propio (como el foco de Foto pero con la
+          página completa), llenando el área a su proporción. Las fotos van por canvas
+          (estáticas) y el texto por encima, arrastrable. */}
+      {textFocus && pageFocusW > 0 && (
+        <div
+          className={[s.focus, post.bg === TRANSPARENT && 'checker'].filter(Boolean).join(' ')}
+          style={{
+            width: Math.round(pageFocusW),
+            height: Math.round(pageFocusH),
+            background: post.bg === TRANSPARENT ? undefined : post.bg,
+          }}
+        >
+          <RegionCanvas
+            cells={cells}
+            index={current}
+            ratio={post.ratio}
+            bg={post.bg}
+            getSource={focusSrc}
+            style={{ width: '100%', height: '100%', display: 'block' }}
+          />
+          {safe && (
+            <div
+              className={s.safe}
+              style={{
+                left: `${safe.l * 100}%`,
+                top: `${safe.t * 100}%`,
+                width: `${(safe.r - safe.l) * 100}%`,
+                height: `${(safe.b - safe.t) * 100}%`,
+              }}
+            />
+          )}
+          <TextLayer
+            texts={post.slides[current].texts}
+            cells={byPage[current]}
+            safe={safe}
+            selId={textSel && textSel.slideIndex === current ? textSel.id : null}
+            active
+            stageH={Math.round(pageFocusH)}
+            onSelect={(id) => onSelectText(current, id)}
+            onMove={(id, x, y, commit) => onMoveText(current, id, x, y, commit)}
           />
         </div>
       )}

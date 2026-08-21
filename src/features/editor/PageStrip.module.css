@@ -70,11 +70,6 @@
   pointer-events: none;
 }
 
-/* Foco de texto: la página activa se agranda hasta llenar el área (la escala la fija
-   el JS por estilo en línea) y las vecinas casi desaparecen. */
-.strip.textfocus .page.inactive {
-  opacity: 0.06;
-}
 
 /* Lienzo de la foto en foco: centrado en el área, a la FORMA de la celda. Entra con
    un pequeño zoom para que el paso a Foto no sea un corte. */

@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.20.2 — 21 ago 2026
+
+- El modo foco de texto ya **no recorta arriba/abajo**: en vez de escalar la página
+  dentro de la tira (que la recortaba), ahora se dibuja la **página entera en un lienzo
+  propio** fuera de la tira —igual que el foco de foto—, a su máximo tamaño en la
+  proporción. Se ve completa y lo más grande posible.
+
 ## 4.20.1 — 21 ago 2026
 
 - Arreglado el modo foco de texto: en vez de un zoom fijo (que dejaba márgenes enormes y
