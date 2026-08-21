@@ -21,6 +21,8 @@ export const newPost = () => ({
      encima de la que ya trae el fichero de origen. Quien quiera archivos ligeros
      puede cambiarlo, pero la opcion cara es la que respeta la foto. */
   fmt: 'png',
+  /* Área segura (guía de edición para el texto): 0 = desactivada. No se exporta. */
+  safe: 0,
   slides: [newSlide('full')],
 });
 

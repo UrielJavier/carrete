@@ -127,6 +127,16 @@
   border-right: 1px dashed rgba(255, 255, 255, 0.45);
 }
 
+/* Área segura: rectángulo guía punteado, por encima de las fotos pero sin capturar
+   toques (z bajo el texto para no tapar su selección). No se exporta. */
+.safe {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  border: 1px dashed var(--c-accent);
+  opacity: 0.55;
+}
+
 /* El rótulo del recorte va FUERA de las páginas: en la banda inferior vacía del
    área (las páginas quedan centradas y son más bajas que el área). */
 .cropnote {

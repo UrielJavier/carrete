@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.15.0 — 21 ago 2026 · área segura del texto
+
+- Nueva herramienta **área segura** (nivel Carrusel): un **margen guía** dentro del que
+  colocar el texto, para no dejarlo pegado a los bordes que Instagram recorta. Se dibuja
+  como rectángulo punteado en el editor y es **solo guía: no se exporta**.
+- El texto se **imanta a las paredes** del margen: al arrastrar, sus bordes se pegan al
+  rectángulo (tope blando). Si el texto es más grande que el margen, puede salirse.
+- Ajustable en pasos (off · 3% · 5% · 7% · 10% del ancho).
+
 ## 4.14.1 — 21 ago 2026
 
 - La **caja del texto se ajusta al contenido** en vez de ocupar un ancho fijo del 80%:
@@ -61,8 +70,7 @@ HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 - Se ve igual en el editor, el feed, la miniatura del perfil y el **export** (imagen y
   vídeo): misma fuente de verdad. Las fuentes van **empaquetadas en local** (sin CDN),
   solo el subconjunto latino.
-- Falta para más adelante: la herramienta de **margen/área segura**. (Texto en el
-  nivel Foto queda descartado a propósito.)
+- (Texto en el nivel Foto queda descartado a propósito.)
 
 ## 4.10.2 — 20 ago 2026
 

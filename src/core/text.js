@@ -9,7 +9,7 @@
  * resolución —el mismo principio que las fotos.
  */
 
-import { uid } from './layouts.js';
+import { uid, RATIOS } from './layouts.js';
 
 /* Familias empaquetadas en local (sin CDN). El `css` se usa TAL CUAL tanto en el
    DOM del editor como en `ctx.font` del canvas, así que la fuente es la misma. */
@@ -48,6 +48,21 @@ export const SIZE_STEPS = [0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.11, 0.13, 0.16,
 
 /* Interlineado (multiplicador del alto de línea), también en pasos. */
 export const LH_STEPS = [0.9, 1.0, 1.1, 1.25, 1.4, 1.6, 1.8, 2.0];
+
+/* Margen del "área segura" como fracción del ANCHO de página; 0 = desactivada. */
+export const SAFE_STEPS = [0, 0.03, 0.05, 0.07, 0.1];
+
+/**
+ * Rectángulo del área segura en coordenadas normalizadas de página (0..1). El margen
+ * se da en fracción del ancho y se convierte a Y con la proporción, así el borde se
+ * ve con el mismo grosor en píxeles por los cuatro lados. Devuelve null si está off.
+ */
+export function safeRect(safe, ratio) {
+  if (!safe) return null;
+  const R = RATIOS[ratio];
+  const iy = safe * (R.w / R.h);
+  return { l: safe, r: 1 - safe, t: iy, b: 1 - iy };
+}
 
 /** Índice del paso más cercano a un valor (para arrancar el deslizador). */
 export function nearestStep(steps, value) {

@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { RATIOS, TRANSPARENT, PEEK_GAP, MAX_SLIDES } from '../../core/layouts.js';
+import { safeRect } from '../../core/text.js';
 import Cell from './Cell.jsx';
 import TextLayer from './TextLayer.jsx';
 import s from './PageStrip.module.css';
@@ -39,6 +40,7 @@ export default function PageStrip({
   const step = stageW + PEEK_GAP;
   const cropPct = Math.min(1, (R.h * 3) / 4 / R.w);
   const photo = level === 'photo';
+  const safe = safeRect(post.safe, post.ratio);
   const locked = photo || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
   /* En Página, si hay una foto seleccionada en la página activa, las demás se
@@ -162,11 +164,26 @@ export default function PageStrip({
                 style={{ left: `${((1 - cropPct) / 2) * 100}%`, width: `${cropPct * 100}%` }} />
             )}
 
+            {/* Área segura: guía de edición (no se exporta), sobre la que el texto
+                se imanta. Se ve mientras editas (niveles Página/Texto). */}
+            {!photo && safe && (
+              <div
+                className={s.safe}
+                style={{
+                  left: `${safe.l * 100}%`,
+                  top: `${safe.t * 100}%`,
+                  width: `${(safe.r - safe.l) * 100}%`,
+                  height: `${(safe.b - safe.t) * 100}%`,
+                }}
+              />
+            )}
+
             {/* Textos por encima de las fotos. Solo se editan en la página activa y
                 en el nivel Página (en Foto se ve solo la celda enfocada). */}
             <TextLayer
               texts={sl.texts}
               cells={byPage[i]}
+              safe={safe}
               selId={textSel && textSel.slideIndex === i ? textSel.id : null}
               active={active && !photo}
               stageH={stageH}

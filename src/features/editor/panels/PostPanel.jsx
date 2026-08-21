@@ -5,6 +5,7 @@ import {
   NotchSlider, ColorSwatches,
 } from '../../../ui/primitives/index.js';
 import { Icon, RatioGlyph, GapGlyph } from '../../../ui/icons.jsx';
+import { SAFE_STEPS } from '../../../core/text.js';
 import { HAPTIC, haptic } from '../../../hooks/useHaptics.js';
 import s from '../LevelPanel.module.css';
 
@@ -144,6 +145,27 @@ export default function PostPanel({
     );
   }
 
+  if (tool === 'safe') {
+    const index = Math.max(0, SAFE_STEPS.indexOf(post.safe || 0));
+    return (
+      <>
+        <Back label="área segura" sub="margen guía para el texto" onBack={onBack} />
+        <Field right={<span className={s.gapval}>{post.safe ? `${Math.round(post.safe * 100)}%` : 'off'}</span>}>
+          <NotchSlider
+            steps={SAFE_STEPS}
+            index={index}
+            ariaLabel="Área segura"
+            onChange={(i, atStop) => {
+              haptic(atStop ? HAPTIC.stop : HAPTIC.step);
+              onSetting({ safe: SAFE_STEPS[i] });
+            }}
+          />
+        </Field>
+        <Hint>un margen guía dentro del que colocar el texto (se imanta). Solo es una ayuda: no se exporta.</Hint>
+      </>
+    );
+  }
+
   const fmt = post.bg === TRANSPARENT ? 'png' : (post.fmt || 'png');
   const ext = fmt === 'jpeg' ? '.jpg' : '.png';
   return (
@@ -154,6 +176,7 @@ export default function PostPanel({
         <ToolBox icon={<GapGlyph gap={post.gap} />} label="gap" onClick={() => onTool('gap')} />
         <ToolBox icon={<Swatch color={post.bg} />} label="color" onClick={() => onTool('bg')} />
         <ToolBox icon={<span className={s.toolval}>{ext}</span>} label="formato" onClick={() => onTool('fmt')} />
+        <ToolBox icon={<Icon.safe />} label="seguro" on={!!post.safe} onClick={() => onTool('safe')} />
       </ToolRow>
       <Hint>arrastra una página, o muévela con izq/der · tócala para abrirla</Hint>
     </>
