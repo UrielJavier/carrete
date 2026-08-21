@@ -70,19 +70,10 @@
   pointer-events: none;
 }
 
-/* Foco de texto: la página activa se agranda un poco y las vecinas casi desaparecen,
-   para editar el texto con la página entera enfocada. */
-.strip.textfocus .page.active {
-  transform: scale(1.06);
-  z-index: 2;
-}
-
+/* Foco de texto: la página activa se agranda hasta llenar el área (la escala la fija
+   el JS por estilo en línea) y las vecinas casi desaparecen. */
 .strip.textfocus .page.inactive {
   opacity: 0.06;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .strip.textfocus .page.active { transform: none; }
 }
 
 /* Lienzo de la foto en foco: centrado en el área, a la FORMA de la celda. Entra con

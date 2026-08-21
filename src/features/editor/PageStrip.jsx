@@ -41,8 +41,12 @@ export default function PageStrip({
   const cropPct = Math.min(1, (R.h * 3) / 4 / R.w);
   const photo = level === 'photo';
   /* En Texto se enfoca la PÁGINA entera: las vecinas se desvanecen y la activa se
-     agranda un poco, como el foco de Foto pero a escala de página. */
+     AGRANDA hasta llenar el área (limitada por ancho y alto, como el foco de Foto),
+     así ocupa todo el espacio y no se recorta en formatos altos ni anchos. */
   const textFocus = level === 'text';
+  const focusScale = (textFocus && areaW && workH && stageW && stageH)
+    ? Math.min(areaW / stageW, workH / stageH)
+    : 1;
   const safe = safeRect(post.safe, post.ratio);
   const locked = photo || textFocus || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
@@ -131,6 +135,8 @@ export default function PageStrip({
               width: stageW,
               height: stageH,
               background: post.bg === TRANSPARENT ? undefined : post.bg,
+              transform: active && textFocus ? `scale(${focusScale})` : undefined,
+              zIndex: active && textFocus ? 2 : undefined,
             }}
           >
             {byPage[i].map((c) => {
