@@ -1,0 +1,145 @@
+.wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.wrap.on {
+  pointer-events: auto;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.wrap.on .backdrop {
+  opacity: 1;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(82vw, 320px);
+  display: flex;
+  flex-direction: column;
+  background: var(--c-bg);
+  border-right: 1px solid var(--c-line);
+  transform: translateX(-100%);
+  transition: transform var(--dur) var(--ease);
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+
+.wrap.on .panel {
+  transform: translateX(0);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-12) var(--s-12) var(--s-8);
+}
+
+.title {
+  font: var(--fs-lg) / 1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  background: none;
+  border: 1px solid var(--c-line);
+  color: var(--c-text);
+  cursor: pointer;
+}
+
+.close :global(svg) {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--s-4) 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-10);
+  width: 100%;
+  padding: var(--s-10) var(--s-12);
+  background: none;
+  border: 0;
+  color: var(--c-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.item:active {
+  background: var(--c-surface);
+}
+
+.item.active {
+  background: var(--c-surface);
+}
+
+.ico {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--c-text-dim);
+}
+
+.ico :global(svg) {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.item.active .ico {
+  color: var(--c-text);
+}
+
+.labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font: var(--fs-lg) / 1.1 var(--font-sans);
+}
+
+.sub {
+  font: var(--fs-xs) / 1.2 var(--font-mono);
+  color: var(--c-text-dim);
+}
+
+.foot {
+  padding: var(--s-10) var(--s-12);
+  border-top: 1px solid var(--c-line);
+  font: var(--fs-xs) / 1.4 var(--font-mono);
+  color: var(--c-text-dim);
+}

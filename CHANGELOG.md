@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.16.0 — 21 ago 2026 · menú de navegación
+
+- Nuevo **menú hamburguesa** en la cabecera para los destinos "meta", sin ensuciar la
+  barra de trabajo (Editar/Feed/Perfil + Exportar se quedan como están).
+- Por ahora: **Proyectos** y **Comentarios**. Los comentarios abren tu app de correo
+  (**mailto:**) con la versión ya puesta: sin servidor, nada sale del dispositivo salvo
+  lo que tú escribas y envíes.
+- Preparado para la **Biblioteca** (ver todos los archivos y su uso), que llega en la
+  siguiente entrega.
+
 ## 4.15.0 — 21 ago 2026 · área segura del texto
 
 - Nueva herramienta **área segura** (nivel Carrusel): un **margen guía** dentro del que

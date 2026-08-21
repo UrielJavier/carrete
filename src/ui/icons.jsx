@@ -54,6 +54,10 @@ export const Icon = {
       <path d="M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3" />
     </S>
   ),
+  menu: () => <S><path d="M4 7h16M4 12h16M4 17h16" /></S>,
+  folder: () => <S><path d="M3 6h6l2 2h10v11H3z" /></S>,
+  library: () => <S><path d="M4 5h4v14H4zM10 5h4v14h-4z" /><path d="M16 6l4 1-3 13-4-1z" /></S>,
+  mail: () => <S><path d="M3 6h18v12H3z" /><path d="M3 7l9 6 9-6" /></S>,
   text: () => <S><path d="M5 6V4h14v2M12 4v16M9 20h6" /></S>,
   size: () => <S><path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4" /></S>,
   align: () => <S><path d="M4 6h16M7 12h10M5 18h14" /></S>,

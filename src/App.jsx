@@ -27,6 +27,7 @@ import { useStorageEstimate } from './hooks/useStorageEstimate.js';
 import { HAPTIC, haptic } from './hooks/useHaptics.js';
 
 import AppShell, { Section, Busy } from './ui/layout/AppShell.jsx';
+import NavDrawer from './ui/layout/NavDrawer.jsx';
 import { Button, SegmentedControl, Notice, Toast, Dialog } from './ui/primitives/index.js';
 import { Icon } from './ui/icons.jsx';
 
@@ -46,7 +47,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.15.0';
+export const VERSION = '4.16.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -67,6 +68,7 @@ export default function App() {
   const [customBg, setCustomBg] = useState('#e7e2d8');
   const [dropIdx, setDropIdx] = useState(null);
   const [liftIdx, setLiftIdx] = useState(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   const wrapRef = useRef(null);
   const swapFrom = useRef(null);
@@ -281,6 +283,14 @@ export default function App() {
     setZip(null);
   };
 
+  /* Feedback por mailto: abre TU app de correo con la versión ya puesta. Sin
+     servidor, nada sale del dispositivo salvo lo que tú escribas y envíes. */
+  const sendFeedback = () => {
+    const subject = encodeURIComponent(`Maqueta v${VERSION} — comentario`);
+    const body = encodeURIComponent(`\n\n———\nMaqueta v${VERSION}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
   const offProfile = Object.values(images).filter((im) => !im.converted && OFF_PROFILE.includes(im.cs));
   const docLevel = mode === 'edit' || mode === 'feed' || mode === 'grid';
   const projectName = projects.projects.find((p) => p.id === projects.projectId)?.name;
@@ -298,6 +308,7 @@ export default function App() {
     <AppShell
       version={VERSION}
       onHome={() => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } })}
+      onMenu={() => setNavOpen(true)}
       fullscreen={fullscreen.active}
       onFullscreen={fullscreen.toggle}
       meta={docLevel && (!projects.projectId
@@ -558,6 +569,29 @@ export default function App() {
           onClose={closeExport}
         />
       )}
+
+      <NavDrawer
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+        footer={`Maqueta v${VERSION} · todo en tu dispositivo`}
+        items={[
+          {
+            key: 'projects',
+            icon: <Icon.folder />,
+            label: 'Proyectos',
+            sub: 'abrir o crear',
+            active: mode === 'projects',
+            onClick: () => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } }),
+          },
+          {
+            key: 'feedback',
+            icon: <Icon.mail />,
+            label: 'Comentarios',
+            sub: 'escríbeme por correo',
+            onClick: sendFeedback,
+          },
+        ]}
+      />
 
       <Busy label={busy} />
       <Toast toast={toast} duration={TOAST_MS} onDone={clear} />

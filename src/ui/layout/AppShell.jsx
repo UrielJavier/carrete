@@ -14,7 +14,7 @@ export const Busy = ({ label }) => (label ? <div className={s.busy}>{label}</div
  * aparece cuando hay uno abierto.
  */
 export default function AppShell({
-  version, onHome,
+  version, onHome, onMenu,
   fullscreen, onFullscreen,
   docBar, meta, notices, children,
 }) {
@@ -22,6 +22,11 @@ export default function AppShell({
     <>
       <header className={s.header}>
         <div className={s.bar}>
+          {onMenu && (
+            <Button variant="icon" title="Menú" onClick={onMenu}>
+              <Icon.menu />
+            </Button>
+          )}
           <div className={s.brandwrap}>
             <button type="button" className={s.home} title="Inicio" onClick={onHome}>
               <h1 className={s.brand}>Maqueta</h1>
