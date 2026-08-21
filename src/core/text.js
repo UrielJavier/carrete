@@ -66,7 +66,6 @@ export function newText(overrides = {}) {
     content: 'Texto',
     x: 0.5,       // ancla (centro) X, 0..1 de la página
     y: 0.5,       // ancla (centro) Y, 0..1 de la página
-    w: 0.8,       // ancho de caja, 0..1 del ancho de página
     size: 0.09,   // altura de fuente, fracción de la altura de página
     lh: LINE_HEIGHT, // interlineado (multiplicador)
     color: '#111111',
@@ -123,8 +122,11 @@ export function drawTexts(ctx, texts, sw, sh) {
     ctx.font = `${style}${weight}${px}px ${fontCss(t.font)}`;
     ctx.textBaseline = 'middle';
     ctx.fillStyle = t.color || '#111111';
-    const maxW = Math.max(1, (t.w ?? 0.8) * sw);
-    const lines = wrapLines((str) => ctx.measureText(str).width, t.content, maxW);
+    /* La caja se ajusta al texto: solo se parte en los saltos de línea explícitos
+       (sin ancho fijo), y su ancho es el de la línea más larga. */
+    const measure = (str) => ctx.measureText(str).width;
+    const lines = wrapLines(measure, t.content, Infinity);
+    const boxW = lines.reduce((m, l) => Math.max(m, measure(l)), 0);
     const lineH = px * (t.lh ?? LINE_HEIGHT);
     const totalH = lines.length * lineH;
 
@@ -134,7 +136,7 @@ export function drawTexts(ctx, texts, sw, sh) {
     /* La caja está centrada en el ancla; la alineación coloca cada línea dentro. */
     const align = t.align || 'center';
     ctx.textAlign = align;
-    const ax = align === 'left' ? -maxW / 2 : align === 'right' ? maxW / 2 : 0;
+    const ax = align === 'left' ? -boxW / 2 : align === 'right' ? boxW / 2 : 0;
     let y = -totalH / 2 + lineH / 2;
     for (const line of lines) {
       ctx.fillText(line, ax, y);

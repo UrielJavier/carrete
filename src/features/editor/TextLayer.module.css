@@ -11,9 +11,10 @@
   /* Por defecto no captura: solo la página activa lo activa (.on). Sin esto, los
      textos de las páginas vecinas robarían los toques. */
   pointer-events: none;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: normal;
+  /* La caja se ajusta al texto: se parte solo en los saltos de línea (Enter), sin
+     ancho fijo ni ajuste automático, para que la selección quede pegada a las letras. */
+  width: max-content;
+  white-space: pre;
   user-select: none;
   -webkit-user-select: none;
   /* El ancla es el centro de la caja; el translate lo coloca por su centro. */

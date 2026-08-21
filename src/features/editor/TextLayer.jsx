@@ -96,7 +96,6 @@ export default function TextLayer({ texts, cells, selId, active, stageH, onSelec
           style={{
             left: `${(t.x ?? 0.5) * 100}%`,
             top: `${(t.y ?? 0.5) * 100}%`,
-            width: `${(t.w ?? 0.8) * 100}%`,
             transform: `translate(-50%, -50%) rotate(${t.rot || 0}deg)`,
             fontFamily: fontCss(t.font),
             fontSize: `${(t.size || 0.09) * stageH}px`,

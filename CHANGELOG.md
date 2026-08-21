@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.14.1 — 21 ago 2026
+
+- La **caja del texto se ajusta al contenido** en vez de ocupar un ancho fijo del 80%:
+  la selección queda pegada a las letras, sin espacio muerto ni sensación de invadir
+  la foto de al lado. Las líneas se parten solo con **Enter** (en "escribir").
+
 ## 4.14.0 — 21 ago 2026 · imanes (snapping) del texto
 
 - Al **arrastrar** un texto, su centro se **imanta** a los centros vertical/horizontal
