@@ -126,13 +126,13 @@ export default function PageStrip({
   }, [current, step, post.slides.length, onCenter]);
 
   return (
-    <div
-      className={s.holder}
-      /* En foco (Texto o Foto), tocar el negro (el propio contenedor, no la página ni
-         la celda) sube un nivel: vuelve a Página. La tira está difuminada y sin
-         captura, así que el toque llega aquí. */
-      onClick={(e) => { if ((photo || textFocus) && e.target === e.currentTarget) onExitFocus?.(); }}
-    >
+    <div className={s.holder}>
+      {/* En foco (Texto o Foto), un backdrop cubre TODA el área: tocar cualquier
+          parte del negro sube un nivel (vuelve a Página). El lienzo del foto/texto va
+          por encima (z mayor), así que sus gestos no lo disparan. */}
+      {(photo || textFocus) && (
+        <div className={s.backdrop} onClick={() => onExitFocus?.()} />
+      )}
       <div
         ref={scrollRef}
         className={[s.strip, locked && s.locked, (photo || textFocus) && s.dim, zoomEntry && s.zoomin]

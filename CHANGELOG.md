@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.21.1 — 21 ago 2026
+
+- "Tocar fuera para salir" en modo foco ahora cubre **todo el negro** del área (antes
+  solo respondía en parte): un backdrop capta el toque en cualquier zona vacía y sube a
+  Página; el lienzo del foto/texto queda por encima, así que sus gestos no lo disparan.
+
 ## 4.21.0 — 21 ago 2026
 
 - En modo foco (**Texto** y **Foto**), tocar el **fondo negro** (fuera de la página/celda)

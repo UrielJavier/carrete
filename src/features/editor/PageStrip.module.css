@@ -10,6 +10,14 @@
   height: 100%;
 }
 
+/* Backdrop del foco: cubre toda el área para que tocar cualquier negro salga a
+   Página. Va por encima de la tira difuminada pero por debajo del lienzo del foco. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .strip {
   display: flex;
   align-items: center;
@@ -77,6 +85,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
+  z-index: 2;
   transform: translate(-50%, -50%);
   overflow: hidden;
   outline: 1px solid var(--c-line);
