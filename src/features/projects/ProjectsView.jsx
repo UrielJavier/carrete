@@ -30,7 +30,6 @@ export default function ProjectsView({
     <>
       <div className={s.bar}>
         <Caption>Proyectos</Caption>
-        <Button onClick={onNew}>nuevo proyecto</Button>
       </div>
 
       {!!sorted.length && (
@@ -77,6 +76,16 @@ export default function ProjectsView({
           cuenta en los dos: la suma puede ser mayor que el espacio real.
         </Hint>
       )}
+
+      {/* Hueco para que el botón fijo no tape las últimas filas al hacer scroll. */}
+      <div className={s.spacer} />
+
+      {/* Botón principal, grande y fijo abajo (centrado): la acción estrella. */}
+      <div className={s.newbar}>
+        <Button variant="primary" className={s.newbtn} onClick={onNew}>
+          nuevo proyecto
+        </Button>
+      </div>
     </>
   );
 }

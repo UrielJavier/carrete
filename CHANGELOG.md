@@ -10,6 +10,11 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.16.3 — 21 ago 2026
+
+- El botón **nuevo proyecto** ahora es **grande y fijo abajo (centrado)**, siempre a
+  mano; la franja se difumina hacia el fondo para separarlo de la lista al hacer scroll.
+
 ## 4.16.2 — 21 ago 2026
 
 - El **número de versión** sale de la cabecera y vive en el **pie del menú**. El título

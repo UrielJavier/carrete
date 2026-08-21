@@ -76,3 +76,33 @@
   margin-top: var(--s-8);
   max-width: var(--stage-cap);
 }
+
+/* Deja sitio bajo la lista para que el botón fijo no tape la última fila. */
+.spacer {
+  height: 96px;
+}
+
+/* Botón "nuevo proyecto": grande y fijo abajo, centrado. La franja se difumina
+   hacia el fondo para separarlo del contenido que pasa por debajo al hacer scroll. */
+.newbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: var(--s-8) var(--s-8) calc(var(--s-8) + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--c-bg) 60%, transparent);
+  pointer-events: none;
+}
+
+.newbtn {
+  pointer-events: auto;
+  width: 100%;
+  max-width: var(--stage-cap);
+  justify-content: center;
+  padding: var(--s-6) var(--s-8);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
