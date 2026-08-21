@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.17.2 — 21 ago 2026
+
+- Texto del espacio en la Biblioteca más claro: **"N archivos · X usados · el navegador
+  te deja hasta ~Y"**. Antes ponía dos cifras casi iguales (nuestra suma y la del
+  navegador) junto al tope, y parecía que el máximo eran ~60 MB en vez de los GB reales.
+
 ## 4.17.1 — 21 ago 2026
 
 - Arreglado el **parpadeo** de la Biblioteca: el autoguardado renovaba el array de

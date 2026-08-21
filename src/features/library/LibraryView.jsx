@@ -82,9 +82,8 @@ export default function LibraryView({ projects, estimate, onAsk, say }) {
             <span><i className={s.dotVideo} /> Vídeos · {weight(t.videos)}</span>
           </div>
           <p className={s.total}>
-            {t.count} {t.count === 1 ? 'archivo' : 'archivos'} · {weight(t.total)}
-            {estimate?.usage != null && ` · el navegador tiene reservados ${weight(estimate.usage)}`}
-            {estimate?.quota ? ` de ${weight(estimate.quota)}` : ''}
+            {t.count} {t.count === 1 ? 'archivo' : 'archivos'} · <strong>{weight(t.total)}</strong> usados
+            {estimate?.quota ? ` · el navegador te deja hasta ~${weight(estimate.quota)}` : ''}
           </p>
         </div>
       )}
