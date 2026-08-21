@@ -55,6 +55,9 @@ export const Icon = {
     </S>
   ),
   menu: () => <S><path d="M4 7h16M4 12h16M4 17h16" /></S>,
+  play: () => (
+    <svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+  ),
   folder: () => <S><path d="M3 6h6l2 2h10v11H3z" /></S>,
   library: () => <S><path d="M4 5h4v14H4zM10 5h4v14h-4z" /><path d="M16 6l4 1-3 13-4-1z" /></S>,
   mail: () => <S><path d="M3 6h18v12H3z" /><path d="M3 7l9 6 9-6" /></S>,

@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { weight } from '../../core/format.js';
 import * as db from '../../core/db.js';
 import { Button, SegmentedControl, Caption, Hint } from '../../ui/primitives/index.js';
+import { Icon } from '../../ui/icons.jsx';
 import { loadLibrary, SORTS } from './loadLibrary.js';
 import s from './LibraryView.module.css';
 
@@ -10,6 +11,56 @@ const stamp = (t) => {
   const d = new Date(t);
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: '2-digit' });
 };
+
+/** Object URL del blob, creado una vez y liberado al desmontar (no copia el fichero). */
+function useBlobUrl(file) {
+  const url = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+  useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
+  return url;
+}
+
+/** Fila con miniatura (póster en vídeos). Al tocar la miniatura se abre el visor. */
+function LibraryRow({ f, onOpen, onDelete }) {
+  const url = useBlobUrl(f.file);
+  return (
+    <div className={[s.row, f.uses === 0 && s.orphan].filter(Boolean).join(' ')}>
+      <button type="button" className={s.thumb} onClick={() => url && onOpen(f)} title="Ver">
+        {url && f.type === 'video' && (
+          <>
+            <video src={url} muted playsInline preload="metadata" />
+            <span className={s.play}><Icon.play /></span>
+          </>
+        )}
+        {url && f.type !== 'video' && <img src={url} alt="" />}
+      </button>
+      <div className={s.info}>
+        <span className={s.name}>{f.name}</span>
+        <span className={s.meta}>
+          {weight(f.size)} · {f.uses === 0 ? 'sin usar' : `en ${f.projects} ${f.projects === 1 ? 'proyecto' : 'proyectos'}`}
+          {f.uses > 0 && ` · ${stamp(f.lastUsed)}`}
+        </span>
+      </div>
+      <Button onClick={onDelete} className={s.del}>borrar</Button>
+    </div>
+  );
+}
+
+/** Visor a pantalla: la foto entera o el vídeo con controles (para revisarlo). */
+function Viewer({ file, onClose }) {
+  const url = useBlobUrl(file?.file);
+  if (!file) return null;
+  return (
+    <div className={s.viewer} onClick={onClose}>
+      <button type="button" className={s.viewerClose} title="Cerrar"><Icon.close /></button>
+      <div className={s.viewerBody} onClick={(e) => e.stopPropagation()}>
+        {file.type === 'video'
+          ? <video src={url} controls playsInline autoPlay className={s.viewerMedia} />
+          : <img src={url} alt="" className={s.viewerMedia} />}
+        <p className={s.viewerMeta}>{file.name} · {weight(file.size)}</p>
+      </div>
+    </div>
+  );
+}
 
 /**
  * Biblioteca: TODO lo que ocupa espacio (fotos y vídeos), con su peso, en qué se usa
@@ -20,6 +71,7 @@ const stamp = (t) => {
 export default function LibraryView({ projects, estimate, onAsk, say }) {
   const [data, setData] = useState(null);
   const [sort, setSort] = useState('size');
+  const [view, setView] = useState(null); // fichero abierto en el visor
 
   /* El autoguardado renueva la identidad del array `projects` cada pocos cientos de
      ms; si el reload dependiera de él, la lista parpadearía. Se lee por ref y se carga
@@ -111,19 +163,7 @@ export default function LibraryView({ projects, estimate, onAsk, say }) {
           <p className={s.lead}>No hay archivos todavía. Al montar un carrusel aparecerán aquí.</p>
         )}
         {files.map((f) => (
-          <div key={f.id} className={[s.row, f.uses === 0 && s.orphan].filter(Boolean).join(' ')}>
-            <span className={[s.badge, f.type === 'video' ? s.vid : s.pho].join(' ')}>
-              {f.type === 'video' ? 'vídeo' : 'foto'}
-            </span>
-            <div className={s.info}>
-              <span className={s.name}>{f.name}</span>
-              <span className={s.meta}>
-                {weight(f.size)} · {f.uses === 0 ? 'sin usar' : `en ${f.projects} ${f.projects === 1 ? 'proyecto' : 'proyectos'}`}
-                {f.uses > 0 && ` · ${stamp(f.lastUsed)}`}
-              </span>
-            </div>
-            <Button onClick={() => del(f)} className={s.del}>borrar</Button>
-          </div>
+          <LibraryRow key={f.id} f={f} onOpen={setView} onDelete={() => del(f)} />
         ))}
       </div>
 
@@ -132,6 +172,8 @@ export default function LibraryView({ projects, estimate, onAsk, say }) {
         Todo vive en tu dispositivo. Si borras un archivo que usa un proyecto, ahí quedará
         un hueco (lo puedes volver a poner importándolo).
       </Hint>
+
+      <Viewer file={view} onClose={() => setView(null)} />
     </>
   );
 }

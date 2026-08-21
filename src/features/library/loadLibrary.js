@@ -35,6 +35,7 @@ export async function loadLibrary(projects) {
       name: rec.name || rec.file?.name || 'archivo',
       type: rec.type === 'video' ? 'video' : 'photo',
       size: rec.file?.size || 0,
+      file: rec.file || null, // el Blob, para miniatura y visor (Object URL, sin copiar)
       uses: u?.count || 0,
       projects: u ? u.projects.size : 0,
       lastUsed: u?.lastUsed || 0,

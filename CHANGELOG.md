@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.19.0 — 21 ago 2026 · miniaturas y visor en la Biblioteca
+
+- Cada archivo de la Biblioteca muestra ahora una **miniatura** (en vídeos, el fotograma
+  con un indicador de play).
+- Al tocarla se abre un **visor a pantalla**: la foto entera, o el vídeo con controles
+  para revisarlo. Todo desde el propio fichero local (Object URL, sin copiarlo).
+
 ## 4.18.0 — 21 ago 2026 · muchos más layouts
 
 - El catálogo de rejillas pasa de 12 a **28 layouts**: 2 celdas (iguales y desiguales),
