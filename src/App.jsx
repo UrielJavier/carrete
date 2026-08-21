@@ -47,7 +47,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.16.1';
+export const VERSION = '4.16.2';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -308,8 +308,6 @@ export default function App() {
 
   return (
     <AppShell
-      version={VERSION}
-      onHome={() => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } })}
       onMenu={() => setNavOpen(true)}
       fullscreen={fullscreen.active}
       onFullscreen={fullscreen.toggle}
@@ -577,6 +575,7 @@ export default function App() {
         onClose={() => setNavOpen(false)}
         footer={`Maqueta v${VERSION} · todo en tu dispositivo`}
         items={[
+          { type: 'caption', key: 'c-work', label: 'Trabajo' },
           {
             key: 'projects',
             icon: <Icon.folder />,
@@ -585,11 +584,12 @@ export default function App() {
             active: mode === 'projects',
             onClick: () => dispatch({ type: 'set', patch: { mode: 'projects', sel: null } }),
           },
+          { type: 'caption', key: 'c-help', label: 'Ayuda' },
           {
             key: 'feedback',
             icon: <Icon.mail />,
             label: 'Comentarios',
-            sub: 'escríbeme por correo',
+            sub: 'por correo (tú eliges a quién)',
             onClick: sendFeedback,
           },
         ]}

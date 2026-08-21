@@ -20,19 +20,23 @@ export default function NavDrawer({ open, items, footer, onClose }) {
         </div>
         <ul className={s.list}>
           {items.map((it) => (
-            <li key={it.key}>
-              <button
-                type="button"
-                className={[s.item, it.active && s.active].filter(Boolean).join(' ')}
-                onClick={() => { it.onClick(); onClose(); }}
-              >
-                <span className={s.ico}>{it.icon}</span>
-                <span className={s.labels}>
-                  <span className={s.label}>{it.label}</span>
-                  {it.sub && <span className={s.sub}>{it.sub}</span>}
-                </span>
-              </button>
-            </li>
+            it.type === 'caption' ? (
+              <li key={it.key} className={s.caption}>{it.label}</li>
+            ) : (
+              <li key={it.key}>
+                <button
+                  type="button"
+                  className={[s.item, it.active && s.active].filter(Boolean).join(' ')}
+                  onClick={() => { it.onClick(); onClose(); }}
+                >
+                  <span className={s.ico}>{it.icon}</span>
+                  <span className={s.labels}>
+                    <span className={s.label}>{it.label}</span>
+                    {it.sub && <span className={s.sub}>{it.sub}</span>}
+                  </span>
+                </button>
+              </li>
+            )
           ))}
         </ul>
         {footer && <div className={s.foot}>{footer}</div>}
