@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.13.0 — 21 ago 2026
+
+- Nueva herramienta **estilo**: **negrita** y **cursiva** por texto (toggles). Inter y
+  Serif traen cursiva propia; la Escrita se inclina de forma sintética (no tiene
+  cursiva real).
+- Nueva herramienta **interlineado**: espacio entre líneas, con puntitos (se nota en
+  textos de varias líneas).
+
 ## 4.12.1 — 21 ago 2026
 
 - **Giro** del texto con **botones** (vuelta 0/90/180/270 + ajuste fino ±½°), igual que

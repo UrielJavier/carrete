@@ -64,3 +64,11 @@
   font-size: 17px;
   line-height: 1;
 }
+
+/* Glifo "Bi" de la herramienta de estilo (negrita + cursiva). */
+.bi {
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 700;
+  font-style: italic;
+}

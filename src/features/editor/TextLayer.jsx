@@ -63,7 +63,9 @@ export default function TextLayer({ texts, selId, active, stageH, onSelect, onMo
             transform: `translate(-50%, -50%) rotate(${t.rot || 0}deg)`,
             fontFamily: fontCss(t.font),
             fontSize: `${(t.size || 0.09) * stageH}px`,
-            lineHeight: LINE_HEIGHT,
+            lineHeight: t.lh ?? LINE_HEIGHT,
+            fontWeight: t.bold ? 700 : 400,
+            fontStyle: t.italic ? 'italic' : 'normal',
             color: t.color || '#111111',
             textAlign: t.align || 'center',
           }}

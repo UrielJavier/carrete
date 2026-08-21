@@ -1,5 +1,5 @@
 import React from 'react';
-import { FONTS, fontCss, SIZE_STEPS, nearestStep } from '../../../core/text.js';
+import { FONTS, fontCss, SIZE_STEPS, LH_STEPS, nearestStep } from '../../../core/text.js';
 import { ToolBox, ToolRow, Field, Hint, ColorSwatches, Swatch, NotchSlider } from '../../../ui/primitives/index.js';
 import { Icon, RotGlyph } from '../../../ui/icons.jsx';
 import { HAPTIC, haptic } from '../../../hooks/useHaptics.js';
@@ -61,6 +61,57 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
             </button>
           ))}
         </div>
+      </>
+    );
+  }
+
+  if (tool === 'style') {
+    return (
+      <>
+        <Back label="estilo" sub="negrita y cursiva" onBack={() => onTool(null)} />
+        <div className={s.seg}>
+          <button
+            type="button"
+            className={[s.segbtn, text.bold && s.on].filter(Boolean).join(' ')}
+            style={{ fontWeight: 700 }}
+            onClick={() => onPatch({ bold: !text.bold }, true)}
+          >
+            Negrita
+          </button>
+          <button
+            type="button"
+            className={[s.segbtn, text.italic && s.on].filter(Boolean).join(' ')}
+            style={{ fontStyle: 'italic' }}
+            onClick={() => onPatch({ italic: !text.italic }, true)}
+          >
+            Cursiva
+          </button>
+        </div>
+        {text.font === 'hand' && (text.italic) && (
+          <Hint>la fuente Escrita no trae cursiva propia; se inclina de forma sintética.</Hint>
+        )}
+      </>
+    );
+  }
+
+  if (tool === 'leading') {
+    const index = nearestStep(LH_STEPS, text.lh ?? 1.25);
+    return (
+      <>
+        <Back label="interlineado" sub="espacio entre líneas" onBack={() => onTool(null)} />
+        <Field right={<span className={s.val}>{LH_STEPS[index].toFixed(2)}×</span>}>
+          <NotchSlider
+            steps={LH_STEPS}
+            index={index}
+            ariaLabel="Interlineado"
+            onStart={() => onPatch({}, true)}
+            onChange={(i, atStop) => {
+              haptic(atStop ? HAPTIC.stop : HAPTIC.step);
+              onPatch({ lh: LH_STEPS[i] }, false);
+            }}
+          />
+        </Field>
+        <Hint>solo se nota en textos de varias líneas.</Hint>
       </>
     );
   }
@@ -154,7 +205,9 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
       <ToolRow>
         <ToolBox icon={<Icon.text />} label="escribir" onClick={() => onTool('write')} />
         <ToolBox icon={<AaGlyph font={text.font} />} label="fuente" onClick={() => onTool('font')} />
+        <ToolBox icon={<span className={s.bi}>Bi</span>} label="estilo" onClick={() => onTool('style')} />
         <ToolBox icon={<Icon.size />} label="tamaño" onClick={() => onTool('size')} />
+        <ToolBox icon={<Icon.leading />} label="interlineado" onClick={() => onTool('leading')} />
         <ToolBox icon={<Icon.align />} label="alinear" onClick={() => onTool('align')} />
         <ToolBox icon={<Swatch color={text.color} />} label="color" onClick={() => onTool('color')} />
         <ToolBox icon={<RotGlyph deg={text.rot || 0} />} label="giro" onClick={() => onTool('rot')} />
