@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.18.0 — 21 ago 2026 · muchos más layouts
+
+- El catálogo de rejillas pasa de 12 a **28 layouts**: 2 celdas (iguales y desiguales),
+  3, 4, 5, 6 (3×2 y 2×3) y **9 (3×3)**, además de asimétricos (izq./arriba grande + resto,
+  1 grande + esquina, etc.). **Todos gratis** — aquí no hay layouts de pago.
+- El selector de layout ahora **envuelve en cuadrícula** con scroll, en vez de una tira
+  horizontal, para verlos de un vistazo.
+- Guardarraíl: un test comprueba que cada layout **parte la página** sin huecos ni
+  solapes.
+
 ## 4.17.2 — 21 ago 2026
 
 - Texto del espacio en la Biblioteca más claro: **"N archivos · X usados · el navegador

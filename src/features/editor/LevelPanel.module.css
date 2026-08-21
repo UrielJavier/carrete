@@ -115,11 +115,15 @@
 
 /* Selector de rejillas: zona tocable de 44px, que es lo que reclamaba el
    navegador cuando estaban demasiado juntas. */
+/* Cuadrícula que envuelve: con muchos layouts, una sola tira horizontal obligaría a
+   un scroll larguísimo. Se reparten en filas y se hace scroll vertical con un tope. */
 .layouts {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--hit), 1fr));
   gap: var(--s-5);
-  overflow-x: auto;
-  padding-bottom: 2px;
+  max-height: 42vh;
+  overflow-y: auto;
+  padding: 2px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
