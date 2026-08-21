@@ -42,6 +42,21 @@ export async function ensureFonts() {
 
 export const LINE_HEIGHT = 1.25;
 
+/* Tamaños de letra como fracción de la altura de página, en pasos con "puntitos"
+   (como el gap). Cubren desde un pie de foto discreto hasta un titular grande. */
+export const SIZE_STEPS = [0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.11, 0.13, 0.16, 0.19, 0.23, 0.28];
+
+/** Índice del paso más cercano a un valor (para arrancar el deslizador). */
+export function nearestStep(steps, value) {
+  let best = 0;
+  let bestD = Infinity;
+  steps.forEach((v, i) => {
+    const d = Math.abs(v - value);
+    if (d < bestD) { bestD = d; best = i; }
+  });
+  return best;
+}
+
 export function newText(overrides = {}) {
   return {
     id: uid(),

@@ -1,8 +1,10 @@
 import React from 'react';
-import { FONTS, fontCss } from '../../../core/text.js';
-import { ToolBox, ToolRow, Field, Hint, ColorSwatches, Swatch } from '../../../ui/primitives/index.js';
+import { FONTS, fontCss, SIZE_STEPS, nearestStep } from '../../../core/text.js';
+import { ToolBox, ToolRow, Field, Hint, ColorSwatches, Swatch, NotchSlider } from '../../../ui/primitives/index.js';
 import { Icon, RotGlyph } from '../../../ui/icons.jsx';
+import { HAPTIC, haptic } from '../../../hooks/useHaptics.js';
 import { Back } from './PostPanel.jsx';
+import { RotateControls } from './PhotoPanel.jsx';
 import s from './TextPanel.module.css';
 
 const COLORS = ['#ffffff', '#000000', '#e11d48', '#2563eb', '#f59e0b'];
@@ -27,7 +29,7 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
   if (tool === 'write') {
     return (
       <>
-        <Back label="escribir" sub="contenido y alineación" onBack={() => onTool(null)} />
+        <Back label="escribir" sub="el contenido del texto" onBack={() => onTool(null)} />
         <Field label="texto">
           <textarea
             className={s.area}
@@ -39,20 +41,26 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
             onBlur={() => onPatch({}, true)}
           />
         </Field>
-        <Field label="alineación">
-          <div className={s.seg}>
-            {ALIGNS.map((a) => (
-              <button
-                key={a.key}
-                type="button"
-                className={[s.segbtn, (text.align || 'center') === a.key && s.on].filter(Boolean).join(' ')}
-                onClick={() => onPatch({ align: a.key }, true)}
-              >
-                {a.label}
-              </button>
-            ))}
-          </div>
-        </Field>
+      </>
+    );
+  }
+
+  if (tool === 'align') {
+    return (
+      <>
+        <Back label="alineación" sub="cómo se alinea el texto" onBack={() => onTool(null)} />
+        <div className={s.seg}>
+          {ALIGNS.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              className={[s.segbtn, (text.align || 'center') === a.key && s.on].filter(Boolean).join(' ')}
+              onClick={() => onPatch({ align: a.key }, true)}
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
       </>
     );
   }
@@ -79,19 +87,23 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
   }
 
   if (tool === 'size') {
+    const index = nearestStep(SIZE_STEPS, text.size);
     return (
       <>
         <Back label="tamaño" sub="alto de la letra" onBack={() => onTool(null)} />
-        <input
-          className={s.range}
-          type="range"
-          min={0.03}
-          max={0.3}
-          step={0.005}
-          value={text.size}
-          onChange={(e) => onPatch({ size: Number(e.target.value) }, false)}
-          onPointerUp={() => onPatch({}, true)}
-        />
+        <Field right={<span className={s.val}>{Math.round(SIZE_STEPS[index] * 100)}%</span>}>
+          <NotchSlider
+            steps={SIZE_STEPS}
+            index={index}
+            ariaLabel="Tamaño del texto"
+            onStart={() => onPatch({}, true)}
+            onChange={(i, atStop) => {
+              haptic(atStop ? HAPTIC.stop : HAPTIC.step);
+              onPatch({ size: SIZE_STEPS[i] }, false);
+            }}
+          />
+        </Field>
+        <Hint>en % del alto de la página, así se ve igual a cualquier resolución.</Hint>
       </>
     );
   }
@@ -99,18 +111,8 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
   if (tool === 'rot') {
     return (
       <>
-        <Back label="giro" sub="inclina el texto" onBack={() => onTool(null)} />
-        <input
-          className={s.range}
-          type="range"
-          min={-180}
-          max={180}
-          step={1}
-          value={text.rot || 0}
-          onChange={(e) => onPatch({ rot: Number(e.target.value) }, false)}
-          onPointerUp={() => onPatch({}, true)}
-        />
-        <Hint>{`${text.rot || 0}°`}</Hint>
+        <Back label="giro" sub="gira o endereza el texto" onBack={() => onTool(null)} />
+        <RotateControls rot={text.rot || 0} onSet={(deg) => onPatch({ rot: deg }, true)} />
       </>
     );
   }
@@ -153,6 +155,7 @@ export default function TextPanel({ text, tool, onTool, onPatch, onReorder, onRe
         <ToolBox icon={<Icon.text />} label="escribir" onClick={() => onTool('write')} />
         <ToolBox icon={<AaGlyph font={text.font} />} label="fuente" onClick={() => onTool('font')} />
         <ToolBox icon={<Icon.size />} label="tamaño" onClick={() => onTool('size')} />
+        <ToolBox icon={<Icon.align />} label="alinear" onClick={() => onTool('align')} />
         <ToolBox icon={<Swatch color={text.color} />} label="color" onClick={() => onTool('color')} />
         <ToolBox icon={<RotGlyph deg={text.rot || 0} />} label="giro" onClick={() => onTool('rot')} />
         <ToolBox icon={<Icon.front />} label="orden" onClick={() => onTool('order')} />

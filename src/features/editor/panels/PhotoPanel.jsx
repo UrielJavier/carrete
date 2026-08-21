@@ -89,7 +89,7 @@ export default function PhotoPanel({
  * quedas en 91,5° en lugar de perder el ajuste. El valor del medio es tambien el
  * boton de volver a recto, asi que no hace falta un control aparte.
  */
-function RotateControls({ rot, onSet }) {
+export function RotateControls({ rot, onSet }) {
   const { base, off } = splitRotation(rot);
   const label = `${off > 0 ? '+' : off < 0 ? '−' : ''}${String(Math.abs(off)).replace('.', ',')}°`;
   return (

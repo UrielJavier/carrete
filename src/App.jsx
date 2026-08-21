@@ -46,7 +46,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.12.0';
+export const VERSION = '4.12.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -147,7 +147,10 @@ export default function App() {
      queda. Lo demas lo decide el usuario con las pestañas. */
   useEffect(() => {
     if (level === 'photo' && !selImage) dispatch({ type: 'level', level: 'page' });
-  }, [level, selImage]);
+    /* Igual con el texto: si el seleccionado deja de existir (p.ej. tras deshacer),
+       se sube a Página en vez de quedar en un nivel Texto vacío. */
+    if (level === 'text' && !selText) dispatch({ type: 'level', level: 'page' });
+  }, [level, selImage, selText]);
 
   /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
      aún conserva el nivel del que se viene. */

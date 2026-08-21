@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.12.1 — 21 ago 2026
+
+- **Giro** del texto con **botones** (vuelta 0/90/180/270 + ajuste fino ±½°), igual que
+  la foto, para más precisión.
+- **Tamaño** con **puntitos** (deslizador por pasos, como el gap), mostrando el % del
+  alto de página.
+- **Alineación** separada de **escribir**: cada una es su propia herramienta.
+
 ## 4.12.0 — 21 ago 2026 · texto como nivel propio
 
 - **Texto es ahora un nivel** en el breadcrumb: `Carrusel › Página › Texto`, igual que

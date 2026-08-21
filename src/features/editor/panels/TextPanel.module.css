@@ -54,9 +54,9 @@
   stroke-width: 1.7;
 }
 
-.range {
-  width: 100%;
-  accent-color: var(--c-accent);
+.val {
+  font: var(--fs-sm) / 1 var(--font-mono);
+  color: var(--c-text-dim);
 }
 
 /* Glifo "Aa" de la herramienta de fuente. */
