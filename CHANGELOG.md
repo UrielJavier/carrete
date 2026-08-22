@@ -10,6 +10,13 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.22.0 — 22 ago 2026
+
+- Nueva proporción **9:16** para **stories/reels** (pantalla completa, 1080×1920).
+- Cada proporción muestra ahora una **descripción** al elegirla: cuadrado (clásico),
+  vertical, la más alargada (máximo feed), apaisado (paisajes), pantalla completa
+  (stories). Sustituye la vieja nota fija del 3:4.
+
 ## 4.21.2 — 21 ago 2026
 
 - "Tocar fuera para salir" ahora también funciona en el **eje vertical** (franja negra

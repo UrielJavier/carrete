@@ -5,10 +5,12 @@
  */
 
 export const RATIOS = {
-  '4:5': { w: 1440, h: 1800, label: '4:5' },
-  '3:4': { w: 1440, h: 1920, label: '3:4' },
-  '1:1': { w: 1440, h: 1440, label: '1:1' },
-  '1.91:1': { w: 1440, h: 754, label: '1.91' },
+  '4:5': { w: 1440, h: 1800, label: '4:5', desc: 'Vertical — buen equilibrio, ocupa bastante feed.' },
+  '3:4': { w: 1440, h: 1920, label: '3:4', desc: 'La más alargada — ocupa el máximo del feed.' },
+  '1:1': { w: 1440, h: 1440, label: '1:1', desc: 'Cuadrado — el toque clásico.' },
+  '1.91:1': { w: 1440, h: 754, label: '1.91', desc: 'Apaisado — para paisajes y horizontales.' },
+  /* Stories / Reels: pantalla completa, 9:16 (1080×1920 al exportar). */
+  '9:16': { w: 1440, h: 2560, label: '9:16', desc: 'Pantalla completa — para stories y reels.' },
 };
 
 const r = (x, y, w, h) => ({ x, y, w, h });

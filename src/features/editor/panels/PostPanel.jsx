@@ -65,12 +65,12 @@ export default function PostPanel({
                 onClick={() => onSetting({ ratio: k })}
               >
                 <RatioGlyph ratio={k} />
-                <span>{RATIOS[k].label}{k === '3:4' ? ' *' : ''}</span>
+                <span>{RATIOS[k].label}</span>
               </button>
             ))}
           </div>
         </Field>
-        <Hint>* 3:4 es la más alargada.</Hint>
+        <Hint>{RATIOS[post.ratio]?.desc}</Hint>
       </>
     );
   }
