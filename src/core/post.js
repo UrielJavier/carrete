@@ -23,6 +23,8 @@ export const newPost = () => ({
   fmt: 'png',
   /* Área segura (guía de edición para el texto): 0 = desactivada. No se exporta. */
   safe: 0,
+  /* Relleno de los huecos (contain): 'color' plano o 'blur' (la foto desenfocada). */
+  fill: 'color',
   slides: [newSlide('full')],
 });
 

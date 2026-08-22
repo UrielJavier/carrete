@@ -169,6 +169,8 @@ export default function PageStrip({
                   tool={tool}
                   showThirds={showThirds}
                   guardRef={guardRef}
+                  fill={post.fill}
+                  blurPx={c.rect.w * stageW * 0.022}
                   dimmed={active && selHere && c.cellIndex !== sel.cellIndex}
                   onSelect={() => onSelect(c.cellIndex)}
                   onOpen={() => onOpen(c.cellIndex)}
@@ -256,6 +258,8 @@ export default function PageStrip({
             tool={tool}
             showThirds={showThirds}
             guardRef={guardRef}
+            fill={post.fill}
+            blurPx={focusW * 0.022}
             onSelect={() => onSelect(focusCell.cellIndex)}
             onOpen={() => {}}
             onTransform={(t, history) => onTransform(focusCell.cellIndex, t, history)}
@@ -282,6 +286,7 @@ export default function PageStrip({
             ratio={post.ratio}
             bg={post.bg}
             getSource={focusSrc}
+            fill={post.fill}
             style={{ width: '100%', height: '100%', display: 'block' }}
           />
           {safe && (

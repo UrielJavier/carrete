@@ -22,7 +22,7 @@ export default function StoriesView({ post, cells, getSource }) {
         <div className={[s.frame, post.bg === TRANSPARENT && 'checker'].filter(Boolean).join(' ')}>
           <RegionCanvas
             cells={cells} index={index} ratio={post.ratio} bg={post.bg}
-            getSource={getSource} texts={sl?.texts} className={s.canvas}
+            getSource={getSource} texts={sl?.texts} className={s.canvas} fill={post.fill}
           />
 
           {/* Barritas de progreso: llenas hasta la story actual. */}

@@ -99,8 +99,18 @@ export default function PostPanel({
   if (tool === 'bg') {
     return (
       <>
-        <Back label="color" sub="el fondo del post" onBack={onBack} />
-        <Field>
+        <Back label="color" sub="fondo y relleno de huecos" onBack={onBack} />
+        <Field label="relleno de huecos">
+          <SegmentedControl
+            value={post.fill || 'color'}
+            onChange={(v) => onSetting({ fill: v })}
+            options={[
+              { value: 'color', label: 'Color' },
+              { value: 'blur', label: 'Foto borrosa' },
+            ]}
+          />
+        </Field>
+        <Field label="color">
           <ColorSwatches
             value={post.bg}
             presets={BGS}
@@ -109,6 +119,9 @@ export default function PostPanel({
             onCustom={(c) => { onCustomBg(c); onSetting({ bg: c }); }}
           />
         </Field>
+        {post.fill === 'blur' && (
+          <Hint>los huecos se rellenan con la propia foto ampliada y desenfocada; el color se usa en la separación entre fotos.</Hint>
+        )}
         {post.bg === TRANSPARENT && (
           <Hint>
             los huecos quedan vacíos y se exporta en PNG. Instagram aplana la

@@ -82,6 +82,7 @@ export async function exportPost({ post, cells, images, onProgress }) {
         vidCell,
         staticSrc: local,
         texts: post.slides[i].texts,
+        fill: post.fill,
         onProgress: (f, tot) => onProgress?.(i + 1, post.slides.length, { frame: f, frames: tot }),
       });
       out.push({
@@ -95,7 +96,7 @@ export async function exportPost({ post, cells, images, onProgress }) {
     }
 
     const ctx = cv.getContext('2d');
-    drawRegion(ctx, cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null);
+    drawRegion(ctx, cells, i, EXW, EXH, post.bg, (id) => local.get(id) || null, post.fill);
     /* Textos SIEMPRE encima de las fotos. */
     drawTexts(ctx, post.slides[i].texts, EXW, EXH);
 

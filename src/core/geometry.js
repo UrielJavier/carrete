@@ -98,7 +98,11 @@ export function postCells(post) {
  * las miniaturas y el export: una sola fuente de verdad, asi que lo que ves es
  * lo que exportas.
  */
-export function drawRegion(ctx, cells, x0, sw, sh, bg, getSource) {
+/* Fracción del ancho del lienzo usada como radio de desenfoque del relleno. Relativa
+   a la resolución, así el preview y el export se ven igual. */
+const BLUR_FRAC = 0.022;
+
+export function drawRegion(ctx, cells, x0, sw, sh, bg, getSource, fill) {
   /* Un fondo transparente deja los huecos vacios con alfa 0, para poder componer
      la pagina sobre un video en otra herramienta. Ojo: Instagram no admite
      transparencia y aplana el alfa, asi que esto es un paso intermedio, no algo
@@ -130,6 +134,18 @@ export function drawRegion(ctx, cells, x0, sw, sh, bg, getSource) {
     ctx.beginPath();
     ctx.rect(rx, ry, rw, rh);
     ctx.clip();
+    /* Relleno de huecos con la propia foto ampliada y borrosa (en vez del color):
+       se cubre la celda entera con la imagen a COVER, oversized, desenfocada; luego
+       encima va la foto nítida en contain. */
+    if (fill === 'blur') {
+      const cellA = rw / rh;
+      let bw = ia > cellA ? rh * ia : rw;
+      let bh = ia > cellA ? rh : rw / ia;
+      bw *= 1.08; bh *= 1.08;
+      ctx.filter = `blur(${Math.max(1, sw * BLUR_FRAC)}px)`;
+      ctx.drawImage(src.el, rx + (rw - bw) / 2, ry + (rh - bh) / 2, bw, bh);
+      ctx.filter = 'none';
+    }
     ctx.drawImage(src.el, rx + rw / 2 - t.fx * dw, ry + rh / 2 - t.fy * dh, dw, dh);
     ctx.restore();
   }

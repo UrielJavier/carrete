@@ -19,6 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
+  fill, blurPx = 8,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -83,11 +84,26 @@ export default function Cell({
   };
 
   /* La celda pinta un <video> si el medio es vídeo, y una <img> si es foto; el
-     encuadre (posición/escala) es idéntico. */
-  const media = image.type === 'video' ? (
-    <video ref={vidRef} src={image.url} style={imgStyle} muted loop playsInline autoPlay preload="auto" />
-  ) : (
-    <img src={image.url} alt="" draggable={false} style={imgStyle} />
+     encuadre (posición/escala) es idéntico. Si el relleno es 'blur', detrás va una
+     capa a COVER, ampliada y desenfocada, que tapa los huecos con la propia foto (en
+     vídeo se usa el póster para no montar dos vídeos por celda). */
+  const media = (
+    <>
+      {fill === 'blur' && (
+        <img
+          className={s.blurfill}
+          src={image.type === 'video' ? image.el?.src : image.url}
+          alt=""
+          draggable={false}
+          style={{ filter: `blur(${blurPx}px)` }}
+        />
+      )}
+      {image.type === 'video' ? (
+        <video ref={vidRef} src={image.url} style={imgStyle} muted loop playsInline autoPlay preload="auto" />
+      ) : (
+        <img src={image.url} alt="" draggable={false} style={imgStyle} />
+      )}
+    </>
   );
 
   const moving = level === 'page' && tool === 'move';

@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.25.0 — 22 ago 2026 · fondo con foto desenfocada
+
+- Nuevo **relleno de huecos** para el modo *contain*: además de color plano, ahora
+  puedes rellenar las franjas con la **propia foto ampliada y desenfocada** (el efecto
+  clásico de IG/TikTok). Se elige en **color → relleno de huecos: Color / Foto borrosa**.
+- Se ve igual en el editor, feed, perfil, miniaturas y **export** (imagen y vídeo);
+  misma fuente de verdad (`drawRegion`). El color sigue usándose en la separación entre
+  fotos.
+
 ## 4.24.0 — 22 ago 2026
 
 - **Márgenes de seguridad del sistema** (`safe-area-inset`): el contenido ya no queda

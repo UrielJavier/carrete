@@ -144,7 +144,7 @@ export default function PostRail({
           onDoubleClick={() => onOpen(i)}
         >
           <RegionCanvas
-            cells={cells} index={i} ratio={post.ratio} bg={post.bg} getSource={getSource} texts={sl.texts} res={300}
+            cells={cells} index={i} ratio={post.ratio} bg={post.bg} getSource={getSource} texts={sl.texts} fill={post.fill} res={300}
             style={{ width: tileW, height: tileH }}
           />
           <span className={s.num}>{String(i + 1).padStart(2, '0')}</span>

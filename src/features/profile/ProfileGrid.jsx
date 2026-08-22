@@ -13,7 +13,7 @@ export default function ProfileGrid({ post, cells, getSource }) {
       <div className={s.mosaic} style={{ marginTop: 'var(--s-4)' }}>
         <div className={s.tile}>
           <RegionCanvas
-            cells={cells} index={0} ratio={post.ratio} bg={post.bg} getSource={getSource} texts={post.slides[0]?.texts} res={540}
+            cells={cells} index={0} ratio={post.ratio} bg={post.bg} getSource={getSource} texts={post.slides[0]?.texts} fill={post.fill} res={540}
             style={{
               width: `${100 / cropPct}%`,
               left: `${-50 * (1 / cropPct - 1)}%`,

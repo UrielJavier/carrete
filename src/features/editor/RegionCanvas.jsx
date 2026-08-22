@@ -10,7 +10,7 @@ import { drawTexts } from '../../core/text.js';
  *
  * La resolucion interna es fija y el CSS la escala: asi no depende de mediciones.
  */
-export default function RegionCanvas({ cells, index, ratio, bg, getSource, texts, res = 1080, style, className }) {
+export default function RegionCanvas({ cells, index, ratio, bg, getSource, texts, fill, res = 1080, style, className }) {
   const ref = useRef(null);
   const R = RATIOS[ratio];
 
@@ -20,10 +20,10 @@ export default function RegionCanvas({ cells, index, ratio, bg, getSource, texts
     cv.width = res;
     cv.height = Math.round((res * R.h) / R.w);
     const ctx = cv.getContext('2d');
-    drawRegion(ctx, cells, index, cv.width, cv.height, bg, getSource);
+    drawRegion(ctx, cells, index, cv.width, cv.height, bg, getSource, fill);
     /* Los textos van SIEMPRE encima de las fotos, en la misma fuente de verdad. */
     drawTexts(ctx, texts, cv.width, cv.height);
-  }, [cells, index, ratio, bg, getSource, texts, res, R.h, R.w]);
+  }, [cells, index, ratio, bg, getSource, texts, fill, res, R.h, R.w]);
 
   return <canvas ref={ref} className={className} style={style} />;
 }
