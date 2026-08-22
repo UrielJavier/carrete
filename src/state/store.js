@@ -241,6 +241,32 @@ export function reducer(state, action) {
       return withHistory(state, { ...state, images: imagesNext, post: { ...state.post, groups } });
     }
 
+    case 'leaveGroup': {
+      /* Saca UNA celda de su grupo (la que se toca). Si el grupo queda con menos de
+         dos celdas, se disuelve del todo (un grupo de una no tiene sentido). */
+      const slide = state.post.slides[action.slideIndex];
+      const gid = slide?.cells[action.cellIndex]?.group;
+      if (!gid) return state;
+      let post = replaceSlide(state.post, action.slideIndex, {
+        ...slide,
+        cells: slide.cells.map((c, i) => (i === action.cellIndex ? { ...c, group: undefined } : c)),
+      });
+      const remaining = post.slides.reduce((n, s) => n + s.cells.filter((c) => c.group === gid).length, 0);
+      if (remaining < 2) {
+        const groups = { ...(post.groups || {}) };
+        delete groups[gid];
+        post = {
+          ...post,
+          groups,
+          slides: post.slides.map((s) => ({
+            ...s,
+            cells: s.cells.map((c) => (c.group === gid ? { ...c, group: undefined } : c)),
+          })),
+        };
+      }
+      return withHistory(state, { ...state, post, sel: null });
+    }
+
     case 'unmergeGroup': {
       const groups = { ...(state.post.groups || {}) };
       delete groups[action.groupId];

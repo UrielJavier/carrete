@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.28.0';
+export const VERSION = '4.28.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -426,7 +426,7 @@ export default function App() {
                     /* En modo grupos: tocar una celda ya unida la separa; tocar una
                        suelta la va marcando para unir. */
                     const gid = post.slides[current]?.cells[cellIndex]?.group;
-                    if (gid) { dispatch({ type: 'unmergeGroup', groupId: gid }); return; }
+                    if (gid) { dispatch({ type: 'leaveGroup', slideIndex: current, cellIndex }); return; }
                     setMergeSel((prev) => (prev.includes(cellIndex)
                       ? prev.filter((x) => x !== cellIndex) : [...prev, cellIndex]));
                   } else {

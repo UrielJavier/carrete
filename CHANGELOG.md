@@ -10,6 +10,11 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.28.1 — 22 ago 2026
+
+- En **grupos**, tocar una celda unida saca **solo esa celda** del grupo (antes deshacía
+  todo el grupo). Si el grupo queda con menos de dos celdas, se disuelve entero.
+
 ## 4.28.0 — 22 ago 2026
 
 - La herramienta se llama ahora **grupos** y hace las dos cosas: tocas celdas sueltas
