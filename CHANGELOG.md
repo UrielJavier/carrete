@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.31.1 — 22 ago 2026
+
+- Arreglado **borrar** la foto de un grupo (en Foto): antes quitaba la foto compartida
+  pero las celdas volvían a mostrar su foto de antes de unir y quedabas atascado. Ahora
+  vacía la foto del grupo **y** las de sus celdas (grupo vacío limpio) y sale a Página.
+
 ## 4.31.0 — 22 ago 2026 · unir entre páginas
 
 - **Unir celdas entre páginas**: en la herramienta **grupos** puedes deslizar a otras

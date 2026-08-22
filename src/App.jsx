@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.31.0';
+export const VERSION = '4.31.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -186,11 +186,11 @@ export default function App() {
   /* El nivel Foto no puede existir sin foto: es el unico ajuste automatico que
      queda. Lo demas lo decide el usuario con las pestañas. */
   useEffect(() => {
-    if (level === 'photo' && !selImage && !editGroup) dispatch({ type: 'level', level: 'page' });
+    if (level === 'photo' && !selImage && !editGroupImage) dispatch({ type: 'level', level: 'page' });
     /* Igual con el texto: si el seleccionado deja de existir (p.ej. tras deshacer),
        se sube a Página en vez de quedar en un nivel Texto vacío. */
     if (level === 'text' && !selText) dispatch({ type: 'level', level: 'page' });
-  }, [level, selImage, selText, editGroup]);
+  }, [level, selImage, selText, editGroupImage]);
 
   /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
      aún conserva el nivel del que se viene. */
@@ -576,7 +576,7 @@ export default function App() {
                   ? library.ingestToGroup(files, editGroupId)
                   : library.ingest(files, sel.slideIndex, sel.cellIndex))}
                 onRemove={() => (editGroup
-                  ? dispatch({ type: 'setGroupImage', groupId: editGroupId, added: [] })
+                  ? dispatch({ type: 'clearGroupImage', groupId: editGroupId })
                   : dispatch({
                     type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
                     patch: { imgId: null, t: newT() }, history: true,

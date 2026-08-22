@@ -280,6 +280,19 @@ export function reducer(state, action) {
       return withHistory(state, { ...state, post, sel: null });
     }
 
+    case 'clearGroupImage': {
+      /* Quita la foto del grupo Y las fotos propias de sus celdas, dejando un grupo
+         vacío limpio (si no, las celdas volvían a enseñar su foto de antes de unir). */
+      const g = (state.post.groups || {})[action.groupId];
+      if (!g) return state;
+      const groups = { ...state.post.groups, [action.groupId]: { ...g, imgId: null } };
+      const slides = state.post.slides.map((s) => ({
+        ...s,
+        cells: s.cells.map((c) => (c.group === action.groupId ? { ...c, imgId: null, t: newT() } : c)),
+      }));
+      return withHistory(state, { ...state, post: { ...state.post, slides, groups }, sel: null });
+    }
+
     case 'unmergeGroup': {
       const groups = { ...(state.post.groups || {}) };
       delete groups[action.groupId];
