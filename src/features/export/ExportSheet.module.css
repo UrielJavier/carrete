@@ -4,6 +4,9 @@
   z-index: var(--z-overlay);
   background: rgba(10, 10, 10, 0.97);
   overflow-y: auto;
+  /* Es un overlay fijo (fuera del #root con márgenes), así que respeta los suyos. */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bar {

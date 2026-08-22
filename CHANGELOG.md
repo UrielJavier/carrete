@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.24.0 — 22 ago 2026
+
+- **Márgenes de seguridad del sistema** (`safe-area-inset`): el contenido ya no queda
+  tapado por la **barra de gestos de Android** (abajo) ni por el notch (arriba en
+  pantalla completa). Aplicado al layout general y a la hoja de export.
+
 ## 4.23.1 — 22 ago 2026
 
 - El selector de **proporción** vuelve a ir en **una sola fila** (con scroll si hace
