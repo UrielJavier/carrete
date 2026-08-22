@@ -10,6 +10,11 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.31.2 — 22 ago 2026
+
+- Al editar la foto de un grupo, ahora se **atenúan las celdas que no son del grupo**,
+  así solo destacan las suyas (antes se veía toda la página igual de destacada).
+
 ## 4.31.1 — 22 ago 2026
 
 - Arreglado **borrar** la foto de un grupo (en Foto): antes quitaba la foto compartida

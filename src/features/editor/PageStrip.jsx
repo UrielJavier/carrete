@@ -90,6 +90,9 @@ export default function PageStrip({
   const focusCell = groupEdit ? null : selCellOnPage;
   const frameCell = groupEdit ? selCellOnPage : null;
   const frameImg = frameCell?.groupImgId ? images[frameCell.groupImgId] : null;
+  /* Al editar un grupo, se atenúa todo lo que NO es de ese grupo, para que solo
+     destaquen sus celdas. */
+  const editGroupId = frameCell?.group || null;
   const focusImage = focusCell?.imgId ? images[focusCell.imgId] : null;
   let focusW = 0;
   let focusH = 0;
@@ -185,7 +188,8 @@ export default function PageStrip({
                   guardRef={guardRef}
                   fill={post.fill}
                   blurPx={c.rect.w * stageW * 0.022}
-                  dimmed={active && selHere && c.cellIndex !== sel.cellIndex}
+                  dimmed={(active && selHere && c.cellIndex !== sel.cellIndex)
+                    || (groupEdit && c.group !== editGroupId)}
                   onSelect={() => onSelect(c.cellIndex)}
                   onOpen={() => onOpen(c.cellIndex)}
                   onFiles={(files) => onFiles(files, c.cellIndex)}
