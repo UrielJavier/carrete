@@ -42,11 +42,11 @@ export default function PagePanel({
   if (tool === 'merge') {
     return (
       <>
-        <Back label="unir" sub="una foto para varias celdas" onBack={onBack} />
+        <Back label="grupos" sub="unir y separar celdas" onBack={onBack} />
         <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
           {mergeCount < 2 ? 'toca 2 o más celdas' : `Unir ${mergeCount} celdas`}
         </Button>
-        <Hint>toca las celdas contiguas que quieras unir; compartirán una foto que las cubre (los huecos hacen de rejilla).</Hint>
+        <Hint>toca celdas contiguas para unirlas (compartirán una foto) · toca una celda ya unida para separarla.</Hint>
       </>
     );
   }
@@ -60,16 +60,13 @@ export default function PagePanel({
           onClick={() => onTool('layout')} />
         <ToolBox icon={<Icon.move />} label="mover" disabled={photoCount < 2}
           disabledReason={onNeedTwo} onClick={() => onTool('move')} />
-        <ToolBox icon={<Icon.merge />} label="unir" disabled={cellCount < 2}
+        <ToolBox icon={<Icon.merge />} label="grupos" disabled={cellCount < 2}
           onClick={() => onTool('merge')} />
         <ToolBox icon={<Icon.text />} label="texto" onClick={onAddText} />
         <ToolBox icon={<Icon.trash />} label="borrar" danger onClick={onDelete} />
       </ToolRow>
       {group ? (
-        <div className={s.groupinfo}>
-          <span>Celdas unidas · grupo de {group.count}</span>
-          <Button danger onClick={onUnmerge}>desunir</Button>
-        </div>
+        <Hint>celdas unidas · grupo de {group.count} · usa <strong>grupos</strong> para separarlas.</Hint>
       ) : (
         <Hint>
           {totalPages > 1

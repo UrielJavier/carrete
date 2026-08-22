@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.27.1';
+export const VERSION = '4.28.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -423,6 +423,10 @@ export default function App() {
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => {
                   if (tool === 'merge') {
+                    /* En modo grupos: tocar una celda ya unida la separa; tocar una
+                       suelta la va marcando para unir. */
+                    const gid = post.slides[current]?.cells[cellIndex]?.group;
+                    if (gid) { dispatch({ type: 'unmergeGroup', groupId: gid }); return; }
                     setMergeSel((prev) => (prev.includes(cellIndex)
                       ? prev.filter((x) => x !== cellIndex) : [...prev, cellIndex]));
                   } else {

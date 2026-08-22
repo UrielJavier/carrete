@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.28.0 — 22 ago 2026
+
+- La herramienta se llama ahora **grupos** y hace las dos cosas: tocas celdas sueltas
+  para **unirlas**; tocas una celda ya unida para **separarla** (sin botón aparte). El
+  botón "desunir" desaparece: separar se hace desde la propia herramienta.
+
 ## 4.27.1 — 22 ago 2026
 
 - **Desunir** más claro: al tocar una celda unida sale un botón **Desunir** (antes era
