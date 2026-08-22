@@ -266,13 +266,24 @@
 
 /* Selector de proporcion: mismas columnas iguales que el ajuste de angulo, con el
    glifo del ratio sobre su etiqueta. Cada opcion es su propia caja. */
+/* Fila horizontal (con scroll si no caben): así todas las proporciones van en línea
+   y no se descuelga ninguna a una segunda fila al añadir opciones nuevas. */
 .ratiogrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: var(--s-3);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ratiogrid::-webkit-scrollbar {
+  display: none;
 }
 
 .ratiogrid button {
+  flex: 0 0 auto;
+  width: 62px;
   aspect-ratio: 1;
   display: flex;
   flex-direction: column;

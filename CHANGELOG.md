@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.23.1 — 22 ago 2026
+
+- El selector de **proporción** vuelve a ir en **una sola fila** (con scroll si hace
+  falta): al añadir el 9:16, la rejilla de 4 columnas lo dejaba caer solo a una segunda
+  fila.
+
 ## 4.23.0 — 22 ago 2026 · vistas para Stories
 
 - Con proporción **9:16** la app se adapta a **stories** (no son un carrusel de feed):
