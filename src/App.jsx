@@ -38,6 +38,7 @@ import PageBar from './features/editor/PageBar.jsx';
 import LevelPanel, { PostPanel, PagePanel, PhotoPanel } from './features/editor/LevelPanel.jsx';
 import TextPanel from './features/editor/panels/TextPanel.jsx';
 import FeedView from './features/feed/FeedView.jsx';
+import StoriesView from './features/feed/StoriesView.jsx';
 import ProfileGrid from './features/profile/ProfileGrid.jsx';
 import ProjectsView from './features/projects/ProjectsView.jsx';
 import LibraryView from './features/library/LibraryView.jsx';
@@ -48,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.22.0';
+export const VERSION = '4.23.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -145,6 +146,9 @@ export default function App() {
   const R = RATIOS[post.ratio];
   /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
   const exSize = exportSize(post.ratio);
+  /* 9:16 es formato Stories: no hay carrusel de feed ni cuadrícula de perfil, así que
+     las vistas previas y el texto del export se adaptan. */
+  const isStories = post.ratio === '9:16';
 
   /* El nivel Foto no puede existir sin foto: es el unico ajuste automatico que
      queda. Lo demas lo decide el usuario con las pestañas. */
@@ -158,6 +162,12 @@ export default function App() {
   /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
      aún conserva el nivel del que se viene. */
   useEffect(() => { prevLevel.current = level; }, [level]);
+
+  /* En Stories no hay pestaña Perfil: si estabas ahí y cambias a 9:16, vuelve a la
+     vista de stories para no quedarte en un modo sin pestaña. */
+  useEffect(() => {
+    if (isStories && mode === 'grid') dispatch({ type: 'set', patch: { mode: 'feed' } });
+  }, [isStories, mode]);
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
      el registro de la foto y no en el post. */
@@ -322,11 +332,16 @@ export default function App() {
           <SegmentedControl
             value={mode}
             onChange={(v) => dispatch({ type: 'set', patch: { mode: v } })}
-            options={[
-              { value: 'edit', label: 'Editar' },
-              { value: 'feed', label: 'Feed' },
-              { value: 'grid', label: 'Perfil' },
-            ]}
+            options={isStories
+              ? [
+                { value: 'edit', label: 'Editar' },
+                { value: 'feed', label: 'Stories' },
+              ]
+              : [
+                { value: 'edit', label: 'Editar' },
+                { value: 'feed', label: 'Feed' },
+                { value: 'grid', label: 'Perfil' },
+              ]}
           />
           <span style={{ flex: 1 }} />
           <Button
@@ -516,10 +531,14 @@ export default function App() {
       )}
 
       {mode === 'feed' && (
-        <Section><FeedView post={post} cells={cells} getSource={getSource} /></Section>
+        <Section>
+          {isStories
+            ? <StoriesView post={post} cells={cells} getSource={getSource} />
+            : <FeedView post={post} cells={cells} getSource={getSource} />}
+        </Section>
       )}
 
-      {mode === 'grid' && (
+      {mode === 'grid' && !isStories && (
         <Section><ProfileGrid post={post} cells={cells} getSource={getSource} /></Section>
       )}
 
@@ -578,6 +597,7 @@ export default function App() {
           width={exSize.w}
           height={exSize.h}
           format={post.bg === 'transparent' ? 'png' : post.fmt}
+          stories={isStories}
           onZip={runZip}
           onClose={closeExport}
         />

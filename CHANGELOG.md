@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.23.0 — 22 ago 2026 · vistas para Stories
+
+- Con proporción **9:16** la app se adapta a **stories** (no son un carrusel de feed):
+  - La pestaña **Perfil** desaparece (las stories no salen en la cuadrícula).
+  - **Feed** pasa a **Stories**: un reproductor a **pantalla completa** con **barritas de
+    progreso** arriba y **tap a los lados** para pasar, como en Instagram.
+  - El **export** cambia el texto: cada página es una story; en Compartir se elige
+    **Historia** (no Feed) y se suben en orden.
+
 ## 4.22.0 — 22 ago 2026
 
 - Nueva proporción **9:16** para **stories/reels** (pantalla completa, 1080×1920).

@@ -1,0 +1,107 @@
+.stage {
+  display: flex;
+  justify-content: center;
+}
+
+/* Marco 9:16 a pantalla (lo más alto que quepa en el área). */
+.frame {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  height: min(72dvh, 640px);
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
+  background: #000;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Barritas de progreso arriba (solo visual, no capturan el toque). */
+.bars {
+  position: absolute;
+  top: var(--s-3);
+  left: var(--s-3);
+  right: var(--s-3);
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: #fff;
+}
+
+.fill.on {
+  width: 100%;
+}
+
+.head {
+  position: absolute;
+  top: calc(var(--s-3) + 12px);
+  left: var(--s-4);
+  right: var(--s-4);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.avatar {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.user {
+  font: var(--fs-sm) / 1 var(--font-mono);
+  color: #fff;
+}
+
+.now {
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Zonas de toque a los lados (por debajo de barras/cabecera, que no capturan). */
+.tap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.prev {
+  left: 0;
+  width: 33%;
+}
+
+.next {
+  right: 0;
+  width: 67%;
+}

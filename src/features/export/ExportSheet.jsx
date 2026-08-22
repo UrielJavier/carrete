@@ -10,7 +10,7 @@ import s from './ExportSheet.module.css';
  * Quien abre esta hoja es responsable de liberarlos al cerrarla.
  */
 export default function ExportSheet({
-  shots, zip, zipping, width, height, format, onZip, onClose,
+  shots, zip, zipping, width, height, format, stories, onZip, onClose,
 }) {
   const total = shots.reduce((a, sh) => a + (sh.bytes || 0), 0);
   const nVideo = shots.filter((sh) => sh.video).length;
@@ -55,12 +55,20 @@ export default function ExportSheet({
       <div className={s.zone}>
         {canShare && (
           <>
-            <p className={s.lead}>
-              Para subirlas a Instagram sin descargar nada: toca <strong>Compartir</strong>,
-              elige <strong>Instagram</strong> y dentro <strong>Feed</strong>. Se publican
-              las {shots.length} como un <strong>carrusel</strong>, en el orden que montaste
-              {nVideo > 0 && <> (las páginas con vídeo van como clip)</>}.
-            </p>
+            {stories ? (
+              <p className={s.lead}>
+                Cada página es una <strong>story</strong> (9:16). Toca <strong>Compartir</strong>,
+                elige <strong>Instagram</strong> y dentro <strong>Historia</strong>, y súbelas
+                <strong> en orden</strong>{nVideo > 0 && <> (las de vídeo van como clip)</>}.
+              </p>
+            ) : (
+              <p className={s.lead}>
+                Para subirlas a Instagram sin descargar nada: toca <strong>Compartir</strong>,
+                elige <strong>Instagram</strong> y dentro <strong>Feed</strong>. Se publican
+                las {shots.length} como un <strong>carrusel</strong>, en el orden que montaste
+                {nVideo > 0 && <> (las páginas con vídeo van como clip)</>}.
+              </p>
+            )}
             <Button variant="primary" className={s.zipbtn} onClick={doShare}>
               <Icon.share />
               {`Compartir las ${shots.length}`}
@@ -86,7 +94,9 @@ export default function ExportSheet({
         )}
         <Hint>
           {canShare
-            ? 'Instagram te preguntará Reels / Stories / Feed al compartir: elige Feed.'
+            ? (stories
+              ? 'Instagram te preguntará Reels / Stories / Feed al compartir: elige Stories.'
+              : 'Instagram te preguntará Reels / Stories / Feed al compartir: elige Feed.')
             : 'o guárdalas de una en una y súbelas en ese orden'}
         </Hint>
       </div>
