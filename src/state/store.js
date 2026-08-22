@@ -213,21 +213,26 @@ export function reducer(state, action) {
       };
 
     case 'mergeCells': {
-      /* Une celdas contiguas de una página en un grupo que comparte una foto. El
-         grupo adopta la foto de la primera celda con imagen (v1: sin encuadre). */
-      const slide = state.post.slides[action.slideIndex];
-      const ids = action.cellIndexes || [];
-      if (!slide || ids.length < 2) return state;
+      /* Une celdas (de una o VARIAS páginas) en un grupo que comparte una foto. El
+         grupo adopta la foto de la primera celda con imagen. La foto cubre la caja
+         envolvente del grupo aunque cruce la costura entre páginas. */
+      const ids = action.cells || []; // [{ slideIndex, cellIndex }]
+      if (ids.length < 2) return state;
       const groupId = uid();
       let imgId = null;
-      for (const ci of ids) { if (slide.cells[ci]?.imgId) { imgId = slide.cells[ci].imgId; break; } }
-      const cells = slide.cells.map((c, i) => (ids.includes(i) ? { ...c, group: groupId } : c));
-      const groups = { ...(state.post.groups || {}), [groupId]: { imgId, t: newT() } };
-      return withHistory(state, {
-        ...state,
-        post: replaceSlide({ ...state.post, groups }, action.slideIndex, { ...slide, cells }),
-        sel: null,
+      for (const { slideIndex, cellIndex } of ids) {
+        const im = state.post.slides[slideIndex]?.cells[cellIndex]?.imgId;
+        if (im) { imgId = im; break; }
+      }
+      const bySlide = {};
+      ids.forEach(({ slideIndex, cellIndex }) => {
+        (bySlide[slideIndex] = bySlide[slideIndex] || new Set()).add(cellIndex);
       });
+      const slides = state.post.slides.map((s, si) => (bySlide[si]
+        ? { ...s, cells: s.cells.map((c, ci) => (bySlide[si].has(ci) ? { ...c, group: groupId } : c)) }
+        : s));
+      const groups = { ...(state.post.groups || {}), [groupId]: { imgId, t: newT() } };
+      return withHistory(state, { ...state, post: { ...state.post, slides, groups }, sel: null });
     }
 
     case 'patchGroupT': {

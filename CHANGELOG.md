@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.31.0 — 22 ago 2026 · unir entre páginas
+
+- **Unir celdas entre páginas**: en la herramienta **grupos** puedes deslizar a otras
+  páginas y seguir sumando celdas al grupo (la selección se conserva al cambiar de
+  página). La foto compartida cubre la región aunque cruce la costura entre páginas —el
+  clásico carrusel "sin costuras".
+- El encuadre del grupo funciona igual aunque cruce páginas (se ajusta desde la parte
+  visible y mapea sobre la región completa).
+
 ## 4.30.0 — 22 ago 2026
 
 - Editar la foto de un grupo es ahora como una foto normal: **doble toque** en una

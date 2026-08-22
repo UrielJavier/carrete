@@ -173,7 +173,7 @@ export default function PageStrip({
                   image={image}
                   ratio={post.ratio}
                   merging={merging && active}
-                  mergeOn={merging && active && mergeSel.includes(c.cellIndex)}
+                  mergeOn={merging && mergeSel.some((m) => m.s === i && m.c === c.cellIndex)}
                   groupBadge={c.group ? groupInfo[c.group] : null}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}

@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.30.0';
+export const VERSION = '4.31.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -202,9 +202,9 @@ export default function App() {
     if (isStories && mode === 'grid') dispatch({ type: 'set', patch: { mode: 'feed' } });
   }, [isStories, mode]);
 
-  /* La selección para unir es transitoria: se vacía al salir del modo unir o cambiar
-     de página. */
-  useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool, current]);
+  /* La selección para unir es transitoria: se vacía al salir del modo unir. NO se
+     borra al cambiar de página, para poder unir celdas de varias páginas. */
+  useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool]);
 
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
@@ -444,11 +444,12 @@ export default function App() {
                 onSelect={(cellIndex) => {
                   if (tool === 'merge') {
                     /* En modo grupos: tocar una celda ya unida la separa; tocar una
-                       suelta la va marcando para unir. */
+                       suelta la va marcando (puede ser de otra página). */
                     const gid = post.slides[current]?.cells[cellIndex]?.group;
                     if (gid) { dispatch({ type: 'leaveGroup', slideIndex: current, cellIndex }); return; }
-                    setMergeSel((prev) => (prev.includes(cellIndex)
-                      ? prev.filter((x) => x !== cellIndex) : [...prev, cellIndex]));
+                    setMergeSel((prev) => (prev.some((m) => m.s === current && m.c === cellIndex)
+                      ? prev.filter((m) => !(m.s === current && m.c === cellIndex))
+                      : [...prev, { s: current, c: cellIndex }]));
                   } else {
                     dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
                   }
@@ -528,7 +529,7 @@ export default function App() {
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onAddText={() => dispatch({ type: 'addText', slideIndex: current, text: newText() })}
                 onMerge={() => {
-                  dispatch({ type: 'mergeCells', slideIndex: current, cellIndexes: mergeSel });
+                  dispatch({ type: 'mergeCells', cells: mergeSel.map((m) => ({ slideIndex: m.s, cellIndex: m.c })) });
                   setMergeSel([]);
                   dispatch({ type: 'tool', tool: null });
                 }}

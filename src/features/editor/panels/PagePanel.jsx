@@ -46,7 +46,7 @@ export default function PagePanel({
         <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
           {mergeCount < 2 ? 'toca 2 o más celdas' : `Unir ${mergeCount} celdas`}
         </Button>
-        <Hint>toca celdas contiguas para unirlas (compartirán una foto) · toca una celda ya unida para separarla.</Hint>
+        <Hint>toca celdas para unirlas (puedes deslizar a otras páginas) · toca una celda ya unida para separarla.</Hint>
       </>
     );
   }
