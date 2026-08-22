@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { clamp, RATIOS } from '../../core/layouts.js';
-import { imageUnits, clampT, newT, groupImageBox } from '../../core/geometry.js';
+import { clamp } from '../../core/layouts.js';
+import { imageUnits, clampT, newT } from '../../core/geometry.js';
 import { weight } from '../../core/format.js';
 import { FileInput } from '../../ui/primitives/index.js';
 import { Icon } from '../../ui/icons.jsx';
@@ -96,15 +96,21 @@ export default function Cell({
 
   let imgStyle;
   if (grouped) {
-    /* Celda UNIDA: enseña su trozo de la foto del grupo (a cover de la caja del
-       grupo), posicionada relativa a esta celda; el overflow oculto recorta. */
-    const RR = RATIOS[ratio] || RATIOS['4:5'];
-    const gb = groupImageBox(cell.groupRect, RR.w, RR.h, ia);
+    /* Celda UNIDA: enseña su trozo de la foto del grupo. La foto se encuadra sobre
+       TODA la caja del grupo (contain + pan/zoom del grupo) y se posiciona relativa a
+       esta celda; el overflow oculto recorta. */
+    const g = cell.groupRect;
+    const gt = clampT(cell.groupT || newT(), cell.groupAspect, ia);
+    const gu = imageUnits(gt.scale, cell.groupAspect, ia);
+    const imgW = gu.dwU * g.w;
+    const imgH = gu.dhU * g.h;
+    const imgX = g.x + g.w / 2 - gt.fx * imgW;
+    const imgY = g.y + g.h / 2 - gt.fy * imgH;
     imgStyle = {
-      left: `${((gb.x - cell.rect.x) / cell.rect.w) * 100}%`,
-      top: `${((gb.y - cell.rect.y) / cell.rect.h) * 100}%`,
-      width: `${(gb.w / cell.rect.w) * 100}%`,
-      height: `${(gb.h / cell.rect.h) * 100}%`,
+      left: `${((imgX - cell.rect.x) / cell.rect.w) * 100}%`,
+      top: `${((imgY - cell.rect.y) / cell.rect.h) * 100}%`,
+      width: `${(imgW / cell.rect.w) * 100}%`,
+      height: `${(imgH / cell.rect.h) * 100}%`,
     };
   } else {
     imgStyle = {

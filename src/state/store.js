@@ -222,12 +222,20 @@ export function reducer(state, action) {
       let imgId = null;
       for (const ci of ids) { if (slide.cells[ci]?.imgId) { imgId = slide.cells[ci].imgId; break; } }
       const cells = slide.cells.map((c, i) => (ids.includes(i) ? { ...c, group: groupId } : c));
-      const groups = { ...(state.post.groups || {}), [groupId]: { imgId } };
+      const groups = { ...(state.post.groups || {}), [groupId]: { imgId, t: newT() } };
       return withHistory(state, {
         ...state,
         post: replaceSlide({ ...state.post, groups }, action.slideIndex, { ...slide, cells }),
         sel: null,
       });
+    }
+
+    case 'patchGroupT': {
+      const g = (state.post.groups || {})[action.groupId];
+      if (!g) return state;
+      const groups = { ...state.post.groups, [action.groupId]: { ...g, t: action.t } };
+      const next = { ...state, post: { ...state.post, groups } };
+      return action.history ? withHistory(state, next) : next;
     }
 
     case 'setGroupImage': {

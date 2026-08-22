@@ -108,8 +108,11 @@ export function postCells(post) {
   for (const cell of out) {
     if (!cell.group) continue;
     const b = bbox[cell.group];
-    cell.groupRect = { x: b.x0, y: b.y0, w: b.x1 - b.x0, h: b.y1 - b.y0 };
+    const gr = { x: b.x0, y: b.y0, w: b.x1 - b.x0, h: b.y1 - b.y0 };
+    cell.groupRect = gr;
     cell.groupImgId = groups[cell.group]?.imgId || null;
+    cell.groupT = groups[cell.group]?.t || newT();
+    cell.groupAspect = (gr.w * R.w) / (gr.h * R.h);
   }
   return out;
 }
@@ -167,12 +170,22 @@ export function drawRegion(ctx, cells, x0, sw, sh, bg, getSource, fill) {
     const ia = src.w / src.h;
 
     if (grouped) {
-      const box = groupImageBox(cell.groupRect, sw, sh, ia);
+      /* La foto del grupo se encuadra sobre TODA la caja del grupo con su transform
+         (contain + pan/zoom), y esta celda solo recorta su trozo. */
+      const g = cell.groupRect;
+      const gt = clampT(cell.groupT, cell.groupAspect, ia);
+      const gu = imageUnits(gt.scale, cell.groupAspect, ia);
+      const gRx = (g.x - x0) * sw;
+      const gRy = g.y * sh;
+      const gRw = g.w * sw;
+      const gRh = g.h * sh;
+      const gdw = gu.dwU * gRw;
+      const gdh = gu.dhU * gRh;
       ctx.save();
       ctx.beginPath();
       ctx.rect(rx, ry, rw, rh);
       ctx.clip();
-      ctx.drawImage(src.el, (box.x - x0) * sw, box.y * sh, box.w * sw, box.h * sh);
+      ctx.drawImage(src.el, gRx + gRw / 2 - gt.fx * gdw, gRy + gRh / 2 - gt.fy * gdh, gdw, gdh);
       ctx.restore();
       continue;
     }

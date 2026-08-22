@@ -3,6 +3,7 @@ import { RATIOS, TRANSPARENT, PEEK_GAP, MAX_SLIDES } from '../../core/layouts.js
 import { safeRect } from '../../core/text.js';
 import Cell from './Cell.jsx';
 import TextLayer from './TextLayer.jsx';
+import GroupFrameLayer from './GroupFrameLayer.jsx';
 import RegionCanvas from './RegionCanvas.jsx';
 import s from './PageStrip.module.css';
 
@@ -25,7 +26,7 @@ export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
   showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {},
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
-  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus,
+  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus, onGroupTransform,
 }) {
   const scrollRef = useRef(null);
   const centered = useRef(-1);
@@ -46,6 +47,7 @@ export default function PageStrip({
      el foco de Foto. Así ocupa el máximo sin recortarse arriba/abajo. */
   const textFocus = level === 'text';
   const merging = tool === 'merge';
+  const gframe = tool === 'gframe';
   let pageFocusW = 0;
   let pageFocusH = 0;
   if (textFocus && areaW && workH) {
@@ -54,7 +56,7 @@ export default function PageStrip({
     pageFocusW = pageFocusH * pa;
   }
   const safe = safeRect(post.safe, post.ratio);
-  const locked = photo || textFocus || tool === 'move';
+  const locked = photo || textFocus || tool === 'move' || gframe;
   const full = post.slides.length >= MAX_SLIDES;
   /* En Página, si hay una foto seleccionada en la página activa, las demás se
      atenúan (estilo Figma): la selección habla sin necesidad de más navegación. */
@@ -82,6 +84,13 @@ export default function PageStrip({
   const focusCell = photo && sel
     ? byPage[current]?.find((c) => c.cellIndex === sel.cellIndex)
     : null;
+
+  /* Encuadre de grupo: la celda unida seleccionada da la región (caja del grupo) y su
+     foto; la capa de gesto va sobre esa región, en la página activa. */
+  const frameCell = gframe && sel && sel.slideIndex === current
+    ? byPage[current]?.find((c) => c.cellIndex === sel.cellIndex && c.group)
+    : null;
+  const frameImg = frameCell?.groupImgId ? images[frameCell.groupImgId] : null;
   const focusImage = focusCell?.imgId ? images[focusCell.imgId] : null;
   let focusW = 0;
   let focusH = 0;
@@ -222,6 +231,22 @@ export default function PageStrip({
               onSelect={(id) => onSelectText(i, id)}
               onMove={(id, x, y, commit) => onMoveText(i, id, x, y, commit)}
             />
+
+            {/* Encuadre del grupo, en su sitio, sobre la región del grupo. */}
+            {gframe && active && frameCell && frameImg && (
+              <GroupFrameLayer
+                rect={{
+                  xLocal: frameCell.groupRect.x - current,
+                  y: frameCell.groupRect.y,
+                  w: frameCell.groupRect.w,
+                  h: frameCell.groupRect.h,
+                }}
+                t={frameCell.groupT}
+                ia={frameImg.w / frameImg.h}
+                aspect={frameCell.groupAspect}
+                onTransform={(t2, commit) => onGroupTransform(frameCell.group, t2, commit)}
+              />
+            )}
           </div>
         );
       })}

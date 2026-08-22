@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.29.0 — 22 ago 2026 · encuadre del grupo
+
+- La foto compartida de un grupo ahora se **encuadra** (mover + ampliar). Con una celda
+  unida seleccionada, botón **encuadrar**: se ajusta **en su sitio** (sin superfoco),
+  arrastrando/pellizcando sobre la región del grupo, viendo la composición entera. Doble
+  toque centra.
+- Modelo *contain* como las fotos: a tamaño 1 la foto entra entera en la región del
+  grupo; amplías para llenar. Se ve igual en editor, feed, perfil y export.
+
 ## 4.28.1 — 22 ago 2026
 
 - En **grupos**, tocar una celda unida saca **solo esa celda** del grupo (antes deshacía

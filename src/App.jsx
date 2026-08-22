@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.28.1';
+export const VERSION = '4.29.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -155,7 +155,11 @@ export default function App() {
   /* Grupo (celdas unidas) de la celda seleccionada, para la cajita de info. */
   const selGroupId = sel ? post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.group : null;
   const selGroup = selGroupId
-    ? { id: selGroupId, count: post.slides.reduce((n, s) => n + s.cells.filter((c) => c.group === selGroupId).length, 0) }
+    ? {
+      id: selGroupId,
+      count: post.slides.reduce((n, s) => n + s.cells.filter((c) => c.group === selGroupId).length, 0),
+      hasImg: !!post.groups?.[selGroupId]?.imgId,
+    }
     : null;
   const R = RATIOS[post.ratio];
   /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
@@ -186,6 +190,14 @@ export default function App() {
   /* La selección para unir es transitoria: se vacía al salir del modo unir o cambiar
      de página. */
   useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool, current]);
+
+  /* El encuadre de grupo necesita una celda unida seleccionada; si deja de serlo, se
+     sale del modo. */
+  useEffect(() => {
+    if (tool !== 'gframe') return;
+    const g = sel && post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.group;
+    if (!g) dispatch({ type: 'tool', tool: null });
+  }, [tool, sel, post]);
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
      el registro de la foto y no en el post. */
@@ -467,6 +479,9 @@ export default function App() {
                   type: 'patchText', slideIndex, id, patch: { x, y }, history: commit,
                 })}
                 onExitFocus={() => dispatch({ type: 'level', level: 'page' })}
+                onGroupTransform={(groupId, t, withHistory) => dispatch({
+                  type: 'patchGroupT', groupId, t, history: withHistory,
+                })}
               />
             )}
           </StageWrap>
@@ -514,7 +529,7 @@ export default function App() {
                   setMergeSel([]);
                   dispatch({ type: 'tool', tool: null });
                 }}
-                onUnmerge={() => selGroup && dispatch({ type: 'unmergeGroup', groupId: selGroup.id })}
+                onFrameGroup={() => dispatch({ type: 'tool', tool: 'gframe' })}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}
                 onDelete={() => setAsk({
