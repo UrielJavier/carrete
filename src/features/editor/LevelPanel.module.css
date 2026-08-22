@@ -311,3 +311,14 @@
   border-color: var(--c-text);
   color: var(--c-ink-on-light);
 }
+
+/* Enlace de acción dentro de un hint (p. ej. "deshacer unión"). */
+.linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--c-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

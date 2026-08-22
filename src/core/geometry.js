@@ -87,10 +87,45 @@ export function postCells(post) {
         imgId: s.cells[ci].imgId,
         t: s.cells[ci].t,
         trim: s.cells[ci].trim,
+        group: s.cells[ci].group || null,
       });
     });
   });
+
+  /* Grupos (celdas UNIDAS que comparten una foto): la foto cubre la caja envolvente
+     del grupo en espacio de post y cada celda enseña su trozo, así que la separación
+     entre celdas hace de rejilla. Se calcula aquí la caja de cada grupo. */
+  const groups = post.groups || {};
+  const bbox = {};
+  for (const cell of out) {
+    if (!cell.group) continue;
+    const b = bbox[cell.group] || (bbox[cell.group] = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity });
+    b.x0 = Math.min(b.x0, cell.rect.x);
+    b.y0 = Math.min(b.y0, cell.rect.y);
+    b.x1 = Math.max(b.x1, cell.rect.x + cell.rect.w);
+    b.y1 = Math.max(b.y1, cell.rect.y + cell.rect.h);
+  }
+  for (const cell of out) {
+    if (!cell.group) continue;
+    const b = bbox[cell.group];
+    cell.groupRect = { x: b.x0, y: b.y0, w: b.x1 - b.x0, h: b.y1 - b.y0 };
+    cell.groupImgId = groups[cell.group]?.imgId || null;
+  }
   return out;
+}
+
+/**
+ * Caja de dibujo de la foto de un GRUPO, a COVER de su caja envolvente (llena y
+ * recorta lo que sobra, centrado). `wu`/`hu` son los píxeles por unidad en x/y (solo
+ * fijan la proporción); el resultado va en unidades de post, como la caja del grupo.
+ */
+export function groupImageBox(g, wu, hu, ia) {
+  const aspect = (g.w * wu) / (g.h * hu);
+  let w;
+  let h;
+  if (ia >= aspect) { h = g.h; w = (g.h * hu * ia) / wu; }
+  else { w = g.w; h = (g.w * wu) / (ia * hu); }
+  return { x: g.x + (g.w - w) / 2, y: g.y + (g.h - h) / 2, w, h };
 }
 
 /**
@@ -118,14 +153,30 @@ export function drawRegion(ctx, cells, x0, sw, sh, bg, getSource, fill) {
   for (const cell of cells) {
     if (cell.rect.x + cell.rect.w <= x0 + 1e-4) continue;
     if (cell.rect.x >= x0 + 1 - 1e-4) continue;
-    if (!cell.imgId) continue;
-    const src = getSource(cell.imgId);
+    /* Una celda UNIDA usa la foto del grupo (no la suya); la foto cubre la caja del
+       grupo y aquí solo se recorta el trozo de esta celda. */
+    const grouped = !!cell.group && !!cell.groupImgId;
+    const imgId = grouped ? cell.groupImgId : cell.imgId;
+    if (!imgId) continue;
+    const src = getSource(imgId);
     if (!src) continue;
     const rx = (cell.rect.x - x0) * sw;
     const ry = cell.rect.y * sh;
     const rw = cell.rect.w * sw;
     const rh = cell.rect.h * sh;
     const ia = src.w / src.h;
+
+    if (grouped) {
+      const box = groupImageBox(cell.groupRect, sw, sh, ia);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(rx, ry, rw, rh);
+      ctx.clip();
+      ctx.drawImage(src.el, (box.x - x0) * sw, box.y * sh, box.w * sw, box.h * sh);
+      ctx.restore();
+      continue;
+    }
+
     const t = clampT(cell.t, cell.cellAspect, ia);
     const u = imageUnits(t.scale, cell.cellAspect, ia);
     const dw = u.dwU * rw;

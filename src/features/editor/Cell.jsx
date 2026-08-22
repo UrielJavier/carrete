@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { clamp } from '../../core/layouts.js';
-import { imageUnits, clampT, newT } from '../../core/geometry.js';
+import { clamp, RATIOS } from '../../core/layouts.js';
+import { imageUnits, clampT, newT, groupImageBox } from '../../core/geometry.js';
 import { weight } from '../../core/format.js';
 import { FileInput } from '../../ui/primitives/index.js';
 import { Icon } from '../../ui/icons.jsx';
@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8,
+  fill, blurPx = 8, ratio, mergeOn,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -75,13 +75,28 @@ export default function Cell({
   const ia = image.w / image.h;
   const t = clampT(cell.t, cell.cellAspect, ia);
   const u = imageUnits(t.scale, cell.cellAspect, ia);
+  const grouped = !!cell.group && !!cell.groupImgId;
 
-  const imgStyle = {
-    left: `${(0.5 - t.fx * u.dwU) * 100}%`,
-    top: `${(0.5 - t.fy * u.dhU) * 100}%`,
-    width: `${u.dwU * 100}%`,
-    height: `${u.dhU * 100}%`,
-  };
+  let imgStyle;
+  if (grouped) {
+    /* Celda UNIDA: enseña su trozo de la foto del grupo (a cover de la caja del
+       grupo), posicionada relativa a esta celda; el overflow oculto recorta. */
+    const RR = RATIOS[ratio] || RATIOS['4:5'];
+    const gb = groupImageBox(cell.groupRect, RR.w, RR.h, ia);
+    imgStyle = {
+      left: `${((gb.x - cell.rect.x) / cell.rect.w) * 100}%`,
+      top: `${((gb.y - cell.rect.y) / cell.rect.h) * 100}%`,
+      width: `${(gb.w / cell.rect.w) * 100}%`,
+      height: `${(gb.h / cell.rect.h) * 100}%`,
+    };
+  } else {
+    imgStyle = {
+      left: `${(0.5 - t.fx * u.dwU) * 100}%`,
+      top: `${(0.5 - t.fy * u.dhU) * 100}%`,
+      width: `${u.dwU * 100}%`,
+      height: `${u.dhU * 100}%`,
+    };
+  }
 
   /* La celda pinta un <video> si el medio es vídeo, y una <img> si es foto; el
      encuadre (posición/escala) es idéntico. Si el relleno es 'blur', detrás va una
@@ -89,7 +104,7 @@ export default function Cell({
      vídeo se usa el póster para no montar dos vídeos por celda). */
   const media = (
     <>
-      {fill === 'blur' && (
+      {fill === 'blur' && !grouped && (
         <img
           className={s.blurfill}
           src={image.type === 'video' ? image.el?.src : image.url}
@@ -122,6 +137,8 @@ export default function Cell({
     faded && s.faded,
     /* En Página, al seleccionar una, las demás se atenúan (siguen tocables). */
     dimmed && s.dimmed,
+    /* Seleccionada para unir (modo unir). */
+    mergeOn && s.mergeon,
   ].filter(Boolean).join(' ');
 
   const chrome = (

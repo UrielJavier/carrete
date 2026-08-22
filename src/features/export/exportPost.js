@@ -63,9 +63,14 @@ export async function exportPost({ post, cells, images, onProgress }) {
     const local = new Map();
     for (const cell of cells) {
       if (cell.rect.x + cell.rect.w <= i + 1e-4 || cell.rect.x >= i + 1 - 1e-4) continue;
-      const im = cell.imgId ? images[cell.imgId] : null;
+      /* Una celda unida usa la foto del grupo (cubre toda la caja del grupo); el
+         resto, la suya. */
+      const grouped = cell.group && cell.groupImgId;
+      const useId = grouped ? cell.groupImgId : cell.imgId;
+      const im = useId ? images[useId] : null;
       if (!im || im.type === 'video') continue;
-      local.set(cell.imgId, await decodeFor(im, drawnWidth(cell, im.w / im.h, EXW)));
+      const needW = grouped ? EXW : drawnWidth(cell, im.w / im.h, EXW);
+      local.set(useId, await decodeFor(im, needW));
     }
 
     /* Si la página tiene un vídeo, se exporta como MP4 (fotograma a fotograma); si

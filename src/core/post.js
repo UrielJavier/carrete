@@ -25,6 +25,8 @@ export const newPost = () => ({
   safe: 0,
   /* Relleno de los huecos (contain): 'color' plano o 'blur' (la foto desenfocada). */
   fill: 'color',
+  /* Grupos de celdas UNIDAS que comparten una foto: { [id]: { imgId } }. */
+  groups: {},
   slides: [newSlide('full')],
 });
 

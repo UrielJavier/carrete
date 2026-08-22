@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.25.0';
+export const VERSION = '4.26.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -71,6 +71,7 @@ export default function App() {
   const [dropIdx, setDropIdx] = useState(null);
   const [liftIdx, setLiftIdx] = useState(null);
   const [navOpen, setNavOpen] = useState(false);
+  const [mergeSel, setMergeSel] = useState([]);
 
   const wrapRef = useRef(null);
   const swapFrom = useRef(null);
@@ -143,6 +144,11 @@ export default function App() {
   const selText = textSel
     ? post.slides[textSel.slideIndex]?.texts?.find((t) => t.id === textSel.id)
     : null;
+  /* Grupo (celdas unidas) de la celda seleccionada, para la cajita de info. */
+  const selGroupId = sel ? post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.group : null;
+  const selGroup = selGroupId
+    ? { id: selGroupId, count: post.slides.reduce((n, s) => n + s.cells.filter((c) => c.group === selGroupId).length, 0) }
+    : null;
   const R = RATIOS[post.ratio];
   /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
   const exSize = exportSize(post.ratio);
@@ -168,6 +174,10 @@ export default function App() {
   useEffect(() => {
     if (isStories && mode === 'grid') dispatch({ type: 'set', patch: { mode: 'feed' } });
   }, [isStories, mode]);
+
+  /* La selección para unir es transitoria: se vacía al salir del modo unir o cambiar
+     de página. */
+  useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool, current]);
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
      el registro de la foto y no en el post. */
@@ -401,9 +411,16 @@ export default function App() {
               <PageStrip
                 post={post} cells={cells} current={current} level={level} tool={tool}
                 images={images} sel={sel} textSel={textSel} enter={prevLevel.current === 'post'}
-                dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys}
+                dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys} mergeSel={mergeSel}
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
-                onSelect={(cellIndex) => dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } })}
+                onSelect={(cellIndex) => {
+                  if (tool === 'merge') {
+                    setMergeSel((prev) => (prev.includes(cellIndex)
+                      ? prev.filter((x) => x !== cellIndex) : [...prev, cellIndex]));
+                  } else {
+                    dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
+                  }
+                }}
                 onOpen={(cellIndex) => dispatch({
                   type: 'set',
                   patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } },
@@ -462,9 +479,20 @@ export default function App() {
                 slide={slide} current={current} totalPages={post.slides.length}
                 photoCount={slide.cells.filter((c) => c.imgId).length}
                 tool={tool} ratio={post.ratio}
-                onTool={(t) => dispatch({ type: 'tool', tool: t })}
+                mergeCount={mergeSel.length}
+                group={selGroup}
+                onTool={(t) => {
+                  if (t === 'merge') dispatch({ type: 'select', sel: null });
+                  dispatch({ type: 'tool', tool: t });
+                }}
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onAddText={() => dispatch({ type: 'addText', slideIndex: current, text: newText() })}
+                onMerge={() => {
+                  dispatch({ type: 'mergeCells', slideIndex: current, cellIndexes: mergeSel });
+                  setMergeSel([]);
+                  dispatch({ type: 'tool', tool: null });
+                }}
+                onUnmerge={() => selGroup && dispatch({ type: 'unmergeGroup', groupId: selGroup.id })}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}
                 onDelete={() => setAsk({

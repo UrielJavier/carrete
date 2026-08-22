@@ -23,7 +23,7 @@ import s from './PageStrip.module.css';
  */
 export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
-  showThirds, metrics, guardRef, enter, areaW, workH, textSel,
+  showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [],
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
   onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus,
 }) {
@@ -45,6 +45,7 @@ export default function PageStrip({
      recorta), dimensionado para llenar el área a su proporción: la misma técnica que
      el foco de Foto. Así ocupa el máximo sin recortarse arriba/abajo. */
   const textFocus = level === 'text';
+  const merging = tool === 'merge';
   let pageFocusW = 0;
   let pageFocusH = 0;
   if (textFocus && areaW && workH) {
@@ -155,12 +156,15 @@ export default function PageStrip({
             }}
           >
             {byPage[i].map((c) => {
-              const image = c.imgId ? images[c.imgId] : null;
+              /* Una celda unida enseña la foto del grupo; el resto, la suya. */
+              const image = c.group && c.groupImgId ? images[c.groupImgId] : (c.imgId ? images[c.imgId] : null);
               return (
                 <Cell
                   key={`${sl.id}-${c.cellIndex}`}
                   cell={c}
                   image={image}
+                  ratio={post.ratio}
+                  mergeOn={merging && active && mergeSel.includes(c.cellIndex)}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}
                   isLifting={active && liftIdx === c.cellIndex}

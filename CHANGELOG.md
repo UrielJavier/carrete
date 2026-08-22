@@ -10,6 +10,17 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.26.0 — 22 ago 2026 · unir celdas (foto compartida), fase A.1
+
+- Nueva herramienta **unir** (nivel Página): tocas **celdas contiguas** de una página y
+  al confirmar **comparten una foto** que cubre toda la región; cada celda enseña su
+  trozo y los huecos hacen de rejilla (efecto puzzle/máscara). Adopta la foto de la
+  primera celda con imagen.
+- Al tocar una celda unida sale una **cajita de info** ("grupo de N") con **deshacer
+  unión**.
+- Se ve igual en editor, feed, perfil, miniaturas y **export** (imagen y vídeo).
+- Falta (fase A.2): unir **entre páginas** y **encuadre** del grupo (pan/zoom).
+
 ## 4.25.0 — 22 ago 2026 · fondo con foto desenfocada
 
 - Nuevo **relleno de huecos** para el modo *contain*: además de color plano, ahora

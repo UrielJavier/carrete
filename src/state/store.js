@@ -7,7 +7,7 @@
  * registro de la foto y no en el post.
  */
 
-import { MAX_SLIDES, clamp } from '../core/layouts.js';
+import { MAX_SLIDES, clamp, uid } from '../core/layouts.js';
 import {
   newPost, newSlide, clonePost, applyLayout, moveSlideTo, swapCells,
 } from '../core/post.js';
@@ -211,6 +211,34 @@ export function reducer(state, action) {
         level: action.id ? 'text' : 'page',
         tool: null,
       };
+
+    case 'mergeCells': {
+      /* Une celdas contiguas de una página en un grupo que comparte una foto. El
+         grupo adopta la foto de la primera celda con imagen (v1: sin encuadre). */
+      const slide = state.post.slides[action.slideIndex];
+      const ids = action.cellIndexes || [];
+      if (!slide || ids.length < 2) return state;
+      const groupId = uid();
+      let imgId = null;
+      for (const ci of ids) { if (slide.cells[ci]?.imgId) { imgId = slide.cells[ci].imgId; break; } }
+      const cells = slide.cells.map((c, i) => (ids.includes(i) ? { ...c, group: groupId } : c));
+      const groups = { ...(state.post.groups || {}), [groupId]: { imgId } };
+      return withHistory(state, {
+        ...state,
+        post: replaceSlide({ ...state.post, groups }, action.slideIndex, { ...slide, cells }),
+        sel: null,
+      });
+    }
+
+    case 'unmergeGroup': {
+      const groups = { ...(state.post.groups || {}) };
+      delete groups[action.groupId];
+      const slides = state.post.slides.map((s) => ({
+        ...s,
+        cells: s.cells.map((c) => (c.group === action.groupId ? { ...c, group: undefined } : c)),
+      }));
+      return withHistory(state, { ...state, post: { ...state.post, slides, groups }, sel: null });
+    }
 
     case 'putImages': {
       /* Coloca las fotos importadas en la celda indicada y las siguientes vacias. */
