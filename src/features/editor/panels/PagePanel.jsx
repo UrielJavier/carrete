@@ -8,7 +8,7 @@ import s from '../LevelPanel.module.css';
 /** Nivel Página: la rejilla, el orden de las fotos y las celdas unidas. */
 export default function PagePanel({
   slide, current, totalPages, photoCount, tool, ratio, mergeCount, group,
-  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge, onFrameGroup,
+  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge,
 }) {
   if (tool === 'layout') {
     return (
@@ -51,15 +51,6 @@ export default function PagePanel({
     );
   }
 
-  if (tool === 'gframe') {
-    return (
-      <>
-        <Back label="encuadrar grupo" sub="mueve y amplía la foto compartida" onBack={onBack} />
-        <Hint>arrastra para mover · pellizca para ampliar · doble toque para centrar.</Hint>
-      </>
-    );
-  }
-
   const cellCount = LAYOUTS[slide.layoutId].cells.length;
 
   return (
@@ -75,13 +66,10 @@ export default function PagePanel({
         <ToolBox icon={<Icon.trash />} label="borrar" danger onClick={onDelete} />
       </ToolRow>
       {group ? (
-        <>
-          <div className={s.groupinfo}>
-            <span>Grupo de {group.count} celdas</span>
-            {group.hasImg && <Button onClick={onFrameGroup}>encuadrar</Button>}
-          </div>
-          <Hint>para separar celdas, usa la herramienta <strong>grupos</strong>.</Hint>
-        </>
+        <Hint>
+          grupo de {group.count} celdas · <strong>doble toque</strong> para encuadrar la foto ·
+          usa <strong>grupos</strong> para separar.
+        </Hint>
       ) : (
         <Hint>
           {totalPages > 1

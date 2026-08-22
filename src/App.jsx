@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.29.0';
+export const VERSION = '4.30.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -161,6 +161,21 @@ export default function App() {
       hasImg: !!post.groups?.[selGroupId]?.imgId,
     }
     : null;
+  /* Al abrir (Foto) una celda unida, se edita la foto del GRUPO, no la de la celda. */
+  const editGroupId = level === 'photo' && selGroupId ? selGroupId : null;
+  const editGroup = editGroupId ? post.groups?.[editGroupId] : null;
+  const editGroupImage = editGroup?.imgId ? images[editGroup.imgId] : null;
+  /* La foto que edita el panel de Foto: la del grupo si es un grupo, si no la de la celda. */
+  const photoImage = editGroup ? editGroupImage : selImage;
+  /* Celda del grupo en espacio de post (para su proporción); el encuadre va al grupo. */
+  const editGroupCell = editGroup
+    ? cells.find((c) => c.slideIndex === sel.slideIndex && c.cellIndex === sel.cellIndex && c.group)
+    : null;
+  const photoAspect = editGroup ? editGroupCell?.groupAspect : selCell?.cellAspect;
+  const photoT = editGroup ? (editGroup.t || newT()) : selCell?.t;
+  const setPhotoT = (t, withHistory) => (editGroup
+    ? dispatch({ type: 'patchGroupT', groupId: editGroupId, t, history: withHistory })
+    : dispatch({ type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex, patch: { t }, history: withHistory }));
   const R = RATIOS[post.ratio];
   /* Tamaño real del fichero al exportar (el ratio da la forma; el ancho es fijo, 1080). */
   const exSize = exportSize(post.ratio);
@@ -171,11 +186,11 @@ export default function App() {
   /* El nivel Foto no puede existir sin foto: es el unico ajuste automatico que
      queda. Lo demas lo decide el usuario con las pestañas. */
   useEffect(() => {
-    if (level === 'photo' && !selImage) dispatch({ type: 'level', level: 'page' });
+    if (level === 'photo' && !selImage && !editGroup) dispatch({ type: 'level', level: 'page' });
     /* Igual con el texto: si el seleccionado deja de existir (p.ej. tras deshacer),
        se sube a Página en vez de quedar en un nivel Texto vacío. */
     if (level === 'text' && !selText) dispatch({ type: 'level', level: 'page' });
-  }, [level, selImage, selText]);
+  }, [level, selImage, selText, editGroup]);
 
   /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
      aún conserva el nivel del que se viene. */
@@ -191,13 +206,6 @@ export default function App() {
      de página. */
   useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool, current]);
 
-  /* El encuadre de grupo necesita una celda unida seleccionada; si deja de serlo, se
-     sale del modo. */
-  useEffect(() => {
-    if (tool !== 'gframe') return;
-    const g = sel && post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.group;
-    if (!g) dispatch({ type: 'tool', tool: null });
-  }, [tool, sel, post]);
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
      el registro de la foto y no en el post. */
@@ -445,15 +453,10 @@ export default function App() {
                     dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
                   }
                 }}
-                onOpen={(cellIndex) => {
-                  /* Una celda unida no se abre a Foto (se edita como grupo): solo se
-                     selecciona, para que salga su info y el botón de desunir. */
-                  if (post.slides[current]?.cells[cellIndex]?.group) {
-                    dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
-                    return;
-                  }
-                  dispatch({ type: 'set', patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } } });
-                }}
+                onOpen={(cellIndex) => dispatch({
+                  type: 'set',
+                  patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } },
+                })}
                 onFiles={(files, cellIndex) => {
                   /* En una celda unida la foto es del GRUPO, no de la celda. */
                   const gid = post.slides[current]?.cells[cellIndex]?.group;
@@ -529,7 +532,6 @@ export default function App() {
                   setMergeSel([]);
                   dispatch({ type: 'tool', tool: null });
                 }}
-                onFrameGroup={() => dispatch({ type: 'tool', tool: 'gframe' })}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}
                 onDelete={() => setAsk({
@@ -554,40 +556,38 @@ export default function App() {
                 onRemove={() => dispatch({ type: 'removeText', slideIndex: textSel.slideIndex, id: textSel.id })}
               />
             )}
-            {level === 'photo' && selImage && (
+            {level === 'photo' && photoImage && (
               <PhotoPanel
-                image={selImage} tool={tool} showThirds={showThirds}
-                trim={post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.trim}
+                image={photoImage} tool={tool} showThirds={showThirds}
+                trim={!editGroup ? post.slides[sel.slideIndex]?.cells[sel.cellIndex]?.trim : undefined}
                 onTool={(t) => dispatch({ type: 'tool', tool: t })}
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onAudio={() => say('Esta versión todavía no admite audio: el vídeo se exporta sin sonido.', 'warn')}
-                onTrim={(trim) => dispatch({
+                onTrim={(trim) => !editGroup && dispatch({
                   type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
                   patch: { trim }, history: false,
                 })}
-                onRotate={(deg) => library.reorient(selImage.id, ((deg % 360) + 360) % 360, !!selImage.flip)}
-                onMirror={() => library.reorient(selImage.id, selImage.rot || 0, !selImage.flip)}
+                onRotate={(deg) => library.reorient(photoImage.id, ((deg % 360) + 360) % 360, !!photoImage.flip)}
+                onMirror={() => library.reorient(photoImage.id, photoImage.rot || 0, !photoImage.flip)}
                 onThirds={() => setShowThirds((v) => !v)}
-                onCenter={() => dispatch({
-                  type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
-                  patch: { t: newT() }, history: true,
-                })}
-                onReplace={(files) => library.ingest(files, sel.slideIndex, sel.cellIndex)}
-                onRemove={() => dispatch({
-                  type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
-                  patch: { imgId: null, t: newT() }, history: true,
-                })}
+                onCenter={() => setPhotoT(newT(), true)}
+                onReplace={(files) => (editGroup
+                  ? library.ingestToGroup(files, editGroupId)
+                  : library.ingest(files, sel.slideIndex, sel.cellIndex))}
+                onRemove={() => (editGroup
+                  ? dispatch({ type: 'setGroupImage', groupId: editGroupId, added: [] })
+                  : dispatch({
+                    type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
+                    patch: { imgId: null, t: newT() }, history: true,
+                  }))}
                 onNudge={(dx, dy) => {
-                  if (!selCell || !selImage) return;
-                  const t = selCell.t;
+                  if (!photoImage || !photoAspect) return;
+                  const t = photoT;
                   const next = clampT(
                     { scale: t.scale, fx: t.fx + dx, fy: t.fy + dy },
-                    selCell.cellAspect, selImage.w / selImage.h,
+                    photoAspect, photoImage.w / photoImage.h,
                   );
-                  dispatch({
-                    type: 'patchCell', slideIndex: sel.slideIndex, cellIndex: sel.cellIndex,
-                    patch: { t: next }, history: true,
-                  });
+                  setPhotoT(next, true);
                 }}
               />
             )}

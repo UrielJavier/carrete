@@ -47,7 +47,6 @@ export default function PageStrip({
      el foco de Foto. Así ocupa el máximo sin recortarse arriba/abajo. */
   const textFocus = level === 'text';
   const merging = tool === 'merge';
-  const gframe = tool === 'gframe';
   let pageFocusW = 0;
   let pageFocusH = 0;
   if (textFocus && areaW && workH) {
@@ -56,7 +55,7 @@ export default function PageStrip({
     pageFocusW = pageFocusH * pa;
   }
   const safe = safeRect(post.safe, post.ratio);
-  const locked = photo || textFocus || tool === 'move' || gframe;
+  const locked = photo || textFocus || tool === 'move';
   const full = post.slides.length >= MAX_SLIDES;
   /* En Página, si hay una foto seleccionada en la página activa, las demás se
      atenúan (estilo Figma): la selección habla sin necesidad de más navegación. */
@@ -81,15 +80,15 @@ export default function PageStrip({
      tira) dimensionado por la FORMA de la celda: se agranda hasta llenar el área real
      según su proporción (apaisada → ancho; vertical → alto). Así se edita al máximo
      detalle y sin distracciones. Reutiliza Cell, con la celda ocupando todo el marco. */
-  const focusCell = photo && sel
+  const selCellOnPage = photo && sel && sel.slideIndex === current
     ? byPage[current]?.find((c) => c.cellIndex === sel.cellIndex)
     : null;
-
-  /* Encuadre de grupo: la celda unida seleccionada da la región (caja del grupo) y su
-     foto; la capa de gesto va sobre esa región, en la página activa. */
-  const frameCell = gframe && sel && sel.slideIndex === current
-    ? byPage[current]?.find((c) => c.cellIndex === sel.cellIndex && c.group)
-    : null;
+  /* Editar un GRUPO como foto: en Foto, si la celda seleccionada está unida, no hay
+     superfoco de una celda; se edita la foto del grupo EN SU SITIO (la capa de gesto
+     va sobre la región del grupo) y el panel de Foto opera sobre el grupo. */
+  const groupEdit = photo && !!selCellOnPage?.group;
+  const focusCell = groupEdit ? null : selCellOnPage;
+  const frameCell = groupEdit ? selCellOnPage : null;
   const frameImg = frameCell?.groupImgId ? images[frameCell.groupImgId] : null;
   const focusImage = focusCell?.imgId ? images[focusCell.imgId] : null;
   let focusW = 0;
@@ -145,7 +144,7 @@ export default function PageStrip({
       )}
       <div
         ref={scrollRef}
-        className={[s.strip, locked && s.locked, (photo || textFocus) && s.dim, zoomEntry && s.zoomin]
+        className={[s.strip, locked && s.locked, ((photo && !groupEdit) || textFocus) && s.dim, zoomEntry && s.zoomin]
           .filter(Boolean).join(' ')}
         style={{ gap: PEEK_GAP, paddingInline: `calc((100% - ${stageW}px) / 2)` }}
         onScroll={onScroll}
@@ -232,8 +231,8 @@ export default function PageStrip({
               onMove={(id, x, y, commit) => onMoveText(i, id, x, y, commit)}
             />
 
-            {/* Encuadre del grupo, en su sitio, sobre la región del grupo. */}
-            {gframe && active && frameCell && frameImg && (
+            {/* Encuadre del grupo (Foto): en su sitio, sobre la región del grupo. */}
+            {groupEdit && active && frameCell && frameImg && (
               <GroupFrameLayer
                 rect={{
                   xLocal: frameCell.groupRect.x - current,

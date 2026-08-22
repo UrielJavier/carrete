@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.30.0 — 22 ago 2026
+
+- Editar la foto de un grupo es ahora como una foto normal: **doble toque** en una
+  celda unida entra en **Foto** y ahí encuadras (arrastrar/pinza), y usas **girar,
+  espejo, tercios, centrar, mover…** sobre la foto compartida. Sin botón "encuadrar"
+  aparte. El encuadre sigue haciéndose **en su sitio** (sin superfoco), sobre la región
+  del grupo, para ver la composición.
+
 ## 4.29.0 — 22 ago 2026 · encuadre del grupo
 
 - La foto compartida de un grupo ahora se **encuadra** (mover + ampliar). Con una celda
