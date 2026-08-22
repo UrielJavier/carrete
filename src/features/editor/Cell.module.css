@@ -54,6 +54,22 @@
   object-fit: fill;
 }
 
+/* Distintivo del grupo: cuadradito con el número, arriba-izquierda, con el color del
+   grupo. z alto para verse sobre la foto. */
+.groupbadge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  font: 700 var(--fs-xs) / 1 var(--font-mono);
+  color: #0a0a0a;
+}
+
 /* Relleno de huecos: la foto a COVER, ampliada y desenfocada, detrás de la nítida. */
 .blurfill {
   inset: 0;

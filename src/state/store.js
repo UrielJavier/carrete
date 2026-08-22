@@ -230,6 +230,17 @@ export function reducer(state, action) {
       });
     }
 
+    case 'setGroupImage': {
+      /* Añade la foto importada al almacén y la pone como imagen del grupo (una foto
+         para todas las celdas unidas). */
+      const g = (state.post.groups || {})[action.groupId];
+      if (!g) return state;
+      const imagesNext = { ...state.images };
+      action.added.forEach((a) => { imagesNext[a.id] = a; });
+      const groups = { ...state.post.groups, [action.groupId]: { ...g, imgId: action.added[0]?.id || null } };
+      return withHistory(state, { ...state, images: imagesNext, post: { ...state.post, groups } });
+    }
+
     case 'unmergeGroup': {
       const groups = { ...(state.post.groups || {}) };
       delete groups[action.groupId];

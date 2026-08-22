@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -57,6 +57,23 @@ export default function Cell({
   };
 
   if (!image) {
+    /* En modo unir, un hueco NO abre el selector de fotos: se toca para sumarlo (o
+       quitarlo) del grupo. Fuera de ese modo, el hueco añade una foto como siempre. */
+    if (merging) {
+      return (
+        <div
+          className={[s.cell, s.empty, mergeOn && s.mergeon].filter(Boolean).join(' ')}
+          data-cell={cell.cellIndex}
+          style={pos}
+          onClick={onSelect}
+        >
+          <div className={s.placeholder}>
+            <span className={s.sign}>+</span>
+            <span className={s.lbl}>unir</span>
+          </div>
+        </div>
+      );
+    }
     return (
       <div
         className={[s.cell, s.empty, faded && s.faded, dimmed && s.dimmed].filter(Boolean).join(' ')}
@@ -143,6 +160,10 @@ export default function Cell({
 
   const chrome = (
     <>
+      {/* Distintivo del grupo (celdas unidas): número y color propios, arriba-izquierda. */}
+      {cell.group && groupBadge && (
+        <span className={s.groupbadge} style={{ background: groupBadge.color }}>{groupBadge.num}</span>
+      )}
       {/* Avisos arriba-derecha, lejos de los metadatos (abajo-izquierda) para que no
           se pisen. */}
       <div className={s.flags}>

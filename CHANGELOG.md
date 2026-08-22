@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.27.0 — 22 ago 2026
+
+- **Unir arregla los huecos vacíos**: en modo unir, tocar una celda vacía la
+  selecciona para el grupo (antes abría el selector de fotos). Puedes unir celdas
+  vacías y **luego añadir una foto**, que se asigna a **todo el grupo**.
+- Las celdas de un mismo grupo llevan un **distintivo** (número + color propio) para
+  ver de un vistazo qué va junto. Paleta segura, sin rojos/ámbar de aviso.
+
 ## 4.26.0 — 22 ago 2026 · unir celdas (foto compartida), fase A.1
 
 - Nueva herramienta **unir** (nivel Página): tocas **celdas contiguas** de una página y

@@ -45,6 +45,31 @@ export function useImageLibrary({ post, images, dispatch, setBusy, onError }) {
     }
   }, [dispatch, setBusy, onError]);
 
+  /* Añade UNA foto y la asigna como imagen compartida de un grupo de celdas unidas. */
+  const ingestToGroup = useCallback(async (files, groupId) => {
+    const file = files[0];
+    if (!file) return;
+    try {
+      setBusy('Leyendo archivo…');
+      let rec;
+      if (file.type.startsWith('video/')) {
+        const key = `${file.name}|${file.size}|${file.lastModified || 0}`;
+        const pv = await buildVideoPreview(file);
+        rec = { id: uid(), name: file.name, file, key, rot: 0, flip: false, ...pv };
+      } else {
+        const cs = await detectColorSpace(file);
+        const key = await fingerprint(file);
+        const pv = await buildPreview(file, cs, false, 0, false);
+        rec = { id: uid(), name: file.name, file, cs, key, converted: false, rot: 0, flip: false, ...pv };
+      }
+      dispatch({ type: 'setGroupImage', groupId, added: [rec] });
+    } catch (e) {
+      onError('No se pudo leer la foto: ' + (e?.message || e));
+    } finally {
+      setBusy(null);
+    }
+  }, [dispatch, setBusy, onError]);
+
   const reorient = useCallback(async (id, nextRot, nextFlip) => {
     const im = images[id];
     if (!im) return;
@@ -100,5 +125,5 @@ export function useImageLibrary({ post, images, dispatch, setBusy, onError }) {
     }
   }, [dispatch, setBusy, onError]);
 
-  return { ingest, reorient, convertToSRGB };
+  return { ingest, ingestToGroup, reorient, convertToSRGB };
 }

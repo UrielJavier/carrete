@@ -121,6 +121,10 @@ export const MAX_SLIDES = 20;
 /** Escala de separacion, en px sobre el lienzo de 1440. Pasos cerrados. */
 export const GAPS = [0, 2, 4, 6, 8, 12, 16, 24, 32, 48];
 
+/** Colores para distinguir grupos de celdas unidas. Se evitan rojos/ámbar/amarillos
+ *  (colores típicos de aviso/error) para no confundir con advertencias. */
+export const GROUP_COLORS = ['#6ea8fe', '#34d399', '#a78bfa', '#22d3ee', '#f472b6', '#818cf8', '#4ade80', '#e879f9'];
+
 /** Valor especial de fondo: sin relleno, alfa 0. No es un color CSS cualquiera,
  *  asi que quien lo pinte tiene que tratarlo aparte. */
 export const TRANSPARENT = 'transparent';

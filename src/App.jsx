@@ -8,7 +8,7 @@
 
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 
-import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM } from './core/layouts.js';
+import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM, GROUP_COLORS } from './core/layouts.js';
 import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
 import { CS_LABEL, OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.26.0';
+export const VERSION = '4.27.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -129,6 +129,14 @@ export default function App() {
     [cells, current]
   );
   const dup = useMemo(() => duplicates(post, images), [post, images]);
+  /* Número y color por grupo de celdas unidas (por orden de aparición). */
+  const groupInfo = useMemo(() => {
+    const seen = [];
+    post.slides.forEach((sl) => sl.cells.forEach((c) => { if (c.group && !seen.includes(c.group)) seen.push(c.group); }));
+    const m = {};
+    seen.forEach((id, i) => { m[id] = { num: i + 1, color: GROUP_COLORS[i % GROUP_COLORS.length] }; });
+    return m;
+  }, [post]);
   const getSource = useCallback(
     /* Sin `el` (p.ej. un vídeo cuyo póster no se pudo capturar) no hay nada que
        dibujar en canvas: se trata como celda vacía en miniaturas/feed/export. */
@@ -411,7 +419,7 @@ export default function App() {
               <PageStrip
                 post={post} cells={cells} current={current} level={level} tool={tool}
                 images={images} sel={sel} textSel={textSel} enter={prevLevel.current === 'post'}
-                dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys} mergeSel={mergeSel}
+                dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys} mergeSel={mergeSel} groupInfo={groupInfo}
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => {
                   if (tool === 'merge') {
@@ -425,7 +433,12 @@ export default function App() {
                   type: 'set',
                   patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } },
                 })}
-                onFiles={(files, cellIndex) => library.ingest(files, current, cellIndex)}
+                onFiles={(files, cellIndex) => {
+                  /* En una celda unida la foto es del GRUPO, no de la celda. */
+                  const gid = post.slides[current]?.cells[cellIndex]?.group;
+                  if (gid) library.ingestToGroup(files, gid);
+                  else library.ingest(files, current, cellIndex);
+                }}
                 onTransform={(cellIndex, t, withHistory) => dispatch({
                   type: 'patchCell', slideIndex: current, cellIndex, patch: { t }, history: withHistory,
                 })}

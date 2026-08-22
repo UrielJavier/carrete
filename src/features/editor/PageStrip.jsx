@@ -23,7 +23,7 @@ import s from './PageStrip.module.css';
  */
 export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
-  showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [],
+  showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {},
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
   onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus,
 }) {
@@ -164,7 +164,9 @@ export default function PageStrip({
                   cell={c}
                   image={image}
                   ratio={post.ratio}
+                  merging={merging && active}
                   mergeOn={merging && active && mergeSel.includes(c.cellIndex)}
+                  groupBadge={c.group ? groupInfo[c.group] : null}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}
                   isLifting={active && liftIdx === c.cellIndex}
