@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.27.0';
+export const VERSION = '4.27.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -429,10 +429,15 @@ export default function App() {
                     dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
                   }
                 }}
-                onOpen={(cellIndex) => dispatch({
-                  type: 'set',
-                  patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } },
-                })}
+                onOpen={(cellIndex) => {
+                  /* Una celda unida no se abre a Foto (se edita como grupo): solo se
+                     selecciona, para que salga su info y el botón de desunir. */
+                  if (post.slides[current]?.cells[cellIndex]?.group) {
+                    dispatch({ type: 'select', sel: { slideIndex: current, cellIndex } });
+                    return;
+                  }
+                  dispatch({ type: 'set', patch: { level: 'photo', tool: null, sel: { slideIndex: current, cellIndex } } });
+                }}
                 onFiles={(files, cellIndex) => {
                   /* En una celda unida la foto es del GRUPO, no de la celda. */
                   const gid = post.slides[current]?.cells[cellIndex]?.group;

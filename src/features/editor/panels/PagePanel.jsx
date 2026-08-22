@@ -66,10 +66,10 @@ export default function PagePanel({
         <ToolBox icon={<Icon.trash />} label="borrar" danger onClick={onDelete} />
       </ToolRow>
       {group ? (
-        <Hint>
-          celda unida · grupo de {group.count}{' '}
-          <button type="button" className={s.linkbtn} onClick={onUnmerge}>deshacer unión</button>
-        </Hint>
+        <div className={s.groupinfo}>
+          <span>Celdas unidas · grupo de {group.count}</span>
+          <Button danger onClick={onUnmerge}>desunir</Button>
+        </div>
       ) : (
         <Hint>
           {totalPages > 1

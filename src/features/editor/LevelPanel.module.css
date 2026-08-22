@@ -322,3 +322,13 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Info de un grupo de celdas unidas, con el botón de desunir a la derecha. */
+.groupinfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  font: var(--fs-xs) / 1.4 var(--font-mono);
+  color: var(--c-text-dim);
+}

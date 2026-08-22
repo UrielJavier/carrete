@@ -10,6 +10,12 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.27.1 — 22 ago 2026
+
+- **Desunir** más claro: al tocar una celda unida sale un botón **Desunir** (antes era
+  un enlace pequeño y fácil de perder). Además, una celda unida ya no se abre a Foto por
+  error (se edita como grupo).
+
 ## 4.27.0 — 22 ago 2026
 
 - **Unir arregla los huecos vacíos**: en modo unir, tocar una celda vacía la
