@@ -333,66 +333,8 @@
   color: var(--c-text-dim);
 }
 
-/* Herramienta «grupos»: lista de radios con los grupos existentes; solo uno activo
-   a la vez. Elegir uno lo enciende para editarlo (añadir/quitar celdas). */
-.groupradios {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-  max-height: 40vh;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.groupradios::-webkit-scrollbar {
-  display: none;
-}
-
-.grouprow {
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  width: 100%;
-  padding: var(--s-3) var(--s-4);
-  min-height: var(--hit);
-  border: 1px solid var(--c-line);
-  background: none;
-  cursor: pointer;
-  font: var(--fs-sm) / 1 var(--font-mono);
-  color: var(--c-text-dim);
-  text-align: left;
-  transition: border-color var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease),
-    background-color var(--dur-fast) var(--ease);
-}
-
-.grouprow:active {
-  transform: scale(0.99);
-}
-
-.grouprow.on {
-  border-color: var(--c-accent);
-  color: var(--c-text);
-  background: var(--c-surface);
-}
-
-/* Círculo del radio: relleno de acento cuando el grupo está activo. */
-.radio {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--c-line);
-  box-sizing: border-box;
-  transition: border-color var(--dur-fast) var(--ease),
-    box-shadow var(--dur-fast) var(--ease);
-}
-
-.radio.on {
-  border-color: var(--c-accent);
-  box-shadow: inset 0 0 0 3px var(--c-accent);
-}
-
+/* Herramienta «grupos»: cada grupo es una ToolBox (booleano tipo radio). El icono
+   es el distintivo del grupo: cuadradito de color con su número, como en el lienzo. */
 .groupdot {
   flex: none;
   min-width: 18px;
@@ -402,10 +344,4 @@
   place-items: center;
   font: 700 var(--fs-xs) / 1 var(--font-mono);
   color: #0a0a0a;
-}
-
-.grouprowcount {
-  margin-left: auto;
-  color: var(--c-text-dim);
-  font-size: var(--fs-xs);
 }

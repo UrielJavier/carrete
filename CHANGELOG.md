@@ -10,6 +10,17 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.33.2 — 23 ago 2026 · grupos como herramientas
+
+### Cambiado
+- **Los grupos se pintan como herramientas (ToolBox), con estado tipo radio.**
+  Cada grupo es una caja (cuadradito de color con su número + nº de celdas); solo
+  uno puede estar activo a la vez. Elegir uno lo enciende para editarlo; no abre
+  ningún subpanel.
+- **El aviso «toca 2 o más celdas» solo sale en el estado vacío** (cuando aún no
+  hay grupos). Si ya hay grupos, se da por sabido: el botón «Unir» aparece solo
+  cuando ya has marcado 2+ celdas para un grupo nuevo.
+
 ## 4.33.1 — 23 ago 2026 · grupos: radios y foto persistente
 
 ### Corregido

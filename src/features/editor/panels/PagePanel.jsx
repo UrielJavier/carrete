@@ -42,50 +42,44 @@ export default function PagePanel({
 
   if (tool === 'merge') {
     const active = groups.find((g) => g.id === activeGid) || null;
+    const hasGroups = groups.length > 0;
     return (
       <>
         <Back label="grupos" sub="celdas que comparten una foto" onBack={onBack} />
 
-        {/* Grupos existentes como radios: solo uno activo. Tocar uno lo enciende para
-            editarlo (añadir/quitar celdas); tocarlo otra vez lo apaga. */}
-        {groups.length > 0 && (
-          <div className={s.groupradios} role="radiogroup" aria-label="grupos">
-            {groups.map((g) => {
-              const on = g.id === activeGid;
-              return (
-                <button
-                  key={g.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  className={[s.grouprow, on && s.on].filter(Boolean).join(' ')}
-                  onClick={() => onPickGroup(g.id)}
-                >
-                  <span className={[s.radio, on && s.on].filter(Boolean).join(' ')} />
-                  <span className={s.groupdot} style={{ background: g.color }}>{g.num}</span>
-                  <span className={s.grouprowlbl}>grupo {g.num}</span>
-                  <span className={s.grouprowcount}>{g.count} celdas</span>
-                </button>
-              );
-            })}
-          </div>
+        {/* Grupos existentes pintados como herramientas: booleano tipo radio (solo uno
+            activo). Elegir uno lo enciende para editarlo; no abre ningún subpanel. */}
+        {hasGroups && (
+          <ToolRow>
+            {groups.map((g) => (
+              <ToolBox
+                key={g.id}
+                icon={<span className={s.groupdot} style={{ background: g.color }}>{g.num}</span>}
+                label={`${g.count} celdas`}
+                on={g.id === activeGid}
+                onClick={() => onPickGroup(g.id)}
+              />
+            ))}
+          </ToolRow>
         )}
 
         {active ? (
-          <Hint>
-            editando el <strong>grupo {active.num}</strong> · toca una celda libre para
-            añadirla · toca una del grupo para quitarla · toca el grupo otra vez para salir.
-          </Hint>
+          <Hint>toca una celda libre para añadirla · una del grupo para quitarla · toca el grupo otra vez para salir.</Hint>
+        ) : hasGroups ? (
+          /* Ya hay grupos: sin el aviso de «toca 2…». El botón Unir solo aparece
+             cuando ya hay 2+ celdas marcadas para un grupo nuevo. */
+          mergeCount >= 2 && (
+            <Button variant="primary" onClick={onMerge} style={{ width: '100%' }}>
+              Unir {mergeCount} celdas
+            </Button>
+          )
         ) : (
+          /* Estado vacío (aún sin grupos): se explica cómo crear el primero. */
           <>
             <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
               {mergeCount < 2 ? 'toca 2 o más celdas' : `Unir ${mergeCount} celdas`}
             </Button>
-            <Hint>
-              {groups.length > 0
-                ? 'toca celdas libres para un grupo nuevo · o elige un grupo para editarlo.'
-                : 'une celdas para que compartan una foto, como una máscara · puedes deslizar a otras páginas.'}
-            </Hint>
+            <Hint>une celdas para que compartan una foto, como una máscara · puedes deslizar a otras páginas.</Hint>
           </>
         )}
       </>
