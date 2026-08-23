@@ -19,9 +19,14 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed, showMeta = true,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
+  /* Chapa del grupo (número + color): visible SIEMPRE que la celda esté unida,
+     tenga foto o no, para saber a qué grupo pertenece incluso vacía. */
+  const groupTag = cell.group && groupBadge ? (
+    <span className={s.groupbadge} style={{ background: groupBadge.color }}>{groupBadge.num}</span>
+  ) : null;
   const boxRef = useRef(null);
   const ptrs = useRef(new Map());
   const gesture = useRef(null);
@@ -71,6 +76,7 @@ export default function Cell({
             <span className={s.sign}>+</span>
             <span className={s.lbl}>unir</span>
           </div>
+          {groupTag}
         </div>
       );
     }
@@ -84,6 +90,7 @@ export default function Cell({
           <span className={s.sign}>+</span>
           <span className={s.lbl}>añadir foto</span>
         </div>
+        {groupTag}
         <FileInput onFiles={onFiles} guardRef={guardRef} />
       </div>
     );
@@ -182,9 +189,7 @@ export default function Cell({
         </button>
       )}
       {/* Distintivo del grupo (celdas unidas): número y color propios, arriba-izquierda. */}
-      {cell.group && groupBadge && (
-        <span className={s.groupbadge} style={{ background: groupBadge.color }}>{groupBadge.num}</span>
-      )}
+      {groupTag}
       {/* Avisos arriba-derecha, lejos de los metadatos (abajo-izquierda) para que no
           se pisen. */}
       <div className={s.flags}>
@@ -206,12 +211,16 @@ export default function Cell({
           </span>
         )}
       </div>
-      <div className={s.badges}>
-        <div className={s.sizetag}>
-          {image.w}×{image.h}
-          {image.file?.size ? ` · ${weight(image.file.size)}` : ''}
+      {/* Tamaño de la foto: en un grupo, la foto es una sola, así que solo se rotula
+          en la primera celda del grupo para no repetir lo mismo en todas. */}
+      {showMeta && (
+        <div className={s.badges}>
+          <div className={s.sizetag}>
+            {image.w}×{image.h}
+            {image.file?.size ? ` · ${weight(image.file.size)}` : ''}
+          </div>
         </div>
-      </div>
+      )}
       <i className={s.mark} />
       {framing && selected && showThirds && (
         <div className={s.thirds}>
