@@ -8,7 +8,8 @@ import s from '../LevelPanel.module.css';
 /** Nivel Página: la rejilla, el orden de las fotos y las celdas unidas. */
 export default function PagePanel({
   slide, current, totalPages, photoCount, tool, ratio, mergeCount, group,
-  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge,
+  groups = [], activeGid = null,
+  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge, onPickGroup, onSeparate,
 }) {
   if (tool === 'layout') {
     return (
@@ -40,13 +41,50 @@ export default function PagePanel({
   }
 
   if (tool === 'merge') {
+    const active = groups.find((g) => g.id === activeGid) || null;
     return (
       <>
-        <Back label="grupos" sub="unir y separar celdas" onBack={onBack} />
-        <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
-          {mergeCount < 2 ? 'toca 2 o más celdas' : `Unir ${mergeCount} celdas`}
-        </Button>
-        <Hint>toca celdas para unirlas (puedes deslizar a otras páginas) · toca una celda ya unida para separarla.</Hint>
+        <Back label="grupos" sub="celdas que comparten una foto" onBack={onBack} />
+
+        {/* Grupos existentes: tocar uno lo ilumina para editarlo (añadir/quitar celdas). */}
+        {groups.length > 0 && (
+          <div className={s.groupchips}>
+            {groups.map((g) => (
+              <button
+                key={g.id}
+                type="button"
+                className={[s.groupchip, g.id === activeGid && s.on].filter(Boolean).join(' ')}
+                onClick={() => onPickGroup(g.id)}
+              >
+                <span className={s.groupdot} style={{ background: g.color }}>{g.num}</span>
+                {g.count} celdas
+              </button>
+            ))}
+          </div>
+        )}
+
+        {active ? (
+          <>
+            <Button variant="danger" onClick={onSeparate} style={{ width: '100%' }}>
+              Separar grupo {active.num}
+            </Button>
+            <Hint>
+              editando el <strong>grupo {active.num}</strong> · toca una celda libre para
+              añadirla · toca una del grupo para quitarla · toca el grupo otra vez para salir.
+            </Hint>
+          </>
+        ) : (
+          <>
+            <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
+              {mergeCount < 2 ? 'toca 2 o más celdas' : `Unir ${mergeCount} celdas`}
+            </Button>
+            <Hint>
+              {groups.length > 0
+                ? 'toca celdas libres para un grupo nuevo · o toca un grupo de arriba para editarlo.'
+                : 'une celdas para que compartan una foto, como una máscara · puedes deslizar a otras páginas.'}
+            </Hint>
+          </>
+        )}
       </>
     );
   }

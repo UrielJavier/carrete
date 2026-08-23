@@ -24,7 +24,7 @@ import s from './PageStrip.module.css';
  */
 export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
-  showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {},
+  showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {}, activeGid = null,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
   onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus, onGroupTransform,
 }) {
@@ -185,7 +185,8 @@ export default function PageStrip({
                   ratio={post.ratio}
                   merging={merging && active}
                   hint={active && pageEmpty}
-                  mergeOn={merging && mergeSel.some((m) => m.s === i && m.c === c.cellIndex)}
+                  mergeOn={merging && (mergeSel.some((m) => m.s === i && m.c === c.cellIndex)
+                    || (activeGid && c.group === activeGid))}
                   groupBadge={c.group ? groupInfo[c.group] : null}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}
@@ -202,7 +203,9 @@ export default function PageStrip({
                   framed={groupEdit && active && !!c.group && c.group === editGroupId}
                   dimmed={(active && selHere && c.cellIndex !== sel.cellIndex
                             && !(selGroupId && c.group === selGroupId))
-                    || (groupEdit && c.group !== editGroupId)}
+                    || (groupEdit && c.group !== editGroupId)
+                    /* Editando un grupo activo: el resto se atenúa para ver qué grupo es. */
+                    || (merging && activeGid && c.group !== activeGid)}
                   onSelect={() => onSelect(c.cellIndex)}
                   onOpen={() => onOpen(c.cellIndex)}
                   onFiles={(files) => onFiles(files, c.cellIndex)}

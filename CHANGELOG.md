@@ -10,6 +10,28 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.33.0 — 23 ago 2026 · gestión de grupos
+
+### Cambiado
+- **La herramienta «grupos» ahora se explica sola y lista tus grupos.**
+  - Si aún no hay grupos, el panel solo explica cómo crear el primero (marca
+    2+ celdas → Unir).
+  - Si ya hay grupos, salen como chips (número + color + nº de celdas). Tocas
+    el que quieras editar y su chip se **ilumina** (grupo activo), sin abrir
+    ningún subpanel.
+  - Con un grupo activo: tocar una celda libre la **añade** al grupo y tocar
+    una celda suya la **quita**. El grupo activo se resalta en el lienzo y el
+    resto se atenúa para ver de cuál se trata.
+  - Botón **«Separar grupo N»** para deshacerlo entero.
+- Crear un grupo ya no cierra la herramienta: el grupo nuevo aparece como chip
+  y puedes seguir gestionando.
+
+### Corregido
+- **Ya no se separa una celda por error.** Antes, tocar una celda unida en la
+  herramienta la separaba directamente. Ahora, si intentas «unir» una celda que
+  ya pertenece a un grupo, sale un aviso (toast) en vez de sacarla sin querer;
+  para quitarla, abres su grupo y la tocas.
+
 ## 4.32.2 — 23 ago 2026 · resalte del grupo
 
 ### Cambiado

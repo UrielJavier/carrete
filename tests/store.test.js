@@ -128,6 +128,46 @@ describe('ajustes del post', () => {
   });
 });
 
+describe('grupos', () => {
+  const twoCellGroup = () => {
+    let s = reducer(start(), { type: 'layout', layoutId: 'quad' });
+    s = withPhotos(s, [[0, 0, 'a'], [0, 1, 'b'], [0, 2, 'c']]);
+    s = reducer(s, { type: 'mergeCells', cells: [{ slideIndex: 0, cellIndex: 0 }, { slideIndex: 0, cellIndex: 1 }] });
+    return s;
+  };
+
+  it('unir crea un grupo que comparte la foto de la primera celda con imagen', () => {
+    const s = twoCellGroup();
+    const gid = s.post.slides[0].cells[0].group;
+    expect(gid).toBeTruthy();
+    expect(s.post.slides[0].cells[1].group).toBe(gid);
+    expect(s.post.groups[gid].imgId).toBe('a');
+  });
+
+  it('addToGroup mete una celda suelta en un grupo existente', () => {
+    let s = twoCellGroup();
+    const gid = s.post.slides[0].cells[0].group;
+    s = reducer(s, { type: 'addToGroup', slideIndex: 0, cellIndex: 2, groupId: gid });
+    expect(s.post.slides[0].cells[2].group).toBe(gid);
+  });
+
+  it('addToGroup no roba una celda que ya tiene grupo', () => {
+    let s = twoCellGroup();
+    const gid = s.post.slides[0].cells[0].group;
+    const before = s.post.slides[0].cells[1].group;
+    s = reducer(s, { type: 'addToGroup', slideIndex: 0, cellIndex: 1, groupId: gid });
+    expect(s.post.slides[0].cells[1].group).toBe(before);
+  });
+
+  it('leaveGroup con solo dos celdas disuelve el grupo', () => {
+    let s = twoCellGroup();
+    s = reducer(s, { type: 'leaveGroup', slideIndex: 0, cellIndex: 0 });
+    expect(s.post.slides[0].cells[0].group).toBeUndefined();
+    expect(s.post.slides[0].cells[1].group).toBeUndefined();
+    expect(Object.keys(s.post.groups)).toHaveLength(0);
+  });
+});
+
 describe('rehacer', () => {
   it('deshace y rehace un cambio de layout', () => {
     let s = reducer(start(), { type: 'layout', layoutId: 'quad' });

@@ -262,6 +262,21 @@ export function reducer(state, action) {
       return withHistory(state, { ...state, post: { ...state.post, slides, groups }, sel: null });
     }
 
+    case 'addToGroup': {
+      /* Mete UNA celda suelta en un grupo que ya existe (unir más celdas a un grupo
+         activo). Si la celda ya tiene grupo, no se toca (eso lo avisa la UI). */
+      const g = (state.post.groups || {})[action.groupId];
+      if (!g) return state;
+      const slide = state.post.slides[action.slideIndex];
+      const cell = slide?.cells[action.cellIndex];
+      if (!cell || cell.group) return state;
+      const post = replaceSlide(state.post, action.slideIndex, {
+        ...slide,
+        cells: slide.cells.map((c, i) => (i === action.cellIndex ? { ...c, group: action.groupId } : c)),
+      });
+      return withHistory(state, { ...state, post, sel: null });
+    }
+
     case 'patchGroupT': {
       const g = (state.post.groups || {})[action.groupId];
       if (!g) return state;

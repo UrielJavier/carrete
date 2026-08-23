@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.32.2';
+export const VERSION = '4.33.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -72,6 +72,9 @@ export default function App() {
   const [liftIdx, setLiftIdx] = useState(null);
   const [navOpen, setNavOpen] = useState(false);
   const [mergeSel, setMergeSel] = useState([]);
+  /* Grupo activo en la herramienta «grupos»: al iluminarlo, tocar una celda libre la
+     añade y tocar una suya la quita. null = modo crear (marcar celdas → Unir). */
+  const [activeGid, setActiveGid] = useState(null);
 
   const wrapRef = useRef(null);
   const swapFrom = useRef(null);
@@ -137,6 +140,14 @@ export default function App() {
     seen.forEach((id, i) => { m[id] = { num: i + 1, color: GROUP_COLORS[i % GROUP_COLORS.length] }; });
     return m;
   }, [post]);
+  /* Lista de grupos para la herramienta: número, color y cuántas celdas tiene cada
+     uno (puede cruzar páginas). El orden es el de aparición (num). */
+  const groups = useMemo(() => Object.keys(groupInfo).map((id) => ({
+    id,
+    num: groupInfo[id].num,
+    color: groupInfo[id].color,
+    count: post.slides.reduce((n, sl) => n + sl.cells.filter((c) => c.group === id).length, 0),
+  })).sort((a, b) => a.num - b.num), [groupInfo, post]);
   const getSource = useCallback(
     /* Sin `el` (p.ej. un vídeo cuyo póster no se pudo capturar) no hay nada que
        dibujar en canvas: se trata como celda vacía en miniaturas/feed/export. */
@@ -204,7 +215,12 @@ export default function App() {
 
   /* La selección para unir es transitoria: se vacía al salir del modo unir. NO se
      borra al cambiar de página, para poder unir celdas de varias páginas. */
-  useEffect(() => { if (tool !== 'merge') setMergeSel([]); }, [tool]);
+  useEffect(() => { if (tool !== 'merge') { setMergeSel([]); setActiveGid(null); } }, [tool]);
+  /* Si el grupo activo desaparece (se separó o quedó con una sola celda), se vuelve al
+     modo crear para no quedar apuntando a un grupo fantasma. */
+  useEffect(() => {
+    if (activeGid && !groupInfo[activeGid]) setActiveGid(null);
+  }, [activeGid, groupInfo]);
 
 
   /* Deshacer puede requerir regenerar previews, porque el giro y el espejo viven en
@@ -447,13 +463,22 @@ export default function App() {
                 post={post} cells={cells} current={current} level={level} tool={tool}
                 images={images} sel={sel} textSel={textSel} enter={prevLevel.current === 'post'}
                 dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys} mergeSel={mergeSel} groupInfo={groupInfo}
+                activeGid={activeGid}
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => {
                   if (tool === 'merge') {
-                    /* En modo grupos: tocar una celda ya unida la separa; tocar una
-                       suelta la va marcando (puede ser de otra página). */
                     const gid = post.slides[current]?.cells[cellIndex]?.group;
-                    if (gid) { dispatch({ type: 'leaveGroup', slideIndex: current, cellIndex }); return; }
+                    if (activeGid) {
+                      /* Con un grupo activo: tocar una celda suya la quita; una libre la
+                         añade; una de OTRO grupo avisa (no se puede robar). */
+                      if (gid === activeGid) { dispatch({ type: 'leaveGroup', slideIndex: current, cellIndex }); return; }
+                      if (gid) { say(`Esa celda ya está en el grupo ${groupInfo[gid].num}. Sepárala primero.`, 'warn'); return; }
+                      dispatch({ type: 'addToGroup', slideIndex: current, cellIndex, groupId: activeGid });
+                      return;
+                    }
+                    /* Modo crear: solo se marcan celdas libres (puede ser de otra
+                       página). Una celda ya unida no se marca: se avisa. */
+                    if (gid) { say('Esa celda ya está en un grupo. Tócalo abajo para editarlo.', 'warn'); return; }
                     setMergeSel((prev) => (prev.some((m) => m.s === current && m.c === cellIndex)
                       ? prev.filter((m) => !(m.s === current && m.c === cellIndex))
                       : [...prev, { s: current, c: cellIndex }]));
@@ -529,16 +554,18 @@ export default function App() {
                 tool={tool} ratio={post.ratio}
                 mergeCount={mergeSel.length}
                 group={selGroup}
+                groups={groups} activeGid={activeGid}
                 onTool={(t) => {
                   if (t === 'merge') dispatch({ type: 'select', sel: null });
                   dispatch({ type: 'tool', tool: t });
                 }}
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onAddText={() => dispatch({ type: 'addText', slideIndex: current, text: newText() })}
+                onPickGroup={(gid) => { setActiveGid((prev) => (prev === gid ? null : gid)); setMergeSel([]); }}
+                onSeparate={() => { if (activeGid) dispatch({ type: 'unmergeGroup', groupId: activeGid }); setActiveGid(null); }}
                 onMerge={() => {
                   dispatch({ type: 'mergeCells', cells: mergeSel.map((m) => ({ slideIndex: m.s, cellIndex: m.c })) });
                   setMergeSel([]);
-                  dispatch({ type: 'tool', tool: null });
                 }}
                 onLayout={chooseLayout}
                 onNeedTwo={() => say('Hacen falta al menos dos fotos en la página para intercambiarlas.', 'warn')}

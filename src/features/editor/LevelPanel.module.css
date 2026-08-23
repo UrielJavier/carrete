@@ -332,3 +332,54 @@
   font: var(--fs-xs) / 1.4 var(--font-mono);
   color: var(--c-text-dim);
 }
+
+/* Herramienta «grupos»: fila de chips con los grupos existentes; tocar uno lo
+   ilumina para editarlo. Scroll horizontal si no caben. */
+.groupchips {
+  display: flex;
+  gap: var(--s-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.groupchips::-webkit-scrollbar {
+  display: none;
+}
+
+.groupchip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+  min-height: var(--hit);
+  border: 1px solid var(--c-line);
+  background: none;
+  cursor: pointer;
+  font: var(--fs-xs) / 1 var(--font-mono);
+  color: var(--c-text-dim);
+  transition: border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+}
+
+.groupchip:active {
+  transform: scale(0.96);
+}
+
+.groupchip.on {
+  border-color: var(--c-accent);
+  color: var(--c-text);
+  background: var(--c-surface);
+}
+
+.groupdot {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  font: 700 var(--fs-xs) / 1 var(--font-mono);
+  color: #0a0a0a;
+}
