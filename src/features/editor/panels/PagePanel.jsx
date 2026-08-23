@@ -9,7 +9,7 @@ import s from '../LevelPanel.module.css';
 export default function PagePanel({
   slide, current, totalPages, photoCount, tool, ratio, mergeCount, group,
   groups = [], activeGid = null,
-  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge, onPickGroup, onSeparate,
+  onTool, onBack, onLayout, onNeedTwo, onDelete, onAddText, onMerge, onPickGroup,
 }) {
   if (tool === 'layout') {
     return (
@@ -46,33 +46,36 @@ export default function PagePanel({
       <>
         <Back label="grupos" sub="celdas que comparten una foto" onBack={onBack} />
 
-        {/* Grupos existentes: tocar uno lo ilumina para editarlo (añadir/quitar celdas). */}
+        {/* Grupos existentes como radios: solo uno activo. Tocar uno lo enciende para
+            editarlo (añadir/quitar celdas); tocarlo otra vez lo apaga. */}
         {groups.length > 0 && (
-          <div className={s.groupchips}>
-            {groups.map((g) => (
-              <button
-                key={g.id}
-                type="button"
-                className={[s.groupchip, g.id === activeGid && s.on].filter(Boolean).join(' ')}
-                onClick={() => onPickGroup(g.id)}
-              >
-                <span className={s.groupdot} style={{ background: g.color }}>{g.num}</span>
-                {g.count} celdas
-              </button>
-            ))}
+          <div className={s.groupradios} role="radiogroup" aria-label="grupos">
+            {groups.map((g) => {
+              const on = g.id === activeGid;
+              return (
+                <button
+                  key={g.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  className={[s.grouprow, on && s.on].filter(Boolean).join(' ')}
+                  onClick={() => onPickGroup(g.id)}
+                >
+                  <span className={[s.radio, on && s.on].filter(Boolean).join(' ')} />
+                  <span className={s.groupdot} style={{ background: g.color }}>{g.num}</span>
+                  <span className={s.grouprowlbl}>grupo {g.num}</span>
+                  <span className={s.grouprowcount}>{g.count} celdas</span>
+                </button>
+              );
+            })}
           </div>
         )}
 
         {active ? (
-          <>
-            <Button variant="danger" onClick={onSeparate} style={{ width: '100%' }}>
-              Separar grupo {active.num}
-            </Button>
-            <Hint>
-              editando el <strong>grupo {active.num}</strong> · toca una celda libre para
-              añadirla · toca una del grupo para quitarla · toca el grupo otra vez para salir.
-            </Hint>
-          </>
+          <Hint>
+            editando el <strong>grupo {active.num}</strong> · toca una celda libre para
+            añadirla · toca una del grupo para quitarla · toca el grupo otra vez para salir.
+          </Hint>
         ) : (
           <>
             <Button variant="primary" disabled={mergeCount < 2} onClick={onMerge} style={{ width: '100%' }}>
@@ -80,7 +83,7 @@ export default function PagePanel({
             </Button>
             <Hint>
               {groups.length > 0
-                ? 'toca celdas libres para un grupo nuevo · o toca un grupo de arriba para editarlo.'
+                ? 'toca celdas libres para un grupo nuevo · o elige un grupo para editarlo.'
                 : 'une celdas para que compartan una foto, como una máscara · puedes deslizar a otras páginas.'}
             </Hint>
           </>

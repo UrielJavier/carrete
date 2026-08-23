@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.33.0';
+export const VERSION = '4.33.1';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -562,7 +562,6 @@ export default function App() {
                 onBack={() => dispatch({ type: 'tool', tool: null })}
                 onAddText={() => dispatch({ type: 'addText', slideIndex: current, text: newText() })}
                 onPickGroup={(gid) => { setActiveGid((prev) => (prev === gid ? null : gid)); setMergeSel([]); }}
-                onSeparate={() => { if (activeGid) dispatch({ type: 'unmergeGroup', groupId: activeGid }); setActiveGid(null); }}
                 onMerge={() => {
                   dispatch({ type: 'mergeCells', cells: mergeSel.map((m) => ({ slideIndex: m.s, cellIndex: m.c })) });
                   setMergeSel([]);

@@ -1,5 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import { postCells, groupImageBox, newT } from '../src/core/geometry.js';
+import { docImageIds } from '../src/core/post.js';
+
+describe('docImageIds (fotos que referencia un post)', () => {
+  it('incluye las fotos de las celdas Y las de los grupos', () => {
+    const doc = {
+      groups: { g1: { imgId: 'gpic' } },
+      slides: [{ cells: [{ imgId: 'a', group: 'g1' }, { imgId: null, group: 'g1' }, { imgId: 'b' }] }],
+    };
+    const ids = docImageIds(doc);
+    expect(ids.has('a')).toBe(true);
+    expect(ids.has('b')).toBe(true);
+    // la foto compartida del grupo NO puede quedarse fuera (si no, se borraba al refrescar)
+    expect(ids.has('gpic')).toBe(true);
+  });
+
+  it('tolera un post sin grupos', () => {
+    const ids = docImageIds({ slides: [{ cells: [{ imgId: 'a' }] }] });
+    expect([...ids]).toEqual(['a']);
+  });
+});
 
 describe('groupImageBox (cover de la caja del grupo)', () => {
   it('mantiene la proporción de la imagen y cubre la caja, centrado', () => {

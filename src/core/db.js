@@ -8,6 +8,8 @@
  * proyectos, nunca contra el que esta abierto.
  */
 
+import { docImageIds } from './post.js';
+
 const DB_NAME = 'carrete';
 let dbPromise = null;
 
@@ -72,11 +74,9 @@ export async function sweepFiles(projects, liveIds = {}) {
     for (const p of projects) {
       const doc = await loadProject(p.id);
       if (!doc || !doc.slides) continue;
-      doc.slides.forEach((sl) =>
-        sl.cells.forEach((c) => {
-          if (c.imgId) used[c.imgId] = true;
-        })
-      );
+      /* Incluye las fotos de los grupos, no solo las de las celdas: si no, la foto
+         compartida de un grupo se borraba como huérfana al refrescar. */
+      docImageIds(doc).forEach((id) => { used[id] = true; });
     }
     const keys = await idbKeys('files');
     const orphans = keys.filter((k) => !used[k] && !liveIds[k]);
@@ -96,8 +96,7 @@ export async function sweepFiles(projects, liveIds = {}) {
 export async function measureProject(id) {
   const doc = await loadProject(id);
   if (!doc?.slides) return null;
-  const ids = new Set();
-  doc.slides.forEach((s) => s.cells.forEach((c) => { if (c.imgId) ids.add(c.imgId); }));
+  const ids = docImageIds(doc);
   const sizes = {};
   for (const imgId of ids) {
     const rec = await loadFile(imgId);

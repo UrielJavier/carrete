@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { uid } from '../core/layouts.js';
-import { newPost, clonePost, projectBytes } from '../core/post.js';
+import { newPost, clonePost, projectBytes, docImageIds } from '../core/post.js';
 import { buildPreview, buildVideoPreview } from '../core/image.js';
 import * as db from '../core/db.js';
 
@@ -29,9 +29,9 @@ export function useProjects({ post, images, current, ui, onLoad, onError, setBus
   const booted = useRef(false);
 
   const loadImagesFor = useCallback(async (doc) => {
-    const need = {};
-    doc.slides.forEach((s) => s.cells.forEach((c) => { if (c.imgId) need[c.imgId] = true; }));
-    const ids = Object.keys(need);
+    /* Carga TAMBIÉN las fotos de los grupos, no solo las de celdas: si no, al abrir
+       o refrescar el grupo aparecía sin su foto compartida. */
+    const ids = [...docImageIds(doc)];
     if (ids.length) setBusy('Cargando fotos…');
     const loaded = {};
     for (const id of ids) {

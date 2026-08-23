@@ -124,11 +124,20 @@ export function duplicates(post, images) {
   return { keys, groups };
 }
 
+/** IDs de TODAS las fotos que referencia un post: las de las celdas Y las de los
+ *  grupos (cada grupo comparte una foto propia). Fuente ÚNICA para guardar, cargar
+ *  y barrer ficheros: así la foto de un grupo nunca se trata como huérfana. */
+export function docImageIds(doc) {
+  const ids = new Set();
+  (doc?.slides || []).forEach((s) => s.cells.forEach((c) => { if (c.imgId) ids.add(c.imgId); }));
+  Object.values(doc?.groups || {}).forEach((g) => { if (g?.imgId) ids.add(g.imgId); });
+  return ids;
+}
+
 /** Fotos que ya no usa ninguna pagina ni ninguna entrada del historial. */
 export function unusedImageIds(post, history, images) {
   const used = {};
-  const mark = (p) =>
-    p.slides.forEach((s) => s.cells.forEach((c) => { if (c.imgId) used[c.imgId] = true; }));
+  const mark = (p) => docImageIds(p).forEach((id) => { used[id] = true; });
   mark(post);
   history.forEach((h) => mark(h.post));
   return Object.keys(images).filter((id) => !used[id]);
@@ -179,14 +188,12 @@ export function upscaleReport(post, images) {
 export function projectBytes(post, sizes) {
   const seen = new Set();
   let photos = 0;
-  post.slides.forEach((s) =>
-    s.cells.forEach((c) => {
-      if (!c.imgId || seen.has(c.imgId)) return;
-      seen.add(c.imgId);
-      const n = sizes[c.imgId];
-      if (n) photos += n;
-    })
-  );
+  docImageIds(post).forEach((id) => {
+    if (seen.has(id)) return;
+    seen.add(id);
+    const n = sizes[id];
+    if (n) photos += n;
+  });
   /* El post es ASCII en la practica, asi que un caracter es un byte. */
   const doc = JSON.stringify(post).length;
   return { photos, doc, total: photos + doc, count: seen.size };

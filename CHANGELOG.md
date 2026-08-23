@@ -10,6 +10,24 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.33.1 — 23 ago 2026 · grupos: radios y foto persistente
+
+### Corregido
+- **La foto de un grupo ya no se pierde al refrescar.** Al calcular qué fotos
+  usa un proyecto (para guardarlas, cargarlas y barrer huérfanas) solo se miraban
+  las de las celdas, no la foto compartida de cada grupo: se borraba del disco
+  como huérfana y al recargar no se volvía a cargar. Ahora hay una fuente única
+  (`docImageIds`) que incluye celdas **y** grupos, usada en el barrido, la carga
+  y la medida de tamaño. (Las fotos ya perdidas en refrescos anteriores no se
+  pueden recuperar.)
+
+### Cambiado
+- **Los grupos se eligen como radios.** En la herramienta «grupos», los grupos
+  existentes salen como una lista de radios: solo uno activo a la vez. Elegir uno
+  lo enciende para editarlo (añadir/quitar celdas); tocarlo otra vez lo apaga.
+- Se quita el botón «Separar grupo»: para deshacer un grupo, quítale celdas hasta
+  que quede con menos de dos y se disuelve solo.
+
 ## 4.33.0 — 23 ago 2026 · gestión de grupos
 
 ### Cambiado
