@@ -1,9 +1,10 @@
-/* Capa de encuadre del grupo: transparente, captura el gesto sobre toda la región. */
+/* Capa de encuadre del grupo: transparente, captura el gesto sobre toda la región
+   (el bounding box, que la matemática del paneo necesita). El resalte lo llevan las
+   propias celdas del grupo (acento por celda), así que aquí NO va borde: un
+   rectángulo sobre el bounding box encerraría huecos que no son del grupo. */
 .frame {
   position: absolute;
   z-index: 6;
   cursor: move;
   touch-action: none;
-  outline: 2px solid var(--c-accent);
-  outline-offset: -2px;
 }

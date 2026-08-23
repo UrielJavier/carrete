@@ -10,6 +10,21 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.32.2 — 23 ago 2026 · resalte del grupo
+
+### Cambiado
+- **El grupo entero se ilumina al seleccionar una de sus celdas.** En Página, al
+  tocar una celda unida ya no se atenúan sus celdas hermanas: todo el grupo queda
+  iluminado (editar su contenido edita el grupo entero). El resto de la página
+  sigue atenuado para dar jerarquía.
+
+### Corregido
+- **El encuadre de grupo ya no encierra huecos ajenos.** El recuadro azul del
+  encuadre dibujaba el *bounding box* del grupo, metiendo dentro celdas vacías del
+  medio que no eran del grupo. Ahora el resalte de acento va **por cada celda del
+  grupo**, así dibuja su forma real; la capa de gesto sigue capturando el arrastre
+  sobre toda la región (lo necesita el paneo), pero sin borde engañoso.
+
 ## 4.32.1 — 23 ago 2026 · deshacer navega al cambio
 
 ### Añadido

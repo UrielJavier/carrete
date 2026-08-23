@@ -93,6 +93,12 @@ export default function PageStrip({
   /* Al editar un grupo, se atenúa todo lo que NO es de ese grupo, para que solo
      destaquen sus celdas. */
   const editGroupId = frameCell?.group || null;
+  /* Grupo de la celda seleccionada en Página: al seleccionar una celda unida, TODO
+     el grupo se mantiene iluminado (no se atenúa), porque editar su contenido edita
+     el grupo entero. */
+  const selGroupId = selHere
+    ? (byPage[current]?.find((c) => c.cellIndex === sel.cellIndex)?.group || null)
+    : null;
   const focusImage = focusCell?.imgId ? images[focusCell.imgId] : null;
   let focusW = 0;
   let focusH = 0;
@@ -191,7 +197,11 @@ export default function PageStrip({
                   guardRef={guardRef}
                   fill={post.fill}
                   blurPx={c.rect.w * stageW * 0.022}
-                  dimmed={(active && selHere && c.cellIndex !== sel.cellIndex)
+                  /* Encuadrando el grupo: sus celdas llevan acento (marcan la forma
+                     real del grupo, sin el rectángulo que engullía huecos). */
+                  framed={groupEdit && active && !!c.group && c.group === editGroupId}
+                  dimmed={(active && selHere && c.cellIndex !== sel.cellIndex
+                            && !(selGroupId && c.group === selGroupId))
                     || (groupEdit && c.group !== editGroupId)}
                   onSelect={() => onSelect(c.cellIndex)}
                   onOpen={() => onOpen(c.cellIndex)}

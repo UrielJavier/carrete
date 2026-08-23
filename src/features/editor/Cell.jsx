@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -162,6 +162,9 @@ export default function Cell({
     dimmed && s.dimmed,
     /* Seleccionada para unir (modo unir). */
     mergeOn && s.mergeon,
+    /* Celda del grupo que se está encuadrando: acento por celda (marca la forma
+       real del grupo, no un rectángulo que englobe huecos). */
+    framed && s.framed,
   ].filter(Boolean).join(' ');
 
   const chrome = (
