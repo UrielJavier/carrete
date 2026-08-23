@@ -38,10 +38,35 @@ const orientMap = (images) => {
   return m;
 };
 
-/** Se llama ANTES de modificar, con el estado que queremos poder recuperar. */
+/** Se llama ANTES de modificar, con el estado que queremos poder recuperar. Guarda
+ *  también la UBICACIÓN (nivel, página, selección) para que deshacer/rehacer lleven a
+ *  donde se hizo el cambio y se vea. */
 export function snapshot(state) {
-  return { post: clonePost(state.post), orient: orientMap(state.images) };
+  return {
+    post: clonePost(state.post),
+    orient: orientMap(state.images),
+    level: state.level,
+    current: state.current,
+    sel: state.sel,
+    textSel: state.textSel,
+  };
 }
+
+/** Restaura post + ubicación de una entrada de historial/futuro. */
+const restoreEntry = (state, entry, history, future) => ({
+  ...state,
+  post: entry.post,
+  history,
+  future,
+  /* Volver a Editar y al nivel del cambio: así el deshacer/rehacer se VE donde ocurrió. */
+  mode: 'edit',
+  level: entry.level || 'page',
+  current: clamp(entry.current || 0, 0, entry.post.slides.length - 1),
+  sel: entry.sel || null,
+  textSel: entry.textSel || null,
+  tool: null,
+  pendingOrient: entry.orient, // lo aplica App con un efecto asincrono
+});
 
 function withHistory(state, next) {
   const history = state.history.concat([snapshot(state)]);
@@ -377,16 +402,7 @@ export function reducer(state, action) {
       const entry = history.pop();
       /* Guarda el estado ACTUAL en el futuro, para poder rehacer. */
       const future = state.future.concat([snapshot(state)]);
-      return {
-        ...state,
-        post: entry.post,
-        history,
-        future,
-        current: clamp(state.current, 0, entry.post.slides.length - 1),
-        sel: null,
-        textSel: null,
-        pendingOrient: entry.orient,   // lo aplica App con un efecto asincrono
-      };
+      return restoreEntry(state, entry, history, future);
     }
 
     case 'redo': {
@@ -395,16 +411,7 @@ export function reducer(state, action) {
       const entry = future.pop();
       /* Vuelve a apilar el estado ACTUAL en el historial de deshacer. */
       const history = state.history.concat([snapshot(state)]);
-      return {
-        ...state,
-        post: entry.post,
-        history,
-        future,
-        current: clamp(state.current, 0, entry.post.slides.length - 1),
-        sel: null,
-        textSel: null,
-        pendingOrient: entry.orient,
-      };
+      return restoreEntry(state, entry, history, future);
     }
 
     case 'orientApplied': {

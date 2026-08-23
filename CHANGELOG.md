@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.32.1 — 23 ago 2026 · deshacer navega al cambio
+
+### Añadido
+- **Deshacer/Rehacer te llevan a donde ocurrió el cambio.** Cada entrada del
+  historial guarda también la ubicación (modo Editar, nivel post/página/texto,
+  página abierta y selección), así que al deshacer o rehacer la app te sitúa en
+  la jerarquía donde se hizo el cambio para que lo veas en vez de dejarte en
+  una pantalla distinta. Si el cambio afectaba a una foto que ya no existe, se
+  cae con gracia al nivel Página.
+
 ## 4.32.0 — 23 ago 2026 · usabilidad
 
 - **Rehacer**: botón junto a deshacer (un cambio nuevo invalida el rehacer). Experimentar

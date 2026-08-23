@@ -152,4 +152,30 @@ describe('rehacer', () => {
     s = reducer(s, { type: 'postSetting', patch: { ratio: '3:4' } });
     expect(s.future).toHaveLength(0);
   });
+
+  it('deshacer lleva a la ubicacion donde se hizo el cambio', () => {
+    // Cambio hecho en la pagina 2 (indice 1): al deshacer debe volver alli.
+    let s = start();
+    s = reducer(s, { type: 'addSlide' });          // ahora hay 2 paginas, current=1
+    expect(s.current).toBe(1);
+    s = reducer(s, { type: 'layout', layoutId: 'quad' }); // cambio en pagina 1
+    // navegamos a otra pagina y nivel para simular que nos hemos movido
+    s = reducer(s, { type: 'goPage', i: 0 });
+    s = reducer(s, { type: 'level', level: 'post' });
+    s = reducer(s, { type: 'undo' });
+    expect(s.mode).toBe('edit');
+    expect(s.current).toBe(1);
+    expect(s.level).toBe('page');
+  });
+
+  it('rehacer tambien lleva a la ubicacion del cambio', () => {
+    let s = start();
+    s = reducer(s, { type: 'addSlide' });
+    s = reducer(s, { type: 'layout', layoutId: 'quad' });
+    s = reducer(s, { type: 'undo' });
+    s = reducer(s, { type: 'goPage', i: 0 });
+    s = reducer(s, { type: 'redo' });
+    expect(s.current).toBe(1);
+    expect(s.level).toBe('page');
+  });
 });
