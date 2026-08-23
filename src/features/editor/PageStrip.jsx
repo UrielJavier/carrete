@@ -67,6 +67,16 @@ export default function PageStrip({
     [images],
   );
 
+  /* Primera celda de cada grupo (en orden de post): es la única que rotula el tamaño
+     de la foto, porque el grupo comparte una sola foto y repetirlo en todas sobra. */
+  const groupMetaLead = useMemo(() => {
+    const lead = {};
+    for (const c of cells) {
+      if (c.group && !(c.group in lead)) lead[c.group] = `${c.slideIndex}-${c.cellIndex}`;
+    }
+    return lead;
+  }, [cells]);
+
   /* Las celdas de cada página en espacio local: x relativa al inicio de su página. */
   const byPage = useMemo(() => {
     const m = post.slides.map(() => []);
@@ -188,6 +198,7 @@ export default function PageStrip({
                   mergeOn={merging && (mergeSel.some((m) => m.s === i && m.c === c.cellIndex)
                     || (activeGid && c.group === activeGid))}
                   groupBadge={c.group ? groupInfo[c.group] : null}
+                  showMeta={!c.group || groupMetaLead[c.group] === `${i}-${c.cellIndex}`}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}
                   isLifting={active && liftIdx === c.cellIndex}

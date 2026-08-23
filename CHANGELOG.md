@@ -10,6 +10,20 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.33.3 — 23 ago 2026 · chapas de grupo y tamaño sin repetir
+
+### Corregido
+- **La chapa del grupo (número + color) se ve aunque la celda esté vacía.** Antes
+  solo aparecía si la celda tenía foto, así que un grupo recién creado sin foto no
+  mostraba a qué grupo pertenecían sus celdas. Ahora se ve siempre que la celda
+  esté unida.
+
+### Cambiado
+- **El tamaño de la foto ya no se repite en cada celda de un grupo.** Como el
+  grupo comparte una sola foto, el rótulo de tamaño (p. ej. «1537×2048 · 296 k»)
+  se muestra solo en la primera celda del grupo. Las celdas sueltas lo siguen
+  mostrando cada una.
+
 ## 4.33.2 — 23 ago 2026 · grupos como herramientas
 
 ### Cambiado
