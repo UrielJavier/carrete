@@ -54,6 +54,47 @@
   object-fit: fill;
 }
 
+/* Señal de "editar" sobre la foto seleccionada (Página): que se vea que se abre. */
+.editchip {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  background: var(--c-accent);
+  color: #0a0a0a;
+  border: 0;
+  font: 600 var(--fs-xs) / 1 var(--font-mono);
+  cursor: pointer;
+}
+
+.editchip :global(svg) {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+}
+
+/* Hueco de una página vacía: parpadeo suave para invitar a añadir la primera foto. */
+.emptyhint {
+  outline: 1px dashed var(--c-accent);
+  animation: emptyPulse 1.8s var(--ease) infinite;
+}
+
+@keyframes emptyPulse {
+  0%, 100% { outline-color: rgba(255, 255, 255, 0.22); }
+  50% { outline-color: var(--c-accent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emptyhint { animation: none; }
+}
+
 /* Distintivo del grupo: cuadradito con el número, arriba-izquierda, con el color del
    grupo. z alto para verse sobre la foto. */
 .groupbadge {

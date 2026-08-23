@@ -18,6 +18,8 @@ const S = ({ children, w = 16, h = 16, cls }) => (
 
 export const Icon = {
   undo: () => <S><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 3v6h6" /></S>,
+  redo: () => <S><path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 3v6h-6" /></S>,
+  edit: () => <S><path d="M4 20h4L18 10l-4-4L4 16z" /><path d="M13 5l4 4" /></S>,
   expand: () => <S><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" /></S>,
   shrink: () => <S><path d="M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5" /></S>,
   left: () => <S><path d="M15 18l-6-6 6-6" /></S>,

@@ -127,3 +127,29 @@ describe('ajustes del post', () => {
     expect(s.post.ratio).toBe('1:1');
   });
 });
+
+describe('rehacer', () => {
+  it('deshace y rehace un cambio de layout', () => {
+    let s = reducer(start(), { type: 'layout', layoutId: 'quad' });
+    s = withPhotos(s, [[0, 0, 'a'], [0, 1, 'b'], [0, 2, 'c'], [0, 3, 'd']]);
+    s = reducer(s, { type: 'layout', layoutId: 'full' });
+    expect(ids(s)).toBe('a');
+    s = reducer(s, { type: 'undo' });
+    expect(ids(s)).toBe('abcd');
+    s = reducer(s, { type: 'redo' });
+    expect(ids(s)).toBe('a');
+  });
+
+  it('rehacer con futuro vacio no rompe nada', () => {
+    const s = start();
+    expect(reducer(s, { type: 'redo' })).toEqual(s);
+  });
+
+  it('un cambio nuevo invalida el rehacer', () => {
+    let s = reducer(start(), { type: 'postSetting', patch: { ratio: '1:1' } });
+    s = reducer(s, { type: 'undo' });
+    expect(s.future).toHaveLength(1);
+    s = reducer(s, { type: 'postSetting', patch: { ratio: '3:4' } });
+    expect(s.future).toHaveLength(0);
+  });
+});

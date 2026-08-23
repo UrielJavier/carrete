@@ -169,6 +169,8 @@ export default function PageStrip({
             {byPage[i].map((c) => {
               /* Una celda unida enseña la foto del grupo; el resto, la suya. */
               const image = c.group && c.groupImgId ? images[c.groupImgId] : (c.imgId ? images[c.imgId] : null);
+              /* Página sin ninguna foto: los huecos parpadean para invitar a empezar. */
+              const pageEmpty = byPage[i].every((x) => !(x.group ? x.groupImgId : x.imgId));
               return (
                 <Cell
                   key={`${sl.id}-${c.cellIndex}`}
@@ -176,6 +178,7 @@ export default function PageStrip({
                   image={image}
                   ratio={post.ratio}
                   merging={merging && active}
+                  hint={active && pageEmpty}
                   mergeOn={merging && mergeSel.some((m) => m.s === i && m.c === c.cellIndex)}
                   groupBadge={c.group ? groupInfo[c.group] : null}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}

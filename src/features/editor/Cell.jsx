@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   const boxRef = useRef(null);
@@ -76,13 +76,13 @@ export default function Cell({
     }
     return (
       <div
-        className={[s.cell, s.empty, faded && s.faded, dimmed && s.dimmed].filter(Boolean).join(' ')}
+        className={[s.cell, s.empty, hint && s.emptyhint, faded && s.faded, dimmed && s.dimmed].filter(Boolean).join(' ')}
         data-cell={cell.cellIndex}
         style={pos}
       >
         <div className={s.placeholder}>
           <span className={s.sign}>+</span>
-          <span className={s.lbl}>añadir</span>
+          <span className={s.lbl}>añadir foto</span>
         </div>
         <FileInput onFiles={onFiles} guardRef={guardRef} />
       </div>
@@ -166,6 +166,18 @@ export default function Cell({
 
   const chrome = (
     <>
+      {/* Señal de gesto: en Página, una foto seleccionada muestra un botón "editar"
+          (además del doble-toque), para que se vea que se puede abrir a encuadrar. */}
+      {level === 'page' && selected && !moving && !merging && (
+        <button
+          type="button"
+          className={s.editchip}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onOpen(); }}
+        >
+          <Icon.edit /> editar
+        </button>
+      )}
       {/* Distintivo del grupo (celdas unidas): número y color propios, arriba-izquierda. */}
       {cell.group && groupBadge && (
         <span className={s.groupbadge} style={{ background: groupBadge.color }}>{groupBadge.num}</span>

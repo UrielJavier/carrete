@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.31.2';
+export const VERSION = '4.32.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -58,7 +58,7 @@ const RESERVED = 366;
 
 export default function App() {
   const [st, dispatch] = useReducer(reducer, undefined, initialState);
-  const { post, images, history, current, sel, textSel, level, tool, mode } = st;
+  const { post, images, history, future, current, sel, textSel, level, tool, mode } = st;
 
   const [busy, setBusy] = useState(null);
   const [err, setErr] = useState(null);
@@ -388,6 +388,13 @@ export default function App() {
             onClick={() => dispatch({ type: 'undo' })}
           >
             <Icon.undo />
+          </Button>
+          <Button
+            variant="icon" title="Rehacer"
+            disabled={!future.length || !projects.projectId}
+            onClick={() => dispatch({ type: 'redo' })}
+          >
+            <Icon.redo />
           </Button>
           <Button variant="primary" disabled={!!busy || !projects.projectId} onClick={runExport}>
             Exportar

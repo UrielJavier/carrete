@@ -19,7 +19,8 @@ export function initialState() {
   return {
     post: newPost(),
     images: {},          // id -> { file, name, cs, key, converted, rot, flip, w, h, srcW, srcH, url, el }
-    history: [],         // [{ post, orient }]
+    history: [],         // [{ post, orient }] — para deshacer
+    future: [],          // [{ post, orient }] — para rehacer (se vacía al hacer un cambio nuevo)
     current: 0,
     sel: null,           // { slideIndex, cellIndex }
     textSel: null,       // { slideIndex, id } del texto seleccionado
@@ -45,7 +46,8 @@ export function snapshot(state) {
 function withHistory(state, next) {
   const history = state.history.concat([snapshot(state)]);
   if (history.length > HISTORY_MAX) history.shift();
-  return { ...next, history };
+  /* Un cambio nuevo invalida el rehacer: se abandona la rama futura. */
+  return { ...next, history, future: [] };
 }
 
 const replaceSlide = (post, i, slide) => ({
@@ -362,6 +364,7 @@ export function reducer(state, action) {
         post: action.post,
         images: action.images || {},
         history: [],
+        future: [],
         current: clamp(action.current || 0, 0, action.post.slides.length - 1),
         sel: null,
         textSel: null,
@@ -372,14 +375,35 @@ export function reducer(state, action) {
       if (!state.history.length) return state;
       const history = state.history.slice();
       const entry = history.pop();
+      /* Guarda el estado ACTUAL en el futuro, para poder rehacer. */
+      const future = state.future.concat([snapshot(state)]);
       return {
         ...state,
         post: entry.post,
         history,
+        future,
         current: clamp(state.current, 0, entry.post.slides.length - 1),
         sel: null,
         textSel: null,
         pendingOrient: entry.orient,   // lo aplica App con un efecto asincrono
+      };
+    }
+
+    case 'redo': {
+      if (!state.future.length) return state;
+      const future = state.future.slice();
+      const entry = future.pop();
+      /* Vuelve a apilar el estado ACTUAL en el historial de deshacer. */
+      const history = state.history.concat([snapshot(state)]);
+      return {
+        ...state,
+        post: entry.post,
+        history,
+        future,
+        current: clamp(state.current, 0, entry.post.slides.length - 1),
+        sel: null,
+        textSel: null,
+        pendingOrient: entry.orient,
       };
     }
 

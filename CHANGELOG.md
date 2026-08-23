@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.32.0 — 23 ago 2026 · usabilidad
+
+- **Rehacer**: botón junto a deshacer (un cambio nuevo invalida el rehacer). Experimentar
+  sin miedo.
+- **Estados vacíos guiados**: en una página sin fotos, los huecos **parpadean** suave
+  para invitar a añadir la primera (y el hueco dice "añadir foto").
+- **Señal de gesto**: al seleccionar una foto en Página aparece un botón **editar** —
+  además del doble-toque— para que se vea que se puede abrir a encuadrar.
+
 ## 4.31.2 — 22 ago 2026
 
 - Al editar la foto de un grupo, ahora se **atenúan las celdas que no son del grupo**,
