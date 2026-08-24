@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.40.1 — 24 ago 2026 · aviso de portada más claro
+
+### Cambiado
+- **La guía 3:4 de la primera página se explica mejor.** El rótulo pasa de "recorte
+  3:4 · cuadrícula" a **"en tu perfil, esta portada se recorta a 3:4"**: deja claro
+  que la 1ª página es la portada y que Instagram la recorta a 3:4 en la cuadrícula
+  del perfil (por eso la guía solo sale ahí).
+
 ## 4.40.0 — 24 ago 2026 · aviso de color en cristiano y progreso al importar
 
 ### Cambiado

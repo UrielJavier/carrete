@@ -453,10 +453,11 @@ export default function PageStrip({
         </div>
       )}
 
-      {/* Aviso del recorte 3:4: FUERA del layout, en la banda inferior vacía del
-          área (las páginas son más bajas), cuando estás en la 1ª página. */}
+      {/* Aviso del recorte de la PORTADA: la 1ª página es la que Instagram enseña en
+          la cuadrícula de tu perfil, recortada a 3:4. Va FUERA del layout, en la banda
+          inferior vacía del área, y solo en la 1ª página (que es la portada). */}
       {!photo && !textFocus && current === 0 && cropPct < 1 && (
-        <span className={s.cropnote}>recorte 3:4 · cuadrícula</span>
+        <span className={s.cropnote}>en tu perfil, esta portada se recorta a 3:4</span>
       )}
     </div>
   );
