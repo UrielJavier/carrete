@@ -15,9 +15,13 @@ import { buildPreview, buildVideoPreview, fingerprint } from '../core/image.js';
 export function useImageLibrary({ post, images, dispatch, setBusy, onError }) {
   const ingest = useCallback(async (files, slideIndex, cellIndex) => {
     try {
-      setBusy(files.length > 1 ? `Leyendo ${files.length} archivos…` : 'Leyendo archivo…');
+      const many = files.length > 1;
+      setBusy(many ? `Leyendo 1/${files.length}…` : 'Leyendo archivo…');
       const added = [];
-      for (const file of files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        /* Progreso por archivo: leer vídeos grandes tarda, y sin esto parece colgada. */
+        if (many) setBusy(`Leyendo ${i + 1}/${files.length}…`);
         if (file.type.startsWith('video/')) {
           /* El vídeo no se hashea entero (podrían ser decenas de MB): basta su huella
              de metadatos para detectar repetidos. */

@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.40.0 — 24 ago 2026 · aviso de color en cristiano y progreso al importar
+
+### Cambiado
+- **El aviso de color ya no es jerga.** En vez de "N fotos no están en sRGB…", ahora
+  dice que esas fotos **pueden verse con colores apagados o distintos en Instagram**,
+  el botón pasa a **«Ajustar colores»** y se aclara que **tu archivo original no se
+  toca**.
+- **Progreso al importar varias fotos/vídeos.** En vez de un "Leyendo…" fijo, muestra
+  un contador **«Leyendo 2/5…»**, para que con vídeos grandes no parezca colgada.
+
 ## 4.39.1 — 24 ago 2026 · separación de páginas más clara en grupos
 
 ### Cambiado
