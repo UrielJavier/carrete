@@ -27,7 +27,7 @@ export default function PageStrip({
   showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {}, activeGid = null,
   upscaleKeys = null,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
-  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus, onGroupTransform,
+  onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onBackground, onGroupTransform,
 }) {
   const scrollRef = useRef(null);
   const centered = useRef(-1);
@@ -160,7 +160,7 @@ export default function PageStrip({
           parte del negro sube un nivel (vuelve a Página). El lienzo del foto/texto va
           por encima (z mayor), así que sus gestos no lo disparan. */}
       {(photo || textFocus) && (
-        <div className={s.backdrop} onClick={() => onExitFocus?.()} />
+        <div className={s.backdrop} onClick={() => onBackground?.()} />
       )}
       <div
         ref={scrollRef}
@@ -168,6 +168,10 @@ export default function PageStrip({
           .filter(Boolean).join(' ')}
         style={{ gap: PEEK_GAP, paddingInline: `calc((100% - ${stageW}px) / 2)` }}
         onScroll={onScroll}
+        /* Tocar el negro de alrededor de las páginas (no una página) sube un nivel.
+           Se comprueba que el objetivo es la propia tira, para no robar los toques
+           de las celdas ni de los botones. */
+        onClick={(e) => { if (e.target === scrollRef.current) onBackground?.(); }}
       >
       {post.slides.map((sl, i) => {
         const active = i === current;
