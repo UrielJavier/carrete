@@ -129,16 +129,19 @@
   .page { transition: none; }
 }
 
-/* Límite entre páginas en el foco de un grupo que cruza páginas (el "doblez" del
-   carrusel). No captura toques: los gestos son de la capa de encuadre. */
+/* Límite entre páginas en el foco de un grupo que cruza páginas: una banda del color
+   del fondo, como el hueco entre diapositivas del carrusel, para que las páginas NO
+   se vean continuas. Va ENCIMA de la foto (que por debajo sigue continua, así el
+   encuadre no se descuadra) y no captura toques (los gestos son de la capa). */
 .pageseam {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 0;
+  width: 7px;
+  transform: translateX(-50%);
   z-index: 7;
-  border-left: 1px dashed rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.7);
+  background: var(--c-bg);
+  box-shadow: inset 1px 0 rgba(255, 255, 255, 0.3), inset -1px 0 rgba(255, 255, 255, 0.3);
   pointer-events: none;
 }
 
