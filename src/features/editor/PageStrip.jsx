@@ -25,6 +25,7 @@ import s from './PageStrip.module.css';
 export default function PageStrip({
   post, cells, current, level, images, sel, tool, dropIdx, liftIdx, dupKeys,
   showThirds, metrics, guardRef, enter, areaW, workH, textSel, mergeSel = [], groupInfo = {}, activeGid = null,
+  upscaleKeys = null,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onCenter, onAdd, onLimit,
   onSwapStart, onSwapOver, onSwapEnd, onSelectText, onMoveText, onExitFocus, onGroupTransform,
 }) {
@@ -199,6 +200,7 @@ export default function PageStrip({
                     || (activeGid && c.group === activeGid))}
                   groupBadge={c.group ? groupInfo[c.group] : null}
                   showMeta={!c.group || groupMetaLead[c.group] === `${i}-${c.cellIndex}`}
+                  lowRes={!!upscaleKeys && upscaleKeys.has(`${i}-${c.cellIndex}`)}
                   selected={sel?.slideIndex === i && sel?.cellIndex === c.cellIndex}
                   isDrop={active && dropIdx === c.cellIndex}
                   isLifting={active && liftIdx === c.cellIndex}

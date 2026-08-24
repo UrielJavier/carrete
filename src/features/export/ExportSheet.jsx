@@ -10,7 +10,7 @@ import s from './ExportSheet.module.css';
  * Quien abre esta hoja es responsable de liberarlos al cerrarla.
  */
 export default function ExportSheet({
-  shots, zip, zipping, width, height, format, stories, onZip, onClose,
+  shots, zip, zipping, width, height, format, stories, lowRes = 0, onZip, onClose,
 }) {
   const total = shots.reduce((a, sh) => a + (sh.bytes || 0), 0);
   const nVideo = shots.filter((sh) => sh.video).length;
@@ -113,6 +113,14 @@ export default function ExportSheet({
         ))}
       </div>
 
+      {lowRes > 0 && (
+        <p className={s.foot}>
+          ⚠︎ {lowRes === 1 ? 'Una foto no llega' : `${lowRes} fotos no llegan`} a la resolución
+          de su hueco a 1080&nbsp;px: Instagram {lowRes === 1 ? 'la' : 'las'} ampliará y
+          puede{lowRes === 1 ? '' : 'n'} verse borrosa{lowRes === 1 ? '' : 's'}. Usa una foto
+          más grande o dale un hueco más pequeño.
+        </p>
+      )}
       {hasOriginal && (
         <p className={s.foot}>
           Los archivos marcados <strong>original</strong> se suben <strong>sin recomprimir</strong>:

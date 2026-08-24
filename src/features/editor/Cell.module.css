@@ -296,6 +296,20 @@
   stroke-width: 1.9;
 }
 
+/* Aviso de resolución insuficiente: la foto no llena el hueco a 1080 e IG la
+   ampliará. Píldora ámbar (aviso recuperable), distinta del naranja de repetida. */
+.lowresflag {
+  flex: none;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  background: var(--c-warn);
+  color: #0a0a0a;
+  font: 700 var(--fs-micro) / 1 var(--font-mono);
+  white-space: nowrap;
+}
+
 .sizetag {
   overflow: hidden;
   white-space: nowrap;

@@ -12,7 +12,7 @@ import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM, GROUP_COLORS } from
 import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
 import { CS_LABEL, OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
-import { newPost, duplicates, layoutChangeImpact, exportSize } from './core/post.js';
+import { newPost, duplicates, layoutChangeImpact, exportSize, upscaleReport, UPSCALE_WARN } from './core/post.js';
 import { newText } from './core/text.js';
 import { reducer, initialState } from './state/store.js';
 
@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.34.1';
+export const VERSION = '4.35.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -132,6 +132,15 @@ export default function App() {
     [cells, current]
   );
   const dup = useMemo(() => duplicates(post, images), [post, images]);
+  /* Celdas cuya foto no llega a la resolución del hueco a 1080: Instagram las
+     ampliará y saldrán borrosas. Es la causa nº1 de carruseles borrosos. */
+  const upscaleKeys = useMemo(() => {
+    const set = new Set();
+    upscaleReport(post, images).forEach((r) => {
+      if (r.factor > UPSCALE_WARN) set.add(`${r.slideIndex}-${r.cellIndex}`);
+    });
+    return set;
+  }, [post, images]);
   /* Número y color por grupo de celdas unidas (por orden de aparición). */
   const groupInfo = useMemo(() => {
     const seen = [];
@@ -463,7 +472,7 @@ export default function App() {
                 post={post} cells={cells} current={current} level={level} tool={tool}
                 images={images} sel={sel} textSel={textSel} enter={prevLevel.current === 'post'}
                 dropIdx={dropIdx} liftIdx={liftIdx} dupKeys={dup.keys} mergeSel={mergeSel} groupInfo={groupInfo}
-                activeGid={activeGid}
+                activeGid={activeGid} upscaleKeys={upscaleKeys}
                 showThirds={showThirds} metrics={metrics} guardRef={guardRef} areaW={wrapW} workH={workH}
                 onSelect={(cellIndex) => {
                   if (tool === 'merge') {
@@ -697,6 +706,7 @@ export default function App() {
           height={exSize.h}
           format={post.bg === 'transparent' ? 'png' : post.fmt}
           stories={isStories}
+          lowRes={upscaleKeys.size}
           onZip={runZip}
           onClose={closeExport}
         />
