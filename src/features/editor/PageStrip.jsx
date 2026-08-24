@@ -119,6 +119,22 @@ export default function PageStrip({
     focusW = focusH * ca;
   }
 
+  /* Un grupo que CRUZA páginas no cabe entero editándolo en su sitio (solo se ve la
+     página centrada), así que se encuadra a ciegas. Para esos, un foco propio con las
+     páginas que abarca puestas lado a lado (sin costura), escaladas para caber; el
+     grupo entero queda a la vista. Los de una sola página se editan en su sitio. */
+  const gr = frameCell?.groupRect;
+  const groupP0 = gr ? Math.floor(gr.x + 1e-4) : 0;
+  const groupPages = gr ? Math.floor(gr.x + gr.w - 1e-4) - groupP0 + 1 : 1;
+  const crossGroup = groupEdit && groupPages > 1;
+  let gFocusW = 0;
+  let gFocusH = 0;
+  if (crossGroup && areaW && workH) {
+    const ga = (groupPages * R.w) / R.h; // ancho/alto del bloque de páginas adyacentes
+    gFocusH = Math.min(workH, areaW / ga);
+    gFocusW = gFocusH * ga;
+  }
+
   /* Centrar la página activa. Al MONTAR (llegando desde Post) se coloca sin animar.
      Después, suave si el cambio vino de fuera (‹ ›, seleccionar) e instantáneo si
      solo cambió el tamaño (resize). Cambiar entre Página y Foto NO desmonta, así que
@@ -164,7 +180,7 @@ export default function PageStrip({
       )}
       <div
         ref={scrollRef}
-        className={[s.strip, locked && s.locked, ((photo && !groupEdit) || textFocus) && s.dim, zoomEntry && s.zoomin]
+        className={[s.strip, locked && s.locked, ((photo && (!groupEdit || crossGroup)) || textFocus) && s.dim, zoomEntry && s.zoomin]
           .filter(Boolean).join(' ')}
         style={{ gap: PEEK_GAP, paddingInline: `calc((100% - ${stageW}px) / 2)` }}
         onScroll={onScroll}
@@ -271,8 +287,9 @@ export default function PageStrip({
               onMove={(id, x, y, commit) => onMoveText(i, id, x, y, commit)}
             />
 
-            {/* Encuadre del grupo (Foto): en su sitio, sobre la región del grupo. */}
-            {groupEdit && active && frameCell && frameImg && (
+            {/* Encuadre del grupo (Foto): en su sitio, sobre la región del grupo.
+                Solo para grupos de UNA página; los que cruzan van al foco propio. */}
+            {groupEdit && !crossGroup && active && frameCell && frameImg && (
               <GroupFrameLayer
                 rect={{
                   xLocal: frameCell.groupRect.x - current,
@@ -335,6 +352,48 @@ export default function PageStrip({
             onOpen={() => {}}
             onTransform={(t, history) => onTransform(focusCell.cellIndex, t, history)}
             onDupInfo={() => onDupInfo(focusImage)}
+          />
+        </div>
+      )}
+
+      {/* Grupo que cruza páginas: foco propio con las páginas que abarca puestas lado
+          a lado (adyacentes, sin costura, como el feed), escaladas para caber. Así se
+          ve el grupo ENTERO al encuadrar. El gesto va en la capa de encima. */}
+      {crossGroup && gr && frameImg && gFocusW > 0 && (
+        <div
+          className={[s.focus, post.bg === TRANSPARENT && 'checker'].filter(Boolean).join(' ')}
+          style={{
+            width: Math.round(gFocusW),
+            height: Math.round(gFocusH),
+            display: 'flex',
+            background: post.bg === TRANSPARENT ? undefined : post.bg,
+          }}
+        >
+          {Array.from({ length: groupPages }, (_, k) => (
+            <RegionCanvas
+              key={groupP0 + k}
+              cells={cells}
+              index={groupP0 + k}
+              ratio={post.ratio}
+              bg={post.bg}
+              getSource={focusSrc}
+              texts={post.slides[groupP0 + k]?.texts}
+              fill={post.fill}
+              style={{ width: `${100 / groupPages}%`, height: '100%', display: 'block' }}
+            />
+          ))}
+          <GroupFrameLayer
+            rect={{
+              xLocal: (gr.x - groupP0) / groupPages,
+              y: gr.y,
+              w: gr.w / groupPages,
+              h: gr.h,
+            }}
+            t={frameCell.groupT}
+            ia={frameImg.w / frameImg.h}
+            aspect={frameCell.groupAspect}
+            showThirds={showThirds}
+            onTransform={(t2, commit) => onGroupTransform(frameCell.group, t2, commit)}
           />
         </div>
       )}

@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.38.0 — 24 ago 2026 · encuadrar grupos que cruzan páginas
+
+### Cambiado
+- **Al encuadrar un grupo que cruza páginas, ahora se ve el grupo entero.** Antes se
+  editaba «en su sitio» y solo se veía la página centrada, así que la otra mitad
+  quedaba fuera y encuadrabas a ciegas. Ahora esos grupos se abren en un foco propio
+  con las páginas que abarca puestas **lado a lado** (sin costura, como en el feed),
+  escaladas para caber; el grupo completo queda a la vista mientras ajustas (mover,
+  pinza, tercios). Los grupos de una sola página se siguen editando en su sitio.
+
 ## 4.37.0 — 24 ago 2026 · menos ruido, tercios en grupo
 
 ### Cambiado
