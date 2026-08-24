@@ -1,7 +1,7 @@
 {
   "name": "maqueta",
   "private": true,
-  "version": "4.33.3",
+  "version": "4.34.0",
   "type": "module",
   "description": "Maqueta: editor de carruseles para Instagram — paginas con rejilla, encuadre con mascara y export al tamaño nativo de IG.",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
+    "fake-indexeddb": "^6.2.5",
     "jszip": "^3.10.1",
     "vite": "^5.4.0",
     "vitest": "^2.1.0"

@@ -10,6 +10,23 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.34.0 — 24 ago 2026 · tarjeta al compartir, README y tests de flujo
+
+### Añadido
+- **Tarjeta social (Open Graph).** Al compartir el enlace ahora sale una imagen de
+  previsualización (`public/og.png`, 1200×630, coherente con la app) más meta tags
+  `og:`/`twitter:` en `index.html`. El fuente reproducible está en `design/og.html`
+  (se rasteriza con Chrome headless).
+- **Tests de flujo (integración).** Nueva carpeta `tests/flows/` que recorre viajes
+  de usuario completos por el reducer + `drawRegion`: ciclo de vida de un grupo
+  (unir → añadir → quitar → disolver), grupo entre páginas, deshacer/rehacer, y un
+  round-trip real de persistencia con `fake-indexeddb` que blinda que la foto de un
+  grupo no se pierde al refrescar. 171 tests en total.
+
+### Cambiado
+- **README reescrito**: más presentable y al día (qué hace, las dos ideas que lo
+  sostienen, estructura, decisiones de diseño), sin las partes ya obsoletas.
+
 ## 4.33.3 — 23 ago 2026 · chapas de grupo y tamaño sin repetir
 
 ### Corregido
