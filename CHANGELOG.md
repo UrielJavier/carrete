@@ -10,6 +10,15 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.39.1 — 24 ago 2026 · separación de páginas más clara en grupos
+
+### Cambiado
+- **Las páginas de un grupo que cruza páginas ya no se ven continuas.** El límite
+  entre páginas pasa de una línea fina a una **banda del color del fondo** (como el
+  hueco entre diapositivas del carrusel), para que se distinga bien cada página. Es
+  solo visual (encima de la foto): por debajo la foto sigue continua y el encuadre no
+  se descuadra.
+
 ## 4.39.0 — 24 ago 2026 · cambio de panel más claro y límite de página en grupos
 
 ### Cambiado
