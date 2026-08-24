@@ -10,6 +10,27 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.34.1 — 24 ago 2026 · máxima calidad: original sin recomprimir
+
+### Añadido
+- **Export "máxima calidad" (passthrough del original).** Cuando una página es una
+  **foto o vídeo a marco completo sin recomponer** (una sola celda, sin recorte,
+  zoom, giro/espejo ni grupo, y con el mismo aspecto que el post), se entrega el
+  **fichero original sin recomprimir** en vez de re-encodarlo. Beneficios:
+  - No añadimos una generación de pérdida nuestra (canvas) antes de la única
+    recompresión de Instagram.
+  - **Fotos:** conserva la gama amplia **Display P3** de iPhone (antes la
+    aplanábamos a sRGB).
+  - **Vídeo:** conserva **códec, bitrate, HDR y AUDIO**, y se salta el transcode.
+    (Solo si el vídeo no está recortado; con trim se sigue re-encodando.)
+  - En la hoja de export, esos archivos se marcan como **original**.
+- **Aviso de calidad en el export:** recuerda activar en Instagram *Ajustes ›
+  Calidad de carga › Subir con la máxima calidad*, y que IG recomprime una vez.
+
+### Notas
+- El caso recompuesto (rejilla, recorte, grupos) se sigue exportando a PNG/1080,
+  que ya era lo óptimo. El passthrough solo entra cuando no aporta nada re-encodar.
+
 ## 4.34.0 — 24 ago 2026 · tarjeta al compartir, README y tests de flujo
 
 ### Añadido

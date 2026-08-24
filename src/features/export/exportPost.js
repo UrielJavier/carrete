@@ -1,6 +1,6 @@
 import { TRANSPARENT, clamp } from '../../core/layouts.js';
 import { drawRegion, drawnWidth } from '../../core/geometry.js';
-import { exportSize } from '../../core/post.js';
+import { exportSize, passthroughImage } from '../../core/post.js';
 import { rotateOnto } from '../../core/image.js';
 import { convertToSRGB } from '../../core/color.js';
 import { drawTexts, ensureFonts } from '../../core/text.js';
@@ -14,7 +14,19 @@ import { encodePageVideo, videoCellOf } from './videoExport.js';
  * giro hay una pasada mas, pero se hace a esa escala mayor, asi que actua como
  * supermuestreo y el resultado sale mejor que rotando al tamaño final.
  */
-export async function exportPost({ post, cells, images, onProgress }) {
+/** Extensión del fichero original, para nombrarlo bien en el ZIP / al compartir. */
+const extOf = (im) => {
+  const m = (im.name || '').match(/\.([a-z0-9]+)$/i);
+  if (m) return `.${m[1].toLowerCase()}`;
+  const t = (im.file && im.file.type) || '';
+  if (/heic|heif/.test(t)) return '.heic';
+  if (t.includes('png')) return '.png';
+  if (t.includes('quicktime')) return '.mov';
+  if (t.includes('mp4') || t.startsWith('video')) return '.mp4';
+  return '.jpg';
+};
+
+export async function exportPost({ post, cells, images, onProgress, original = true }) {
   /* La proporcion sale del ratio; el ancho es fijo (1080, el de IG). */
   const { w: EXW, h: EXH } = exportSize(post.ratio);
   const out = [];
@@ -54,6 +66,24 @@ export async function exportPost({ post, cells, images, onProgress }) {
 
   for (let i = 0; i < post.slides.length; i++) {
     onProgress?.(i + 1, post.slides.length);
+    const idx = String(i + 1).padStart(2, '0');
+
+    /* MÁXIMA CALIDAD: si la página es una FOTO a marco completo sin recomponer, se
+       entrega el fichero ORIGINAL sin recomprimir (sin generación de pérdida nuestra;
+       conserva P3). El vídeo se trata más abajo, en su rama. */
+    const pt = original ? passthroughImage(post, images, i) : null;
+    if (pt && pt.type !== 'video') {
+      out.push({
+        blob: pt.file,
+        url: URL.createObjectURL(pt.file),
+        thumb: pt.url, // el preview decodificado, para que la miniatura se vea en cualquier navegador
+        name: idx + extOf(pt),
+        bytes: pt.file.size,
+        original: true,
+      });
+      continue;
+    }
+
     const cv = document.createElement('canvas');
     cv.width = EXW;
     cv.height = EXH;
@@ -77,6 +107,25 @@ export async function exportPost({ post, cells, images, onProgress }) {
        no, como imagen. Así un carrusel mezcla páginas-foto y páginas-vídeo. */
     const vidCell = videoCellOf(cells, i, images);
     if (vidCell) {
+      /* MÁXIMA CALIDAD para vídeo: si la página es un vídeo a marco completo, sin
+         recomponer y SIN recortar (trim), se entrega el `.mov`/`.mp4` original —
+         conserva códec, bitrate, HDR y AUDIO, y se salta el transcode. */
+      if (pt && pt.type === 'video') {
+        const tr = post.slides[i].cells[0]?.trim;
+        const dur = pt.duration;
+        const trimmed = tr && ((tr.start || 0) > 0.05 || (dur && tr.end < dur - 0.05));
+        if (!trimmed) {
+          out.push({
+            blob: pt.file,
+            url: URL.createObjectURL(pt.file),
+            name: idx + extOf(pt),
+            bytes: pt.file.size,
+            video: true,
+            original: true,
+          });
+          continue;
+        }
+      }
       const blob = await encodePageVideo({
         pageIndex: i,
         cells,

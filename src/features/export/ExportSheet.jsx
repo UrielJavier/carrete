@@ -14,6 +14,7 @@ export default function ExportSheet({
 }) {
   const total = shots.reduce((a, sh) => a + (sh.bytes || 0), 0);
   const nVideo = shots.filter((sh) => sh.video).length;
+  const hasOriginal = shots.some((sh) => sh.original);
   /* El carrusel mezcla fotos y vídeos: la etiqueta se adapta a lo que hay. */
   const kind = nVideo === 0 ? (shots.length === 1 ? 'imagen' : 'imágenes')
     : nVideo === shots.length ? (shots.length === 1 ? 'vídeo' : 'vídeos')
@@ -106,12 +107,23 @@ export default function ExportSheet({
           <a key={sh.name} href={sh.url} download={sh.name}>
             {sh.video
               ? <video src={sh.url} muted loop playsInline autoPlay preload="metadata" />
-              : <img src={sh.url} alt="" />}
-            <span>{sh.name} · {weight(sh.bytes)} ↓</span>
+              : <img src={sh.thumb || sh.url} alt="" />}
+            <span>{sh.name} · {weight(sh.bytes)}{sh.original ? ' · original' : ''} ↓</span>
           </a>
         ))}
       </div>
 
+      {hasOriginal && (
+        <p className={s.foot}>
+          Los archivos marcados <strong>original</strong> se suben <strong>sin recomprimir</strong>:
+          es la mejor calidad posible (la foto/vídeo tal cual la hiciste, con su color y su audio).
+        </p>
+      )}
+      <p className={s.foot}>
+        <strong>Truco de calidad:</strong> en Instagram, activa Ajustes › Calidad de carga ›
+        <strong> Subir con la máxima calidad</strong>, y sube con Wi-Fi. Aun así, Instagram
+        recomprime una vez por su cuenta.
+      </p>
       <p className={s.foot}>
         En Android puedes mantener pulsada cada imagen para guardarla en la galería.
         El ZIP va a Descargas y hay que abrirlo desde ahí.
