@@ -10,6 +10,14 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.36.1 — 24 ago 2026 · sin "editar" mientras editas
+
+### Corregido
+- **El chip azul "editar" ya no aparece cuando ya estás editando.** Al encuadrar la
+  foto de un grupo en su sitio (nivel Foto), la tira no se atenúa y el chip "editar"
+  seguía saliendo sobre la celda seleccionada, aunque ya estuvieras editando. Ahora
+  se oculta en nivel Foto.
+
 ## 4.36.0 — 24 ago 2026 · tocar el fondo sube un nivel
 
 ### Cambiado
