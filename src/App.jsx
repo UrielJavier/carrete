@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } 
 
 import { RATIOS, MAX_SLIDES, PEEK_FRAC, PEEK_GAP, FOTO_ZOOM, GROUP_COLORS } from './core/layouts.js';
 import { postCells, stageMetrics, newT, clampT } from './core/geometry.js';
-import { CS_LABEL, OFF_PROFILE } from './core/color.js';
+import { OFF_PROFILE } from './core/color.js';
 import { buildPreview } from './core/image.js';
 import { newPost, duplicates, layoutChangeImpact, exportSize, upscaleReport, UPSCALE_WARN } from './core/post.js';
 import { newText } from './core/text.js';
@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.39.1';
+export const VERSION = '4.40.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -436,12 +436,13 @@ export default function App() {
           {offProfile.length > 0 && (
             <Notice
               tone="warn"
-              actionLabel="Convertir"
+              actionLabel="Ajustar colores"
               onAction={() => library.convertToSRGB(offProfile)}
             >
-              {offProfile.length} {offProfile.length === 1 ? 'foto no está' : 'fotos no están'} en sRGB
-              {' '}({[...new Set(offProfile.map((i) => CS_LABEL[i.cs]))].join(', ')}).
-              Instagram asume sRGB, así que los colores saldrán distintos a lo que ves aquí.
+              {offProfile.length === 1 ? 'Una foto puede verse' : `${offProfile.length} fotos pueden verse`}
+              {' '}con colores apagados o distintos en Instagram (usan un perfil de color que IG no
+              respeta). Ajústalos para que lo que ves aquí sea lo que se publica; tu archivo original
+              no se toca.
             </Notice>
           )}
         </>
