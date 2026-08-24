@@ -283,6 +283,7 @@ export default function PageStrip({
                 t={frameCell.groupT}
                 ia={frameImg.w / frameImg.h}
                 aspect={frameCell.groupAspect}
+                showThirds={showThirds}
                 onTransform={(t2, commit) => onGroupTransform(frameCell.group, t2, commit)}
               />
             )}

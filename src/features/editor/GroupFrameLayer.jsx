@@ -9,7 +9,7 @@ import s from './GroupFrameLayer.module.css';
  * transform del grupo. Misma matemática que el encuadre de una foto, pero la "caja"
  * es toda la región del grupo, así que la composición se ve entera mientras ajustas.
  */
-export default function GroupFrameLayer({ rect, t, ia, aspect, onTransform }) {
+export default function GroupFrameLayer({ rect, t, ia, aspect, showThirds, onTransform }) {
   const boxRef = useRef(null);
   const ptrs = useRef(new Map());
   const gesture = useRef(null);
@@ -72,6 +72,17 @@ export default function GroupFrameLayer({ rect, t, ia, aspect, onTransform }) {
       }}
       onPointerCancel={() => { ptrs.current.clear(); gesture.current = null; before.current = null; }}
       onDoubleClick={() => onTransform(newT(), true)}
-    />
+    >
+      {/* Regla de los tercios sobre la región del grupo, para encuadrar igual que en
+          una foto normal. No captura toques (los gestos son de la capa). */}
+      {showThirds && (
+        <div className={s.thirds}>
+          <i className="v" style={{ left: '33.333%' }} />
+          <i className="v" style={{ left: '66.666%' }} />
+          <i className="h" style={{ top: '33.333%' }} />
+          <i className="h" style={{ top: '66.666%' }} />
+        </div>
+      )}
+    </div>
   );
 }
