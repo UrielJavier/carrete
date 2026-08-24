@@ -129,6 +129,19 @@
   .page { transition: none; }
 }
 
+/* Límite entre páginas en el foco de un grupo que cruza páginas (el "doblez" del
+   carrusel). No captura toques: los gestos son de la capa de encuadre. */
+.pageseam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  z-index: 7;
+  border-left: 1px dashed rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
 /* Fantasma del recorte 3:4 que Instagram aplica en la cuadrícula del perfil. */
 .cropline {
   position: absolute;

@@ -50,18 +50,18 @@
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  animation: panelIn var(--dur) var(--ease);
+  animation: panelIn 0.34s var(--ease);
 }
 
 .body::-webkit-scrollbar {
   display: none;
 }
 
-/* Entrada del panel al cambiar de nivel: sube y aparece, lo bastante para que se
-   note el cambio de herramientas. */
+/* Entrada del panel al cambiar de nivel o herramienta: sube, aparece y crece un
+   pelín. Con recorrido suficiente para que el cambio del panel de abajo SE NOTE. */
 @keyframes panelIn {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

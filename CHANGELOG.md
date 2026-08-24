@@ -10,6 +10,18 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.39.0 — 24 ago 2026 · cambio de panel más claro y límite de página en grupos
+
+### Cambiado
+- **Se nota más el cambio del panel de abajo.** Al cambiar de nivel (o al abrir/
+  cerrar una herramienta), el panel de herramientas se re-anima (aparece subiendo y
+  creciendo un poco), para que quede claro que su contenido ha cambiado. Antes solo
+  se animaba al cambiar de nivel y era muy sutil.
+- **El foco de un grupo que cruza páginas marca el límite de cada página.** La foto
+  se sigue viendo continua, pero ahora una línea señala el «doblez» entre páginas
+  (donde el carrusel corta al deslizar), para no colocar ahí lo importante. Sin meter
+  hueco extra: el espacio queda optimizado y el encuadre no se descuadra.
+
 ## 4.38.0 — 24 ago 2026 · encuadrar grupos que cruzan páginas
 
 ### Cambiado

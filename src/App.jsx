@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.38.0';
+export const VERSION = '4.39.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -546,6 +546,7 @@ export default function App() {
           <LevelPanel
             level={level}
             current={current}
+            tool={tool}
             onGo={(v) => dispatch({ type: 'level', level: v })}
           >
             {level === 'post' && (
