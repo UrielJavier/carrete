@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed, showMeta = true, lowRes = false,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed, showMeta = true, lowRes = false, editing = false,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   /* Chapa del grupo (número + color): visible SIEMPRE que la celda esté unida,
@@ -177,8 +177,9 @@ export default function Cell({
   const chrome = (
     <>
       {/* Señal de gesto: en Página, una foto seleccionada muestra un botón "editar"
-          (además del doble-toque), para que se vea que se puede abrir a encuadrar. */}
-      {level === 'page' && selected && !moving && !merging && (
+          (además del doble-toque), para que se vea que se puede abrir a encuadrar.
+          Si ya estás editando (nivel Foto, p. ej. encuadrando un grupo), no sale. */}
+      {level === 'page' && selected && !moving && !merging && !editing && (
         <button
           type="button"
           className={s.editchip}

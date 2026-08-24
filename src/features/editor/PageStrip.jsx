@@ -210,6 +210,9 @@ export default function PageStrip({
                   isLifting={active && liftIdx === c.cellIndex}
                   dupCount={image ? dupKeys[image.key] || 0 : 0}
                   level="page"
+                  /* En Foto (p. ej. encuadrando un grupo en su sitio) ya estás
+                     editando: no hace falta el chip "editar" sobre la celda. */
+                  editing={photo}
                   tool={tool}
                   showThirds={showThirds}
                   guardRef={guardRef}
