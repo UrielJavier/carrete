@@ -19,7 +19,7 @@ import s from './Cell.module.css';
  */
 export default function Cell({
   cell, image, selected, isDrop, isLifting, dupCount, level, tool, showThirds, guardRef, faded, dimmed,
-  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed, showMeta = true,
+  fill, blurPx = 8, ratio, mergeOn, merging, groupBadge, hint, framed, showMeta = true, lowRes = false,
   onSelect, onOpen, onFiles, onTransform, onDupInfo, onSwapStart, onSwapOver, onSwapEnd,
 }) {
   /* Chapa del grupo (número + color): visible SIEMPRE que la celda esté unida,
@@ -208,6 +208,14 @@ export default function Cell({
         {image.type === 'video' && (
           <span className={s.mutedflag} title="Esta versión exporta el vídeo sin audio">
             <Icon.mute />
+          </span>
+        )}
+        {lowRes && (
+          <span
+            className={s.lowresflag}
+            title="La foto no llega a la resolución de este hueco: Instagram la ampliará y puede verse borrosa."
+          >
+            baja res
           </span>
         )}
       </div>

@@ -112,19 +112,38 @@ describe('unusedImageIds: el historial retiene las fotos', () => {
   });
 });
 
-describe('upscaleReport: donde perdemos calidad de verdad', () => {
-  it('una foto de Camera Remote a sangre en 4:5 se amplia un 52%', () => {
-    const post = { ...newPost(), slides: [withPhotos('full', ['i1'])] };
-    const images = { i1: { w: 1776, h: 1184 } };
+describe('upscaleReport: detecta cuando una foto se amplía (contain, export 1080)', () => {
+  it('una foto pequeña a marco completo pide 1080 y se amplía', () => {
+    // 800×1000 (aspecto 4:5) a sangre: a 1080 de ancho hay que ampliarla un 35%.
+    const post = { ...newPost(), ratio: '4:5', slides: [withPhotos('full', ['i1'])] };
+    const images = { i1: { w: 800, h: 1000 } };
     const rep = upscaleReport(post, images);
-    expect(rep[0].need).toBe(2700);
-    expect(rep[0].factor).toBeCloseTo(1.52, 2);
+    expect(rep[0].need).toBe(1080);
+    expect(rep[0].factor).toBeCloseTo(1.35, 2);
   });
 
-  it('un original de la X100T sobra resolucion', () => {
-    const post = { ...newPost(), slides: [withPhotos('full', ['i1'])] };
-    const images = { i1: { w: 4896, h: 3264 } };
+  it('con resolución de sobra el factor es menor que 1 (no amplía)', () => {
+    const post = { ...newPost(), ratio: '4:5', slides: [withPhotos('full', ['i1'])] };
+    const images = { i1: { w: 2000, h: 2500 } };
     expect(upscaleReport(post, images)[0].factor).toBeLessThan(1);
+  });
+
+  it('el vídeo se omite del informe', () => {
+    const post = { ...newPost(), ratio: '4:5', slides: [withPhotos('full', ['v1'])] };
+    const images = { v1: { w: 400, h: 500, type: 'video' } };
+    expect(upscaleReport(post, images)).toHaveLength(0);
+  });
+
+  it('mide la foto compartida de un grupo contra la caja del grupo', () => {
+    const sl = withPhotos('v2', ['g', null]);
+    sl.cells[0].group = 'g1';
+    sl.cells[1].group = 'g1';
+    const post = { ...newPost(), ratio: '4:5', groups: { g1: { imgId: 'g', t: { scale: 1, fx: 0.5, fy: 0.5 } } }, slides: [sl] };
+    const images = { g: { w: 300, h: 375 } }; // foto pequeña para una caja grande
+    const rep = upscaleReport(post, images);
+    // ambas celdas del grupo aparecen y todas amplían (factor > 1)
+    expect(rep.length).toBeGreaterThan(0);
+    expect(rep.every((r) => r.factor > 1)).toBe(true);
   });
 });
 

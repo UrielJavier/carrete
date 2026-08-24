@@ -10,6 +10,20 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.35.0 — 24 ago 2026 · aviso de resolución insuficiente
+
+### Añadido
+- **Aviso "baja res".** Cuando una foto no llega a la resolución de su hueco a
+  1080 px, Instagram la ampliará y sale borrosa (la causa nº1 de carruseles
+  borrosos). Ahora aparece una etiqueta **baja res** en la celda y un aviso en la
+  hoja de export contando cuántas fotos lo sufren, para poder usar una foto más
+  grande o darle un hueco más pequeño.
+
+### Corregido
+- **`upscaleReport` calcula bien la ampliación** con el modelo actual (*contain* a
+  1080 px de ancho, vía `drawnWidth`), incluyendo la foto compartida de un grupo
+  contra la caja del grupo. Antes seguía con la fórmula del modelo *cover* viejo.
+
 ## 4.34.1 — 24 ago 2026 · máxima calidad: original sin recomprimir
 
 ### Añadido

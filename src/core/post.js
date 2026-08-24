@@ -3,8 +3,8 @@
  * de deshacer cuesta microsegundos. Las fotos no se clonan: se referencian por id.
  */
 
-import { LAYOUTS, MAX_SLIDES, RATIOS, uid, clamp } from './layouts.js';
-import { newT, postCells } from './geometry.js';
+import { LAYOUTS, MAX_SLIDES, RATIOS, uid } from './layouts.js';
+import { newT, postCells, drawnWidth, imageUnits, clampT } from './geometry.js';
 
 export const newSlide = (layoutId = 'full') => ({
   id: uid(),
@@ -187,17 +187,28 @@ export function splitRotation(rot) {
   };
 }
 
-/** Resolucion que necesitaria cada celda: sirve para detectar ampliaciones. */
+/* Por debajo de este factor la ampliación no se percibe; por encima, se avisa. */
+export const UPSCALE_WARN = 1.15;
+
+/**
+ * ¿Cada celda amplía su foto por encima de la resolución del original? Es la causa
+ * nº1 de carruseles borrosos: al partir una foto en trozos, cada trozo puede quedar
+ * con menos píxeles de los que ocupa a 1080, e Instagram lo amplía.
+ *
+ * `need` = ancho en px que ocupa la foto en el export (drawnWidth, que ya respeta el
+ * modelo *contain* y el zoom); `have` = ancho real del original; factor = need/have.
+ */
 export function upscaleReport(post, images) {
-  const R = RATIOS[post.ratio];
+  const { w: EXW } = exportSize(post.ratio);
   const out = [];
   postCells(post).forEach((c) => {
-    const im = c.imgId ? images[c.imgId] : null;
-    if (!im) return;
+    const grouped = c.group && c.groupImgId;
+    const im = grouped ? images[c.groupImgId] : (c.imgId ? images[c.imgId] : null);
+    if (!im || im.type === 'video' || !im.w) return; // el vídeo no se mide igual
     const ia = im.w / im.h;
-    const wider = ia > c.cellAspect;
-    const dwU = (wider ? ia / c.cellAspect : 1) * clamp(c.t.scale, 1, 8);
-    const need = dwU * c.rect.w * R.w;
+    const need = grouped
+      ? imageUnits(clampT(c.groupT, c.groupAspect, ia).scale, c.groupAspect, ia).dwU * c.groupRect.w * EXW
+      : drawnWidth(c, ia, EXW);
     out.push({
       slideIndex: c.slideIndex,
       cellIndex: c.cellIndex,
