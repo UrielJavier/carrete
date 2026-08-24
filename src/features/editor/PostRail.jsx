@@ -22,7 +22,7 @@ const EDGE_ZONE = 56;
  */
 export default function PostRail({
   post, cells, current, tool, areaH, getSource, enter,
-  onSelect, onOpen, onMove, onDuplicate, onDelete, onAdd, onLimit,
+  onSelect, onOpen, onMove, onDuplicate, onDelete, onAdd, onLimit, onBackground,
 }) {
   const railRef = useRef(null);
   const railW = useElementWidth(railRef);
@@ -93,6 +93,8 @@ export default function PostRail({
     <div
       className={[s.rail, zoomEntry && s.zoomout].filter(Boolean).join(' ')}
       ref={railRef}
+      /* Tocar el fondo del rail (no una miniatura) cierra la herramienta abierta. */
+      onClick={(e) => { if (e.target === railRef.current) onBackground?.(); }}
     >
       {post.slides.map((sl, i) => (
         <div

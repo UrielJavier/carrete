@@ -10,6 +10,16 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.36.0 — 24 ago 2026 · tocar el fondo sube un nivel
+
+### Cambiado
+- **Tocar el fondo negro sube un nivel de navegación.** Generaliza el gesto que ya
+  sacaba del foco: ahora, en cualquier nivel, tocar el negro alrededor del contenido
+  primero **cierra la herramienta** abierta (subpanel) y, si no hay ninguna, **sube
+  en la jerarquía de composición** (Foto/Texto → Página → Post). En Post, que es lo
+  más externo, no hace nada. Funciona en la tira de páginas, en el foco de Foto/Texto
+  y en el rail de Post, sin robar los toques de celdas, miniaturas ni botones.
+
 ## 4.35.0 — 24 ago 2026 · aviso de resolución insuficiente
 
 ### Añadido

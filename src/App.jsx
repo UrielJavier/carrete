@@ -49,7 +49,7 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.35.0';
+export const VERSION = '4.36.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
@@ -215,6 +215,15 @@ export default function App() {
   /* Se actualiza DESPUÉS del render, así que al montar la vista nueva `prevLevel`
      aún conserva el nivel del que se viene. */
   useEffect(() => { prevLevel.current = level; }, [level]);
+
+  /* Tocar el fondo negro sube UN nivel de navegación: primero cierra la herramienta
+     abierta (subpanel), y si no hay, sube en la jerarquía de composición
+     (Foto/Texto → Página → Post). En Post, que es lo más externo, no hace nada. */
+  const goOut = useCallback(() => {
+    if (tool) { dispatch({ type: 'tool', tool: null }); return; }
+    if (level === 'photo' || level === 'text') { dispatch({ type: 'level', level: 'page' }); return; }
+    if (level === 'page') dispatch({ type: 'level', level: 'post' });
+  }, [tool, level]);
 
   /* En Stories no hay pestaña Perfil: si estabas ahí y cambias a 9:16, vuelve a la
      vista de stories para no quedarte en un modo sin pestaña. */
@@ -451,6 +460,7 @@ export default function App() {
                 post={post} cells={cells} current={current} tool={tool}
                 areaH={metrics.areaH} getSource={getSource}
                 enter={prevLevel.current === 'page'}
+                onBackground={goOut}
                 onSelect={(i) => dispatch({ type: 'goPage', i })}
                 onOpen={(i) => {
                   arm();
@@ -523,7 +533,7 @@ export default function App() {
                 onMoveText={(slideIndex, id, x, y, commit) => dispatch({
                   type: 'patchText', slideIndex, id, patch: { x, y }, history: commit,
                 })}
-                onExitFocus={() => dispatch({ type: 'level', level: 'page' })}
+                onBackground={goOut}
                 onGroupTransform={(groupId, t, withHistory) => dispatch({
                   type: 'patchGroupT', groupId, t, history: withHistory,
                 })}
