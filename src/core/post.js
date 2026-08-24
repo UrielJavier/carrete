@@ -134,6 +134,38 @@ export function docImageIds(doc) {
   return ids;
 }
 
+/**
+ * ¿La página `i` es UNA foto/vídeo a marco completo SIN recomponer? Entonces se puede
+ * entregar el FICHERO ORIGINAL sin recomprimir (máxima calidad): Instagram hará su
+ * única pasada sobre el mejor origen posible, sin una generación de pérdida nuestra
+ * (canvas) por delante, y conservando gama amplia (P3), y en vídeo el códec/HDR/audio.
+ *
+ * Elegible = una sola celda que ocupa TODA la página, sin grupo, sin zoom (scale 1),
+ * sin giro/espejo, y con el MISMO aspecto que el post (si no, la foto no llena el marco
+ * y hay que recortar/encajar, lo que obliga a componer). Devuelve la foto o null.
+ */
+export function passthroughImage(post, images, i) {
+  const sl = post?.slides?.[i];
+  if (!sl) return null;
+  const layout = LAYOUTS[sl.layoutId];
+  if (!layout || layout.cells.length !== 1) return null;
+  const r = layout.cells[0];
+  if (r.x !== 0 || r.y !== 0 || r.w !== 1 || r.h !== 1) return null;
+  const cell = sl.cells[0];
+  if (!cell || cell.group || !cell.imgId) return null;
+  const im = images?.[cell.imgId];
+  if (!im || !im.file) return null;
+  if ((cell.t?.scale ?? 1) !== 1) return null;            // sin zoom
+  if ((im.rot || 0) % 360 !== 0 || im.flip) return null;  // sin giro/espejo
+  const R = RATIOS[post.ratio];
+  if (!R) return null;
+  const iw = im.srcW || im.w;
+  const ih = im.srcH || im.h;
+  if (!iw || !ih) return null;
+  if (Math.abs(iw / ih - R.w / R.h) > 0.01) return null;  // aspecto de la foto == ratio
+  return im;
+}
+
 /** Fotos que ya no usa ninguna pagina ni ninguna entrada del historial. */
 export function unusedImageIds(post, history, images) {
   const used = {};
