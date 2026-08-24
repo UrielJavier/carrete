@@ -10,6 +10,18 @@ https://urieljavier.github.io/carrete/ dice qué build está desplegado.
 Las versiones **1.0.0 – 3.13.2** son de la versión original de un solo fichero
 HTML (el antiguo Carrete), conservada en `reference/carrete-3.13.2.html`.
 
+## 4.37.0 — 24 ago 2026 · menos ruido, tercios en grupo
+
+### Cambiado
+- **Fuera la línea de metadatos del área de trabajo** (fecha/proyecto · páginas ·
+  tamaño): no aportaba y quitaba aire. Ese alto se lo queda el lienzo.
+
+### Corregido
+- **La regla de los tercios ya funciona al encuadrar un grupo.** Antes solo salía
+  al encuadrar una foto suelta; al ajustar la foto compartida de un grupo (en su
+  sitio) el botón «tercios» no dibujaba nada. Ahora la rejilla se pinta sobre la
+  región del grupo.
+
 ## 4.36.1 — 24 ago 2026 · sin "editar" mientras editas
 
 ### Corregido

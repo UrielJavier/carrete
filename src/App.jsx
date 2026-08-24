@@ -49,12 +49,12 @@ import { zipShots, safeName } from './features/export/zipShots.js';
 import './styles/tokens.css';
 import './styles/base.css';
 
-export const VERSION = '4.36.1';
+export const VERSION = '4.37.0';
 
 /* Altura que consumen cabecera, datos, barra de pagina, pestañas y herramientas.
    Todo lo que queda es para el area de trabajo, que mide lo mismo en los tres
    niveles: lo que cambia es el tamaño del contenido, no el hueco. */
-const RESERVED = 366;
+const RESERVED = 344;
 
 export default function App() {
   const [st, dispatch] = useReducer(reducer, undefined, initialState);
@@ -394,11 +394,6 @@ export default function App() {
       onMenu={() => setNavOpen(true)}
       fullscreen={fullscreen.active}
       onFullscreen={fullscreen.toggle}
-      meta={docLevel && (!projects.projectId
-        ? 'ningún proyecto abierto'
-        : `${projectName ? `${projectName} · ` : ''}${post.slides.length}`
-          + `${post.slides.length >= MAX_SLIDES - 4 ? `/${MAX_SLIDES}` : ''} `
-          + `${post.slides.length === 1 ? 'página' : 'páginas'} · ${exSize.w}×${exSize.h}`)}
       docBar={docLevel && (
         <>
           <SegmentedControl

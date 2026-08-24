@@ -8,3 +8,29 @@
   cursor: move;
   touch-action: none;
 }
+
+/* Regla de los tercios sobre la región del grupo (igual que en el foco de una foto).
+   No captura toques: los gestos de encuadre son de .frame. */
+.thirds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.thirds i {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.thirds i:global(.v) {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.thirds i:global(.h) {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
