@@ -39,13 +39,14 @@ function Breadcrumb({ level, current, onGo }) {
   );
 }
 
-export default function LevelPanel({ level, current, onGo, children }) {
+export default function LevelPanel({ level, current, tool, onGo, children }) {
   return (
     <div className={s.panel}>
       <Breadcrumb level={level} current={current} onGo={onGo} />
-      {/* key por nivel: al cambiar de nivel el cuerpo se remonta y reproduce la
-          animación de entrada, para que se note que las herramientas han cambiado. */}
-      <div className={s.body} key={level}>{children}</div>
+      {/* key por nivel+herramienta: al cambiar de nivel O al abrir/cerrar una
+          herramienta, el cuerpo se remonta y reproduce la animación de entrada, para
+          que SE NOTE que el panel de abajo ha cambiado. */}
+      <div className={s.body} key={`${level}:${tool || ''}`}>{children}</div>
     </div>
   );
 }

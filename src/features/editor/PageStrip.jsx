@@ -357,8 +357,10 @@ export default function PageStrip({
       )}
 
       {/* Grupo que cruza páginas: foco propio con las páginas que abarca puestas lado
-          a lado (adyacentes, sin costura, como el feed), escaladas para caber. Así se
-          ve el grupo ENTERO al encuadrar. El gesto va en la capa de encima. */}
+          a lado (la foto sigue continua, como el feed), escaladas para caber. Así se
+          ve el grupo ENTERO al encuadrar. El gesto va en la capa de encima, y una
+          línea marca el LÍMITE de cada página (el "doblez" del carrusel) para no poner
+          ahí lo importante. */}
       {crossGroup && gr && frameImg && gFocusW > 0 && (
         <div
           className={[s.focus, post.bg === TRANSPARENT && 'checker'].filter(Boolean).join(' ')}
@@ -380,6 +382,14 @@ export default function PageStrip({
               texts={post.slides[groupP0 + k]?.texts}
               fill={post.fill}
               style={{ width: `${100 / groupPages}%`, height: '100%', display: 'block' }}
+            />
+          ))}
+          {/* Límite entre páginas: una línea por costura interior. */}
+          {Array.from({ length: groupPages - 1 }, (_, k) => (
+            <div
+              key={`seam-${k}`}
+              className={s.pageseam}
+              style={{ left: `${((k + 1) / groupPages) * 100}%` }}
             />
           ))}
           <GroupFrameLayer
